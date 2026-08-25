@@ -110,3 +110,51 @@ Accessible to registered Patients.
 *   **Frontend:** Razor Views, Bootstrap 5
 *   **Security:** ASP.NET Core Identity (Role-based Authorization)
 *   **Deployment:** Docker, Azure App Service or Render
+
+---
+
+## 9. Implementation Order
+
+To build the application systematically, the pages should be implemented in the following phases (dummy data can be used at first before database integration):
+
+**Phase 1: Foundation & Authentication**
+*   Landing Page (Home)
+*   Authentication (Login / Register)
+*   Admin: User Management (Role assignment)
+
+**Phase 2: Master Data & Core Setup**
+*   Admin: Master Data Management (Locations, Medicines, Hospitals, Blood Groups)
+*   Patient: My Profile & History (Basic setup)
+
+**Phase 3: Camp Management (Host)**
+*   Admin: Host (NGO) Approvals
+*   Host: Host Overview
+*   Host: Camp Management (List & Setup)
+*   Public Camp Directory
+
+**Phase 4: Field Staffing & Inventory**
+*   Host: Camp Details & Staffing
+*   Host: Camp Inventory Allocation
+
+**Phase 5: Field Operations (Triage)**
+*   Volunteer: Active Camp Selection
+*   Volunteer: Patient Search & Registration
+*   Volunteer: Triage & Token Generation
+
+**Phase 6: Clinical & Pharmacy (Core Workflow)**
+*   Doctor: Patient Queue
+*   Doctor: Consultation Workspace
+*   Doctor: Prescription & Referral Builder
+*   Pharmacist: Prescription Queue
+*   Pharmacist: Dispensing Interface
+*   Pharmacist: Inventory & Restock
+
+**Phase 7: Follow-ups & Blood Donation**
+*   Volunteer: Follow-up Management
+*   Patient: Blood Donation Hub
+
+**Phase 8: Reporting & Analytics**
+*   Host: Camp Monitoring & Financials
+*   Host: Host Reports
+*   Admin: Global Reports & Analytics
+*   Admin: Admin Overview (Dashboard)
