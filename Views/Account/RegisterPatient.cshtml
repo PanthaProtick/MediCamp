@@ -1,0 +1,157 @@
+@model RegisterPatientViewModel
+@{
+    ViewData["Title"] = "Patient Registration - MediCamp";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="glass-card">
+                <div class="glass-card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="badge badge-role-patient mb-2"><i class="fa-solid fa-id-card"></i> Community Patient</span>
+                        <h3 class="fw-bold mb-1 text-dark">Patient Registration</h3>
+                        <p class="text-secondary small mb-0">Create your health record profile for community medical camps & blood donor network.</p>
+                    </div>
+                    <div class="stat-icon stat-icon-rose d-none d-sm-flex">
+                        <i class="fa-solid fa-user-plus"></i>
+                    </div>
+                </div>
+
+                <div class="glass-card-body p-4 p-md-5">
+                    <form asp-controller="Account" asp-action="RegisterPatient" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 px-3 small rounded-3 mb-4"></div>
+
+                        <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">
+                            <i class="fa-solid fa-user text-primary me-2"></i>1. Personal & Identity Details
+                        </h5>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="FullName" class="form-label-custom">Full Name (as per NID/Birth Certificate) *</label>
+                                <input asp-for="FullName" class="form-control form-control-custom" placeholder="e.g. Mohammad Rafiq" required />
+                                <span asp-validation-for="FullName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="NID" class="form-label-custom">National ID (NID) Number *</label>
+                                <input asp-for="NID" class="form-control form-control-custom" placeholder="e.g. 19852691234567890" required />
+                                <span asp-validation-for="NID" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label asp-for="DateOfBirth" class="form-label-custom">Date of Birth *</label>
+                                <input asp-for="DateOfBirth" type="date" class="form-control form-control-custom" required />
+                            </div>
+
+                            <div class="col-md-4">
+                                <label asp-for="Gender" class="form-label-custom">Gender *</label>
+                                <select asp-for="Gender" class="form-select form-select-custom" required>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label asp-for="BloodGroup" class="form-label-custom">Blood Group *</label>
+                                <select asp-for="BloodGroup" class="form-select form-select-custom" required>
+                                    <option value="A+">A+ (A Positive)</option>
+                                    <option value="A-">A- (A Negative)</option>
+                                    <option value="B+">B+ (B Positive)</option>
+                                    <option value="B-">B- (B Negative)</option>
+                                    <option value="AB+">AB+ (AB Positive)</option>
+                                    <option value="AB-">AB- (AB Negative)</option>
+                                    <option value="O+">O+ (O Positive)</option>
+                                    <option value="O-">O- (O Negative)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">
+                            <i class="fa-solid fa-location-dot text-primary me-2"></i>2. Contact & Rural Location Details
+                        </h5>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="Email" class="form-label-custom">Email Address *</label>
+                                <input asp-for="Email" type="email" class="form-control form-control-custom" placeholder="e.g. rafiq@gmail.com" required />
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="PhoneNumber" class="form-label-custom">Mobile Number *</label>
+                                <input asp-for="PhoneNumber" class="form-control form-control-custom" placeholder="e.g. 01712345678" required />
+                                <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="District" class="form-label-custom">District *</label>
+                                <select asp-for="District" class="form-select form-select-custom">
+                                    <option value="Kurigram">Kurigram</option>
+                                    <option value="Sunamganj">Sunamganj</option>
+                                    <option value="Bandarban">Bandarban</option>
+                                    <option value="Satkhira">Satkhira</option>
+                                    <option value="Rangpur">Rangpur</option>
+                                    <option value="Dhaka">Dhaka</option>
+                                    <option value="Chittagong">Chittagong</option>
+                                    <option value="Sylhet">Sylhet</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Upazila" class="form-label-custom">Upazila *</label>
+                                <input asp-for="Upazila" class="form-control form-control-custom" placeholder="e.g. Chilmari, Tahirpur, Ruma" required />
+                            </div>
+
+                            <div class="col-12">
+                                <label asp-for="Address" class="form-label-custom">Village / Address *</label>
+                                <input asp-for="Address" class="form-control form-control-custom" placeholder="e.g. Ward 4, Char Ramna Village, Chilmari" required />
+                            </div>
+                        </div>
+
+                        <!-- Integrated Voluntary Blood Donor Network -->
+                        <div class="p-3 rounded-4 bg-danger-subtle border border-danger-subtle mb-4">
+                            <div class="form-check d-flex align-items-center gap-3">
+                                <input asp-for="IsBloodDonor" class="form-check-input mt-0 fs-5" type="checkbox" id="donorCheck">
+                                <label class="form-check-label text-dark fw-bold mb-0" for="donorCheck">
+                                    <i class="fa-solid fa-droplet text-danger me-1"></i> Opt-in as a Voluntary Blood Donor in MediCamp Network
+                                    <span class="d-block text-secondary font-normal" style="font-size: 0.8rem; font-weight: normal;">
+                                        Allows emergency blood requests to contact you in your district/upazila.
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">
+                            <i class="fa-solid fa-lock text-primary me-2"></i>3. Password
+                        </h5>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="Password" class="form-label-custom">Account Password *</label>
+                                <input asp-for="Password" type="password" class="form-control form-control-custom" placeholder="Min. 6 characters" required />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="ConfirmPassword" class="form-label-custom">Confirm Password *</label>
+                                <input asp-for="ConfirmPassword" type="password" class="form-control form-control-custom" placeholder="Repeat password" required />
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pt-3 border-top">
+                            <a asp-controller="Account" asp-action="Login" class="text-secondary small text-decoration-none">
+                                <i class="fa-solid fa-arrow-left me-1"></i> Already registered? Sign In
+                            </a>
+                            <button type="submit" class="btn btn-sapphire btn-lg px-4 shadow">
+                                <i class="fa-solid fa-check-circle me-2"></i> Complete Patient Registration
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

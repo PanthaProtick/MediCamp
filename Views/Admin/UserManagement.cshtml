@@ -1,0 +1,622 @@
+@model UserManagementViewModel
+@{
+    ViewData["Title"] = "User Management - Admin Portal";
+}
+
+<div class="container py-4">
+
+    <!-- Top Admin Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge badge-role-admin"><i class="fa-solid fa-shield-halved"></i> System Administration</span>
+                <span class="text-muted small">Phase 1: Foundation & Auth</span>
+            </div>
+            <h2 class="fw-bold text-dark mb-0">System User Management</h2>
+            <p class="text-secondary small mb-0">Role assignment, credential resets, and account access control for all 6 actors.</p>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+            <button type="button" class="btn btn-sapphire shadow-sm" data-bs-toggle="modal" data-bs-target="#createUserModal">
+                <i class="fa-solid fa-user-plus me-1"></i> Add / Invite New User
+            </button>
+        </div>
+    </div>
+
+    <!-- Metrics Bar across Roles -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-4 col-lg-2">
+            <div class="p-3 rounded-4 bg-white border shadow-sm text-center">
+                <span class="d-block text-muted small fw-bold">Total Accounts</span>
+                <span class="fs-4 fw-bold text-dark">@Model.TotalUsersCount</span>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2">
+            <div class="p-3 rounded-4 bg-white border shadow-sm text-center">
+                <span class="d-block text-muted small fw-bold"><i class="fa-solid fa-user-doctor text-teal me-1"></i>Doctors</span>
+                <span class="fs-4 fw-bold text-teal" style="color: #0f766e;">@Model.ActiveDoctorsCount</span>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2">
+            <div class="p-3 rounded-4 bg-white border shadow-sm text-center">
+                <span class="d-block text-muted small fw-bold"><i class="fa-solid fa-hand-holding-heart text-amber me-1"></i>Volunteers</span>
+                <span class="fs-4 fw-bold text-warning">@Model.ActiveVolunteersCount</span>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2">
+            <div class="p-3 rounded-4 bg-white border shadow-sm text-center">
+                <span class="d-block text-muted small fw-bold"><i class="fa-solid fa-prescription-bottle text-info me-1"></i>Pharmacists</span>
+                <span class="fs-4 fw-bold text-info">@Model.ActivePharmacistsCount</span>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2">
+            <div class="p-3 rounded-4 bg-white border shadow-sm text-center">
+                <span class="d-block text-muted small fw-bold"><i class="fa-solid fa-building-ngo text-primary me-1"></i>NGO Hosts</span>
+                <span class="fs-4 fw-bold text-primary">@Model.ActiveHostsCount</span>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-2">
+            <div class="p-3 rounded-4 bg-white border shadow-sm text-center">
+                <span class="d-block text-muted small fw-bold"><i class="fa-solid fa-hospital-user text-danger me-1"></i>Patients</span>
+                <span class="fs-4 fw-bold text-danger">@Model.ActivePatientsCount</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Table Card -->
+    <div class="glass-card">
+        
+        <!-- Filter & Search Toolbar -->
+        <div class="glass-card-header p-3">
+            <form method="get" asp-controller="Admin" asp-action="UserManagement" class="row g-2 align-items-center">
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 text-muted" style="border-radius: 12px 0 0 12px; border-color: rgba(45, 55, 135, 0.15);">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                        <input type="text" name="search" value="@Model.SearchTerm" class="form-control form-control-custom border-start-0" placeholder="Search by name, email, NID, phone, or district..." style="border-radius: 0 12px 12px 0;" />
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <select name="role" class="form-select form-select-custom" onchange="this.form.submit()">
+                        <option value="All" selected="@(Model.SelectedRole == "All" || string.IsNullOrEmpty(Model.SelectedRole))">All Roles (6 Actors)</option>
+                        <option value="Admin" selected="@(Model.SelectedRole == "Admin")">Admin</option>
+                        <option value="Host" selected="@(Model.SelectedRole == "Host")">Host (NGO)</option>
+                        <option value="Doctor" selected="@(Model.SelectedRole == "Doctor")">Doctor</option>
+                        <option value="Volunteer" selected="@(Model.SelectedRole == "Volunteer")">Volunteer</option>
+                        <option value="Pharmacist" selected="@(Model.SelectedRole == "Pharmacist")">Pharmacist</option>
+                        <option value="Patient" selected="@(Model.SelectedRole == "Patient")">Patient</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <select name="status" class="form-select form-select-custom" onchange="this.form.submit()">
+                        <option value="All" selected="@(Model.SelectedStatus == "All" || string.IsNullOrEmpty(Model.SelectedStatus))">All Status</option>
+                        <option value="Active" selected="@(Model.SelectedStatus == "Active")">Active</option>
+                        <option value="Disabled" selected="@(Model.SelectedStatus == "Disabled")">Disabled</option>
+                        <option value="Pending" selected="@(Model.SelectedStatus == "Pending")">Pending NGO</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-sapphire w-100 btn-sm-custom py-2">
+                        <i class="fa-solid fa-filter me-1"></i> Filter
+                    </button>
+                    <a asp-controller="Admin" asp-action="UserManagement" class="btn btn-light border btn-sm-custom py-2" title="Reset Filters">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Table Body -->
+        <div class="table-responsive">
+            <table class="table table-custom align-middle">
+                <thead>
+                    <tr>
+                        <th>User Profile</th>
+                        <th>System Role</th>
+                        <th>National ID & Location</th>
+                        <th>Contact</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Users.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                <i class="fa-solid fa-users-slash fs-1 d-block mb-2 opacity-50"></i>
+                                <span class="fw-bold">No users match the search criteria.</span>
+                                <p class="small mb-0">Try adjusting your keyword or role filter.</p>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var user in Model.Users)
+                        {
+                            var roleBadgeClass = user.Role switch
+                            {
+                                "Admin" => "badge-role-admin",
+                                "Host" => "badge-role-host",
+                                "Doctor" => "badge-role-doctor",
+                                "Volunteer" => "badge-role-volunteer",
+                                "Pharmacist" => "badge-role-pharmacist",
+                                _ => "badge-role-patient"
+                            };
+
+                            var roleIcon = user.Role switch
+                            {
+                                "Admin" => "fa-shield-halved",
+                                "Host" => "fa-building-ngo",
+                                "Doctor" => "fa-user-doctor",
+                                "Volunteer" => "fa-hand-holding-heart",
+                                "Pharmacist" => "fa-prescription-bottle-medical",
+                                _ => "fa-user"
+                            };
+
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="avatar-initials">
+                                            @user.FullName[0]
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-dark mb-0">@user.FullName</div>
+                                            <div class="text-muted small" style="font-size: 0.8rem;">@user.Email</div>
+                                            @if (!string.IsNullOrEmpty(user.OrganizationName))
+                                            {
+                                                <div class="badge bg-light text-primary border p-1 small" style="font-size: 0.72rem;">
+                                                    <i class="fa-solid fa-building me-1"></i>@user.OrganizationName
+                                                </div>
+                                            }
+                                            @if (!string.IsNullOrEmpty(user.MedicalSpecialization))
+                                            {
+                                                <div class="text-secondary small" style="font-size: 0.75rem;">
+                                                    <i class="fa-solid fa-stethoscope me-1 text-teal"></i>@user.MedicalSpecialization
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <span class="badge @roleBadgeClass">
+                                        <i class="fa-solid @roleIcon"></i> @user.Role
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <div class="small">
+                                        <div class="fw-semibold text-dark">
+                                            <i class="fa-solid fa-id-card-clip text-secondary me-1"></i>
+                                            @(user.NID ?? "N/A")
+                                        </div>
+                                        <div class="text-muted">
+                                            <i class="fa-solid fa-location-dot text-danger me-1"></i>
+                                            @(user.Upazila ?? ""), @(user.District ?? "Bangladesh")
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div class="small">
+                                        <div><i class="fa-solid fa-phone text-muted me-1"></i>@user.PhoneNumber</div>
+                                        @if (!string.IsNullOrEmpty(user.BloodGroup))
+                                        {
+                                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-1 py-0 small" style="font-size: 0.72rem;">
+                                                <i class="fa-solid fa-droplet me-1"></i>@user.BloodGroup
+                                            </span>
+                                        }
+                                    </div>
+                                </td>
+
+                                <td>
+                                    @if (!user.IsActive)
+                                    {
+                                        <span class="badge badge-status-disabled">
+                                            <i class="fa-solid fa-ban"></i> Disabled
+                                        </span>
+                                    }
+                                    else if (user.Role == "Host" && user.HostApprovalStatus == "Pending")
+                                    {
+                                        <span class="badge badge-status-pending">
+                                            <i class="fa-solid fa-hourglass-half"></i> Pending Review
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-status-active">
+                                            <i class="fa-solid fa-circle-check"></i> Active
+                                        </span>
+                                    }
+                                </td>
+
+                                <td class="text-end">
+                                    <div class="dropdown">
+                                        <button class="btn btn-light border btn-sm shadow-none dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 8px;">
+                                            <i class="fa-solid fa-ellipsis-vertical"></i> Manage
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2" style="border-radius: 12px; min-width: 190px;">
+                                            <li>
+                                                <button type="button" class="dropdown-item rounded py-2 d-flex align-items-center gap-2" onclick="openUserDetailsModal('@user.Id')">
+                                                    <i class="fa-solid fa-eye text-primary"></i> View Details
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button type="button" class="dropdown-item rounded py-2 d-flex align-items-center gap-2" onclick="openChangeRoleModal('@user.Id', '@user.FullName', '@user.Role')">
+                                                    <i class="fa-solid fa-user-tag text-teal"></i> Change Role
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button type="button" class="dropdown-item rounded py-2 d-flex align-items-center gap-2" onclick="openResetPasswordModal('@user.Id', '@user.FullName')">
+                                                    <i class="fa-solid fa-key text-warning"></i> Reset Password
+                                                </button>
+                                            </li>
+                                            <li><hr class="dropdown-divider my-1"></li>
+                                            <li>
+                                                <form asp-controller="Admin" asp-action="ToggleStatus" method="post" class="m-0">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="userId" value="@user.Id" />
+                                                    <button type="submit" class="dropdown-item rounded py-2 d-flex align-items-center gap-2 @(user.IsActive ? "text-danger" : "text-success")">
+                                                        <i class="fa-solid @(user.IsActive ? "fa-user-slash" : "fa-user-check")"></i>
+                                                        @(user.IsActive ? "Disable Account" : "Enable Account")
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="glass-card-header p-3 d-flex justify-content-between align-items-center">
+            <span class="small text-muted">Showing <strong>@Model.Users.Count</strong> of <strong>@Model.TotalUsersCount</strong> registered users</span>
+            <span class="small text-muted"><i class="fa-solid fa-lock text-success me-1"></i>Admin Role-Based Authorization Enforced</span>
+        </div>
+    </div>
+</div>
+
+<!-- =========================================================================
+     MODAL 1: Create / Invite User Modal
+     ========================================================================= -->
+<div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; background: #faf8f2;">
+            <div class="modal-header border-bottom px-4 py-3 bg-white" style="border-radius: 20px 20px 0 0;">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="stat-icon stat-icon-sapphire" style="width: 38px; height: 38px; font-size: 1rem;">
+                        <i class="fa-solid fa-user-plus"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold text-dark mb-0" id="createUserModalLabel">Create / Assign System User</h5>
+                        <p class="text-secondary small mb-0">Create accounts for Clinicians, Volunteers, Pharmacists, Hosts, or Admins.</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <form asp-controller="Admin" asp-action="CreateUser" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label-custom">Full Name *</label>
+                            <input name="FullName" class="form-control form-control-custom" placeholder="e.g. Dr. Sabrina Akhter" required />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label-custom">Assign Role *</label>
+                            <select name="Role" id="newRoleSelect" class="form-select form-select-custom" onchange="toggleRoleSpecificFields(this.value)" required>
+                                <option value="Doctor">Doctor (Clinician)</option>
+                                <option value="Volunteer" selected>Volunteer (Field Triage)</option>
+                                <option value="Pharmacist">Pharmacist (Dispensary)</option>
+                                <option value="Host">Host (NGO Organizer)</option>
+                                <option value="Patient">Patient (Community)</option>
+                                <option value="Admin">Admin (System Administrator)</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label-custom">Email Address *</label>
+                            <input name="Email" type="email" class="form-control form-control-custom" placeholder="e.g. sabrina@medicamp.org" required />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label-custom">Phone Number *</label>
+                            <input name="PhoneNumber" class="form-control form-control-custom" placeholder="e.g. 01700112233" required />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label-custom">National ID (NID)</label>
+                            <input name="NID" class="form-control form-control-custom" placeholder="e.g. 19902690011223344" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label-custom">Assigned District</label>
+                            <select name="District" class="form-select form-select-custom">
+                                <option value="Kurigram">Kurigram</option>
+                                <option value="Sunamganj">Sunamganj</option>
+                                <option value="Bandarban">Bandarban</option>
+                                <option value="Satkhira">Satkhira</option>
+                                <option value="Rangpur">Rangpur</option>
+                                <option value="Dhaka">Dhaka</option>
+                                <option value="Chittagong">Chittagong</option>
+                                <option value="Sylhet">Sylhet</option>
+                            </select>
+                        </div>
+
+                        <!-- Doctor Specific Fields -->
+                        <div id="doctorFields" class="col-12 p-3 rounded-3 bg-white border" style="display: none;">
+                            <h6 class="fw-bold text-teal mb-2"><i class="fa-solid fa-stethoscope me-1"></i>Doctor Credentials</h6>
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <label class="form-label-custom">Medical Specialization</label>
+                                    <input name="MedicalSpecialization" class="form-control form-control-custom" placeholder="e.g. MBBS, FCPS Pediatrics" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label-custom">BMDC Registration Number</label>
+                                    <input name="BMDCRegNo" class="form-control form-control-custom" placeholder="e.g. BMDC-A-98765" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Host Specific Fields -->
+                        <div id="hostFields" class="col-12 p-3 rounded-3 bg-white border" style="display: none;">
+                            <h6 class="fw-bold text-primary mb-2"><i class="fa-solid fa-building-ngo me-1"></i>Organization Info</h6>
+                            <div class="row g-2">
+                                <div class="col-12">
+                                    <label class="form-label-custom">Organization / NGO Legal Name</label>
+                                    <input name="OrganizationName" class="form-control form-control-custom" placeholder="e.g. Hope Foundation for Women & Children" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label-custom">Temporary Default Password *</label>
+                            <input name="TemporaryPassword" value="Pass@123" class="form-control form-control-custom" required />
+                            <span class="text-muted small">User will be prompted to update this password upon initial login.</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top px-4 py-3 bg-white" style="border-radius: 0 0 20px 20px;">
+                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-sapphire px-4">
+                        <i class="fa-solid fa-save me-1"></i> Create System User
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- =========================================================================
+     MODAL 2: Change User Role Modal
+     ========================================================================= -->
+<div class="modal fade" id="changeRoleModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; background: #faf8f2;">
+            <div class="modal-header border-bottom px-4 py-3 bg-white" style="border-radius: 20px 20px 0 0;">
+                <h5 class="modal-title fw-bold text-dark mb-0">Change User System Role</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-controller="Admin" asp-action="ChangeRole" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="userId" id="crUserId" />
+                <div class="modal-body p-4">
+                    <p class="text-secondary small mb-3">
+                        Updating the role will reconfigure the user's dashboard permissions and access rights across camps and clinical workflows.
+                    </p>
+                    <div class="p-3 rounded-3 bg-white border mb-3">
+                        <div class="text-muted small">Target User:</div>
+                        <div class="fw-bold text-dark fs-6" id="crUserName">Loading...</div>
+                        <div class="text-muted small mt-1">Current Role: <span class="badge badge-role-admin" id="crCurrentRole">Admin</span></div>
+                    </div>
+
+                    <label class="form-label-custom">Select New Role *</label>
+                    <select name="newRole" class="form-select form-select-custom" required>
+                        <option value="Admin">Admin (System Administrator)</option>
+                        <option value="Host">Host (Organizing NGO)</option>
+                        <option value="Doctor">Doctor (Volunteer Clinician)</option>
+                        <option value="Volunteer">Volunteer (Field Triage)</option>
+                        <option value="Pharmacist">Pharmacist (Dispensary)</option>
+                        <option value="Patient">Patient (Community Member)</option>
+                    </select>
+                </div>
+                <div class="modal-footer border-top px-4 py-3 bg-white" style="border-radius: 0 0 20px 20px;">
+                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-sapphire px-4">
+                        <i class="fa-solid fa-check me-1"></i> Update Role
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- =========================================================================
+     MODAL 3: Reset Password Modal
+     ========================================================================= -->
+<div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; background: #faf8f2;">
+            <div class="modal-header border-bottom px-4 py-3 bg-white" style="border-radius: 20px 20px 0 0;">
+                <h5 class="modal-title fw-bold text-dark mb-0">Reset User Password</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-controller="Admin" asp-action="ResetPassword" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="userId" id="rpUserId" />
+                <div class="modal-body p-4">
+                    <p class="text-secondary small mb-3">
+                        Enter a new password for the selected account. The user will be able to log in with this new credential immediately.
+                    </p>
+                    <div class="p-3 rounded-3 bg-white border mb-3">
+                        <div class="text-muted small">Target User:</div>
+                        <div class="fw-bold text-dark fs-6" id="rpUserName">Loading...</div>
+                    </div>
+
+                    <label class="form-label-custom">New Password *</label>
+                    <input name="newPassword" value="Pass@123" class="form-control form-control-custom" required minlength="6" />
+                    <span class="text-muted small">Minimum 6 characters recommended.</span>
+                </div>
+                <div class="modal-footer border-top px-4 py-3 bg-white" style="border-radius: 0 0 20px 20px;">
+                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-sapphire px-4">
+                        <i class="fa-solid fa-key me-1"></i> Save New Password
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- =========================================================================
+     MODAL 4: User Details View Modal (AJAX)
+     ========================================================================= -->
+<div class="modal fade" id="userDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; background: #faf8f2;">
+            <div class="modal-header border-bottom px-4 py-3 bg-white" style="border-radius: 20px 20px 0 0;">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="stat-icon stat-icon-sapphire" style="width: 38px; height: 38px; font-size: 1rem;">
+                        <i class="fa-solid fa-address-card"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold text-dark mb-0">System User Profile</h5>
+                        <p class="text-secondary small mb-0">Comprehensive record and metadata.</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4" id="userDetailsModalContent">
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="text-muted small mt-2">Loading user data...</p>
+                </div>
+            </div>
+            <div class="modal-footer border-top px-4 py-3 bg-white" style="border-radius: 0 0 20px 20px;">
+                <button type="button" class="btn btn-sapphire px-4" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function toggleRoleSpecificFields(role) {
+            const docFields = document.getElementById('doctorFields');
+            const hostFields = document.getElementById('hostFields');
+            
+            if (role === 'Doctor') {
+                docFields.style.display = 'block';
+                hostFields.style.display = 'none';
+            } else if (role === 'Host') {
+                docFields.style.display = 'none';
+                hostFields.style.display = 'block';
+            } else {
+                docFields.style.display = 'none';
+                hostFields.style.display = 'none';
+            }
+        }
+
+        function openChangeRoleModal(userId, fullName, currentRole) {
+            document.getElementById('crUserId').value = userId;
+            document.getElementById('crUserName').innerText = fullName;
+            document.getElementById('crCurrentRole').innerText = currentRole;
+            new bootstrap.Modal(document.getElementById('changeRoleModal')).show();
+        }
+
+        function openResetPasswordModal(userId, fullName) {
+            document.getElementById('rpUserId').value = userId;
+            document.getElementById('rpUserName').innerText = fullName;
+            new bootstrap.Modal(document.getElementById('resetPasswordModal')).show();
+        }
+
+        function openUserDetailsModal(userId) {
+            const modalEl = document.getElementById('userDetailsModal');
+            const contentEl = document.getElementById('userDetailsModalContent');
+            contentEl.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><p class="text-muted small mt-2">Loading user data...</p></div>';
+            
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+
+            fetch('/Admin/GetUserDetails/' + encodeURIComponent(userId))
+                .then(res => res.json())
+                .then(data => {
+                    contentEl.innerHTML = `
+                        <div class="d-flex align-items-center gap-3 p-3 rounded-4 bg-white border mb-4">
+                            <div class="avatar-initials" style="width: 54px; height: 54px; font-size: 1.4rem;">
+                                ${data.fullName.charAt(0)}
+                            </div>
+                            <div>
+                                <h4 class="fw-bold text-dark mb-0">${data.fullName}</h4>
+                                <div class="text-muted small">${data.email} • ${data.phoneNumber}</div>
+                                <div class="mt-1">
+                                    <span class="badge badge-role-${data.role.toLowerCase()}">${data.role}</span>
+                                    <span class="badge ${data.isActive ? 'badge-status-active' : 'badge-status-disabled'} ms-1">${data.isActive ? 'Active' : 'Disabled'}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="p-3 rounded-3 bg-white border">
+                                    <div class="text-muted small fw-bold mb-1">National ID (NID)</div>
+                                    <div class="fw-semibold text-dark">${data.nid}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 rounded-3 bg-white border">
+                                    <div class="text-muted small fw-bold mb-1">Blood Group & Gender</div>
+                                    <div class="fw-semibold text-dark">${data.bloodGroup} • ${data.gender}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 rounded-3 bg-white border">
+                                    <div class="text-muted small fw-bold mb-1">District / Upazila</div>
+                                    <div class="fw-semibold text-dark">${data.upazila}, ${data.district}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 rounded-3 bg-white border">
+                                    <div class="text-muted small fw-bold mb-1">Registered Since</div>
+                                    <div class="fw-semibold text-dark">${data.createdAt}</div>
+                                </div>
+                            </div>
+                            ${data.organizationName !== 'N/A' ? `
+                            <div class="col-12">
+                                <div class="p-3 rounded-3 bg-white border">
+                                    <div class="text-muted small fw-bold mb-1">Organization / License</div>
+                                    <div class="fw-semibold text-primary">${data.organizationName} (${data.organizationRegNo})</div>
+                                </div>
+                            </div>` : ''}
+                            ${data.medicalSpecialization !== 'N/A' ? `
+                            <div class="col-12">
+                                <div class="p-3 rounded-3 bg-white border">
+                                    <div class="text-muted small fw-bold mb-1">Medical Credentials</div>
+                                    <div class="fw-semibold text-teal">${data.medicalSpecialization} (BMDC: ${data.bmdcRegNo})</div>
+                                </div>
+                            </div>` : ''}
+                            <div class="col-12">
+                                <div class="p-3 rounded-3 bg-white border">
+                                    <div class="text-muted small fw-bold mb-1">Full Address</div>
+                                    <div class="text-secondary small">${data.address}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                })
+                .catch(err => {
+                    contentEl.innerHTML = '<div class="alert alert-danger">Failed to load user details.</div>';
+                });
+        }
+    </script>
+}

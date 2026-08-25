@@ -1,0 +1,125 @@
+@{
+    ViewData["Title"] = "Mission & System Architecture - MediCamp";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="text-center mb-5">
+                <span class="hero-badge">
+                    <i class="fa-solid fa-heart-pulse text-primary"></i> CSE 3200 / CSE 3224 Project Report
+                </span>
+                <h1 class="fw-bold fs-1 mb-2">MediCamp System Architecture</h1>
+                <p class="text-secondary lead">A Community Healthcare Camp Management System for Bangladesh</p>
+            </div>
+
+            <!-- Problem & SDG Alignment Card -->
+            <div class="glass-card p-4 p-md-5 mb-4">
+                <h3 class="fw-bold text-dark mb-3"><i class="fa-solid fa-bullseye text-primary me-2"></i>1. Problem Statement & Motivation</h3>
+                <p class="text-secondary" style="line-height: 1.8;">
+                    Free medical camps run by NGOs are one of the primary ways rural and underserved communities in Bangladesh access healthcare. Most camps currently run on paper: hand-written registration slips, paper prescriptions, and manual stock counts.
+                </p>
+                <div class="row g-3 my-2">
+                    <div class="col-md-6">
+                        <div class="p-3 rounded-4 bg-white border h-100">
+                            <h6 class="fw-bold text-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i>Paper Process Gaps</h6>
+                            <ul class="text-secondary small mb-0 ps-3">
+                                <li>Loss of care continuity (doctors cannot see prior diagnoses or drug allergies).</li>
+                                <li>Frequent stock-outs or expired medicine wastage due to manual counts.</li>
+                                <li>Unresolved hospital referrals and untracked patient follow-ups.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 rounded-4 bg-white border h-100">
+                            <h6 class="fw-bold text-success"><i class="fa-solid fa-circle-check me-2"></i>MediCamp Digital Solution</h6>
+                            <ul class="text-secondary small mb-0 ps-3">
+                                <li>Single longitudinal patient record across all camps in Bangladesh.</li>
+                                <li>Real-time inventory deduction with instant restock shortage alerts.</li>
+                                <li>Role-scoped workflows for 6 actors: Admin, Host, Doctor, Volunteer, Pharmacist, Patient.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SDG Alignment -->
+            <div class="glass-card p-4 p-md-5 mb-4">
+                <h3 class="fw-bold text-dark mb-3"><i class="fa-solid fa-earth-americas text-teal me-2"></i>2. United Nations Sustainable Development Goals</h3>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="p-4 rounded-4 bg-white border h-100">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <span class="badge bg-success fs-6">SDG 3</span>
+                                <h5 class="fw-bold mb-0 text-dark">Good Health & Well-being</h5>
+                            </div>
+                            <p class="text-secondary small mb-0">
+                                Primary goal: Ensures quality community healthcare delivery from triage and diagnosis through digital prescriptions, hospital referrals, and household recovery follow-ups.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-4 rounded-4 bg-white border h-100">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <span class="badge bg-primary fs-6">SDG 10</span>
+                                <h5 class="fw-bold mb-0 text-dark">Reduced Inequalities</h5>
+                            </div>
+                            <p class="text-secondary small mb-0">
+                                Secondary goal: Bridges healthcare accessibility gaps for marginalized rural, haor, coastal, and hill-tract populations in Bangladesh.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6 Actors -->
+            <div class="glass-card p-4 p-md-5">
+                <h3 class="fw-bold text-dark mb-3"><i class="fa-solid fa-users text-primary me-2"></i>3. Role-Based Ecosystem Overview</h3>
+                <div class="table-responsive">
+                    <table class="table table-custom">
+                        <thead>
+                            <tr>
+                                <th>Role</th>
+                                <th>Target User</th>
+                                <th>Core Responsibilities</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="badge badge-role-admin">Admin</span></td>
+                                <td>System Administrator</td>
+                                <td class="small">User management, NGO host verification, master locations/medicines tables, system-wide analytics.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-role-host">Host</span></td>
+                                <td>Organizing NGO</td>
+                                <td class="small">Camp setup, staffing doctor/volunteer teams, central medicine inventory allocation, budget tracking.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-role-doctor">Doctor</span></td>
+                                <td>Volunteer Clinician</td>
+                                <td class="small">Live queue, longitudinal health history, diagnosis recording, camp-inventory-mapped e-prescriptions, hospital referrals.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-role-volunteer">Volunteer</span></td>
+                                <td>Field Staff</td>
+                                <td class="small">NID patient search/registration, vitals screening (BP, BMI, Temperature), queue token issuing, follow-up logs.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-role-pharmacist">Pharmacist</span></td>
+                                <td>Dispensary Staff</td>
+                                <td class="small">Doctor prescription queue, barcode dispensing with auto-stock decrease, restock shortage requests.</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-role-patient">Patient</span></td>
+                                <td>Community Member</td>
+                                <td class="small">Upcoming camp schedule finder, lifetime visit records, e-prescriptions, voluntary blood donation hub.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

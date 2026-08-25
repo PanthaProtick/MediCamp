@@ -1,0 +1,95 @@
+@model LoginViewModel
+@{
+    ViewData["Title"] = "Sign In - MediCamp";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-8">
+            
+            <!-- Main Secure Login Card -->
+            <div class="glass-card mb-4">
+                <div class="glass-card-header text-center py-4">
+                    <div class="brand-badge-logo mx-auto mb-3" style="width: 52px; height: 52px;">
+                        <i class="fa-solid fa-lock fs-4"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1 text-dark">Portal Sign In</h3>
+                    <p class="text-secondary small mb-0">Enter your registered Email Address or National ID (NID)</p>
+                </div>
+
+                <div class="glass-card-body p-4 p-md-5">
+                    
+                    @if (!ViewData.ModelState.IsValid && !string.IsNullOrEmpty(Model.ErrorMessage))
+                    {
+                        <div class="alert alert-danger py-2 px-3 small rounded-3 mb-4 d-flex align-items-center gap-2">
+                            <i class="fa-solid fa-circle-exclamation text-danger fs-5"></i>
+                            <div>@Model.ErrorMessage</div>
+                        </div>
+                    }
+
+                    <form asp-controller="Account" asp-action="Login" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="ReturnUrl" />
+
+                        <div class="mb-4">
+                            <label asp-for="Identifier" class="form-label-custom">Email Address or National ID (NID) *</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0 text-muted" style="border-radius: 14px 0 0 14px; border-color: rgba(61, 90, 255, 0.18);">
+                                    <i class="fa-solid fa-user text-primary"></i>
+                                </span>
+                                <input asp-for="Identifier" class="form-control form-control-custom border-start-0" placeholder="e.g. email@domain.org or NID number" style="border-radius: 0 14px 14px 0;" required />
+                            </div>
+                            <span asp-validation-for="Identifier" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label asp-for="Password" class="form-label-custom mb-0">Password *</label>
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0 text-muted" style="border-radius: 14px 0 0 14px; border-color: rgba(61, 90, 255, 0.18);">
+                                    <i class="fa-solid fa-key text-primary"></i>
+                                </span>
+                                <input asp-for="Password" type="password" class="form-control form-control-custom border-start-0" placeholder="••••••••" style="border-radius: 0 14px 14px 0;" required />
+                            </div>
+                            <span asp-validation-for="Password" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div class="form-check">
+                                <input asp-for="RememberMe" class="form-check-input" type="checkbox" id="rememberCheck">
+                                <label class="form-check-label small text-secondary" for="rememberCheck">
+                                    Keep me signed in
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-sapphire w-100 py-3 fs-6 fw-bold mb-3 shadow">
+                            <i class="fa-solid fa-arrow-right-to-bracket me-2"></i> Sign In to Account
+                        </button>
+                    </form>
+
+                    <!-- Registration Options if user has not registered yet -->
+                    <div class="text-center pt-4 border-top">
+                        <span class="text-secondary small d-block mb-2 fw-semibold">Haven't registered an account yet?</span>
+                        <div class="dropdown">
+                            <button class="btn btn-outline-sapphire btn-sm w-100 dropdown-toggle py-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa-solid fa-user-plus me-1"></i> Register New Account First
+                            </button>
+                            <ul class="dropdown-menu w-100 shadow border-0 p-2 text-start" style="border-radius: 14px;">
+                                <li class="dropdown-header text-uppercase fw-bold" style="font-size: 0.7rem; color: #64748b;">Select Role to Register</li>
+                                <li><a class="dropdown-item rounded py-2" asp-controller="Account" asp-action="Register" asp-route-role="Patient"><i class="fa-solid fa-user text-danger me-2"></i>Patient Registration</a></li>
+                                <li><a class="dropdown-item rounded py-2" asp-controller="Account" asp-action="Register" asp-route-role="Doctor"><i class="fa-solid fa-user-doctor text-teal me-2"></i>Doctor Registration</a></li>
+                                <li><a class="dropdown-item rounded py-2" asp-controller="Account" asp-action="Register" asp-route-role="Volunteer"><i class="fa-solid fa-hand-holding-heart text-amber me-2"></i>Volunteer Registration</a></li>
+                                <li><a class="dropdown-item rounded py-2" asp-controller="Account" asp-action="Register" asp-route-role="Pharmacist"><i class="fa-solid fa-prescription-bottle-medical text-info me-2"></i>Pharmacist Registration</a></li>
+                                <li><hr class="dropdown-divider my-1"></li>
+                                <li><a class="dropdown-item rounded py-2" asp-controller="Account" asp-action="Register" asp-route-role="Host"><i class="fa-solid fa-building-ngo text-primary me-2"></i>Organizing NGO Host</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

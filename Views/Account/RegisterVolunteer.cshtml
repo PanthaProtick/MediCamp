@@ -1,0 +1,113 @@
+@model RegisterViewModel
+@{
+    ViewData["Title"] = "Field Volunteer Registration - MediCamp";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="glass-card">
+                <div class="glass-card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="badge badge-role-volunteer mb-2"><i class="fa-solid fa-hand-holding-heart"></i> Field Triage Volunteer</span>
+                        <h3 class="fw-bold mb-1 text-dark">Field Volunteer Registration</h3>
+                        <p class="text-secondary small mb-0">Register as a field volunteer to handle patient registration, vital sign screening, and queue triage.</p>
+                    </div>
+                    <div class="stat-icon stat-icon-amber d-none d-sm-flex">
+                        <i class="fa-solid fa-users-viewfinder"></i>
+                    </div>
+                </div>
+
+                <div class="glass-card-body p-4 p-md-5">
+                    <form asp-controller="Account" asp-action="RegisterVolunteer" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 px-3 small rounded-3 mb-4"></div>
+
+                        <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">
+                            <i class="fa-solid fa-user text-primary me-2"></i>1. Personal & Contact Details
+                        </h5>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="FullName" class="form-label-custom">Full Name *</label>
+                                <input asp-for="FullName" class="form-control form-control-custom" placeholder="e.g. Karim Ahmed" required />
+                                <span asp-validation-for="FullName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Email" class="form-label-custom">Email Address *</label>
+                                <input asp-for="Email" type="email" class="form-control form-control-custom" placeholder="e.g. volunteer@medicamp.org" required />
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="PhoneNumber" class="form-label-custom">Mobile Number *</label>
+                                <input asp-for="PhoneNumber" class="form-control form-control-custom" placeholder="e.g. 01511000006" required />
+                                <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="NID" class="form-label-custom">National ID (NID)</label>
+                                <input asp-for="NID" class="form-control form-control-custom" placeholder="e.g. 19962690066778899" />
+                            </div>
+                        </div>
+
+                        <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">
+                            <i class="fa-solid fa-location-dot text-primary me-2"></i>2. Field Location
+                        </h5>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="District" class="form-label-custom">Assigned District *</label>
+                                <select asp-for="District" class="form-select form-select-custom">
+                                    <option value="Kurigram">Kurigram</option>
+                                    <option value="Sunamganj">Sunamganj</option>
+                                    <option value="Bandarban">Bandarban</option>
+                                    <option value="Satkhira">Satkhira</option>
+                                    <option value="Rangpur">Rangpur</option>
+                                    <option value="Dhaka">Dhaka</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Upazila" class="form-label-custom">Upazila *</label>
+                                <input asp-for="Upazila" class="form-control form-control-custom" placeholder="e.g. Chilmari, Tahirpur, Ruma" required />
+                            </div>
+
+                            <div class="col-12">
+                                <label asp-for="Address" class="form-label-custom">Village Address *</label>
+                                <input asp-for="Address" class="form-control form-control-custom" placeholder="e.g. Char Chilmari, Ward 3, Kurigram" required />
+                            </div>
+                        </div>
+
+                        <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">
+                            <i class="fa-solid fa-lock text-primary me-2"></i>3. Password
+                        </h5>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="Password" class="form-label-custom">Account Password *</label>
+                                <input asp-for="Password" type="password" class="form-control form-control-custom" placeholder="Min. 6 characters" required />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="ConfirmPassword" class="form-label-custom">Confirm Password *</label>
+                                <input asp-for="ConfirmPassword" type="password" class="form-control form-control-custom" placeholder="Repeat password" required />
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pt-3 border-top">
+                            <a asp-controller="Account" asp-action="Login" class="text-secondary small text-decoration-none">
+                                <i class="fa-solid fa-arrow-left me-1"></i> Return to Sign In
+                            </a>
+                            <button type="submit" class="btn btn-sapphire btn-lg px-4 shadow">
+                                <i class="fa-solid fa-user-check me-2"></i> Complete Volunteer Registration
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,116 @@
+@model RegisterViewModel
+@{
+    ViewData["Title"] = "Doctor Registration - MediCamp";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="glass-card">
+                <div class="glass-card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="badge badge-role-doctor mb-2"><i class="fa-solid fa-user-doctor"></i> Volunteer Clinician</span>
+                        <h3 class="fw-bold mb-1 text-dark">Doctor Registration</h3>
+                        <p class="text-secondary small mb-0">Register as a volunteer clinician to diagnose, prescribe, and refer patients in rural health camps.</p>
+                    </div>
+                    <div class="stat-icon stat-icon-emerald d-none d-sm-flex">
+                        <i class="fa-solid fa-stethoscope"></i>
+                    </div>
+                </div>
+
+                <div class="glass-card-body p-4 p-md-5">
+                    <form asp-controller="Account" asp-action="RegisterDoctor" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 px-3 small rounded-3 mb-4"></div>
+
+                        <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">
+                            <i class="fa-solid fa-user-doctor text-teal me-2"></i>1. Clinician Qualifications & Registration
+                        </h5>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="FullName" class="form-label-custom">Doctor Full Name (Title & Name) *</label>
+                                <input asp-for="FullName" class="form-control form-control-custom" placeholder="e.g. Dr. Rafiqul Rahman" required />
+                                <span asp-validation-for="FullName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="BMDCRegNo" class="form-label-custom">BMDC Registration Number *</label>
+                                <input asp-for="BMDCRegNo" class="form-control form-control-custom" placeholder="e.g. BMDC-A-48291" required />
+                                <span asp-validation-for="BMDCRegNo" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <label asp-for="MedicalSpecialization" class="form-label-custom">Medical Specialization & Degrees *</label>
+                                <input asp-for="MedicalSpecialization" class="form-control form-control-custom" placeholder="e.g. MBBS, FCPS (Internal Medicine) / DGO (Gynecology)" required />
+                                <span asp-validation-for="MedicalSpecialization" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">
+                            <i class="fa-solid fa-address-book text-teal me-2"></i>2. Contact Details & NID
+                        </h5>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="Email" class="form-label-custom">Official Email Address *</label>
+                                <input asp-for="Email" type="email" class="form-control form-control-custom" placeholder="e.g. doctor@hospital.org" required />
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="PhoneNumber" class="form-label-custom">Mobile Number *</label>
+                                <input asp-for="PhoneNumber" class="form-control form-control-custom" placeholder="e.g. 01712345678" required />
+                                <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="NID" class="form-label-custom">National ID (NID)</label>
+                                <input asp-for="NID" class="form-control form-control-custom" placeholder="e.g. 19882690044556677" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="District" class="form-label-custom">District *</label>
+                                <select asp-for="District" class="form-select form-select-custom">
+                                    <option value="Dhaka">Dhaka</option>
+                                    <option value="Chittagong">Chittagong</option>
+                                    <option value="Sylhet">Sylhet</option>
+                                    <option value="Rangpur">Rangpur</option>
+                                    <option value="Kurigram">Kurigram</option>
+                                    <option value="Sunamganj">Sunamganj</option>
+                                    <option value="Bandarban">Bandarban</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">
+                            <i class="fa-solid fa-lock text-teal me-2"></i>3. Password
+                        </h5>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="Password" class="form-label-custom">Account Password *</label>
+                                <input asp-for="Password" type="password" class="form-control form-control-custom" placeholder="Min. 6 characters" required />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="ConfirmPassword" class="form-label-custom">Confirm Password *</label>
+                                <input asp-for="ConfirmPassword" type="password" class="form-control form-control-custom" placeholder="Repeat password" required />
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pt-3 border-top">
+                            <a asp-controller="Account" asp-action="Login" class="text-secondary small text-decoration-none">
+                                <i class="fa-solid fa-arrow-left me-1"></i> Return to Sign In
+                            </a>
+                            <button type="submit" class="btn btn-sapphire btn-lg px-4 shadow">
+                                <i class="fa-solid fa-user-check me-2"></i> Complete Doctor Registration
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
