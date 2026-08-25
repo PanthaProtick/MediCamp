@@ -1,0 +1,129 @@
+@model List<CampOverviewItem>
+@{
+    ViewData["Title"] = "Public Camp Directory - MediCamp";
+}
+
+<div class="container py-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <span class="badge badge-role-host mb-2"><i class="fa-solid fa-tent"></i> Public Directory</span>
+            <h2 class="fw-bold text-dark mb-1">Healthcare Camps in Bangladesh</h2>
+            <p class="text-secondary small mb-0">Search and filter active and scheduled medical camps across districts.</p>
+        </div>
+        <a asp-controller="Account" asp-action="Register" class="btn btn-sapphire">
+            <i class="fa-solid fa-user-plus me-1"></i> Register as Patient
+        </a>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="glass-card p-3 mb-4">
+        <form method="get" asp-controller="Home" asp-action="Camps" class="row g-2 align-items-center">
+            <div class="col-md-4">
+                <input type="text" name="search" value="@ViewBag.SearchTerm" class="form-control form-control-custom" placeholder="Search by camp title, venue, or NGO..." />
+            </div>
+            <div class="col-md-3">
+                <select name="district" class="form-select form-select-custom" onchange="this.form.submit()">
+                    <option value="All" selected="@(ViewBag.SelectedDistrict == "All" || string.IsNullOrEmpty(ViewBag.SelectedDistrict))">All Districts</option>
+                    <option value="Kurigram" selected="@(ViewBag.SelectedDistrict == "Kurigram")">Kurigram</option>
+                    <option value="Sunamganj" selected="@(ViewBag.SelectedDistrict == "Sunamganj")">Sunamganj</option>
+                    <option value="Bandarban" selected="@(ViewBag.SelectedDistrict == "Bandarban")">Bandarban</option>
+                    <option value="Satkhira" selected="@(ViewBag.SelectedDistrict == "Satkhira")">Satkhira</option>
+                    <option value="Rangpur" selected="@(ViewBag.SelectedDistrict == "Rangpur")">Rangpur</option>
+                    <option value="Dhaka" selected="@(ViewBag.SelectedDistrict == "Dhaka")">Dhaka</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="campType" class="form-select form-select-custom" onchange="this.form.submit()">
+                    <option value="All" selected="@(ViewBag.SelectedType == "All" || string.IsNullOrEmpty(ViewBag.SelectedType))">All Camp Types</option>
+                    <option value="General" selected="@(ViewBag.SelectedType == "General")">General Healthcare</option>
+                    <option value="Maternal" selected="@(ViewBag.SelectedType == "Maternal")">Maternal & Child Care</option>
+                    <option value="Eye" selected="@(ViewBag.SelectedType == "Eye")">Eye & Dental</option>
+                    <option value="Diabetes" selected="@(ViewBag.SelectedType == "Diabetes")">Non-Communicable Diseases</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-sapphire w-100 btn-sm-custom py-2">
+                    <i class="fa-solid fa-filter me-1"></i> Search
+                </button>
+                <a asp-controller="Home" asp-action="Camps" class="btn btn-light border btn-sm-custom py-2" title="Reset">
+                    <i class="fa-solid fa-rotate-left"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Camp Grid -->
+    <div class="row g-4">
+        @if (!Model.Any())
+        {
+            <div class="col-12 text-center py-5">
+                <div class="glass-card p-5">
+                    <i class="fa-solid fa-tent-arrow-down-to-line fs-1 text-muted mb-3 opacity-50"></i>
+                    <h4 class="fw-bold">No Healthcare Camps Found</h4>
+                    <p class="text-secondary small">Try changing your district or category search filters.</p>
+                </div>
+            </div>
+        }
+        else
+        {
+            @foreach (var camp in Model)
+            {
+                <div class="col-lg-6">
+                    <div class="glass-card h-100 p-4 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="badge @(camp.Status == "Ongoing" ? "badge-status-active" : "badge-role-host") px-3 py-1">
+                                    <i class="fa-solid fa-circle-dot me-1"></i> @camp.Status
+                                </span>
+                                <span class="text-muted small fw-bold">
+                                    <i class="fa-solid fa-calendar-days text-primary me-1"></i>
+                                    @camp.StartDate.ToString("dd MMM yyyy") - @camp.EndDate.ToString("dd MMM yyyy")
+                                </span>
+                            </div>
+
+                            <h4 class="fw-bold text-dark mb-2">@camp.Title</h4>
+                            
+                            <div class="mb-3">
+                                <span class="badge bg-light text-primary border"><i class="fa-solid fa-stethoscope me-1"></i>@camp.CampType</span>
+                            </div>
+
+                            <div class="row g-2 small text-secondary mb-4">
+                                <div class="col-sm-6">
+                                    <div class="p-2 rounded-3 bg-white border">
+                                        <span class="text-muted d-block" style="font-size: 0.72rem;">Location:</span>
+                                        <strong><i class="fa-solid fa-location-dot text-danger me-1"></i>@camp.Upazila, @camp.District</strong>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="p-2 rounded-3 bg-white border">
+                                        <span class="text-muted d-block" style="font-size: 0.72rem;">Venue:</span>
+                                        <strong><i class="fa-solid fa-school text-muted me-1"></i>@camp.Venue</strong>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="p-2 rounded-3 bg-white border">
+                                        <span class="text-muted d-block" style="font-size: 0.72rem;">Host Organization:</span>
+                                        <strong><i class="fa-solid fa-building-ngo text-primary me-1"></i>@camp.HostOrganization</strong>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="p-2 rounded-3 bg-white border">
+                                        <span class="text-muted d-block" style="font-size: 0.72rem;">Capacity:</span>
+                                        <strong><i class="fa-solid fa-users text-teal me-1"></i>@camp.ExpectedPatients Expected Patients</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-3 border-top d-flex justify-content-between align-items-center">
+                            <span class="small text-muted">Free Consultation & Medicines</span>
+                            <a asp-controller="Account" asp-action="Register" class="btn btn-sapphire btn-sm-custom">
+                                <i class="fa-solid fa-id-card me-1"></i> Register as Patient
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
