@@ -99,3 +99,14 @@ Accessible to registered Patients.
         *   Form to submit a blood request (Group, Units, Urgency, Hospital).
         *   Search interface to find donors by blood group and location.
         *   Log of past donations/requests.
+
+---
+
+## 8. Proposed Technology Stack
+
+*   **Database:** PostgreSQL (Supabase or Neon)
+*   **Data Access:** Entity Framework Core (Npgsql Provider)
+*   **Application / Backend:** ASP.NET Core MVC (C#)
+*   **Frontend:** Razor Views, Bootstrap 5
+*   **Security:** ASP.NET Core Identity (Role-based Authorization)
+*   **Deployment:** Docker, Azure App Service or Render
