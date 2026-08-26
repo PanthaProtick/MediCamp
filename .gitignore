@@ -1,0 +1,27 @@
+# .NET build artifacts
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# User-specific files & IDE configuration
+*.user
+*.userosscache
+*.suo
+*.userprefs
+.vs/
+.vscode/
+.idea/
+
+# Environment and Secrets files
+.env
+.env.*
+*.env
+
+# Local App Settings (contains sensitive DB credentials)
+appsettings.Local.json
+appsettings.Development.json
+
+# Operating System files
+.DS_Store
+Thumbs.db

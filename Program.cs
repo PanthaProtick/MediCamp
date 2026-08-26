@@ -1,10 +1,16 @@
+using MediCamp.Data;
 using MediCamp.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Register Entity Framework Core with PostgreSQL (Neon)
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Register In-Memory Mock Data Service
 builder.Services.AddSingleton<IMockDataService, MockDataService>();
@@ -38,6 +44,21 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Seed PostgreSQL database with initial data
+using (var scope = app.Services.CreateScope())
+{
+    try
+    {
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        dbContext.Database.EnsureCreated();
+        DbSeeder.SeedData(dbContext);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Database initialization error: {ex.Message}");
+    }
+}
 
 app.MapControllerRoute(
     name: "default",
