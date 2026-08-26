@@ -1,0 +1,355 @@
+@model HostApprovalsViewModel
+@{
+    ViewData["Title"] = "Host Approvals - Admin Governance";
+}
+
+<div class="container py-4">
+
+    <!-- Top Admin Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge badge-role-admin"><i class="fa-solid fa-shield-halved"></i> System Administration</span>
+                <span class="text-muted small">Governance & Verification</span>
+            </div>
+            <h2 class="fw-bold text-dark mb-0">Host Organization Verification Queue</h2>
+            <p class="text-secondary small mb-0">Review, verify, approve, or reject Host organization registration applications before camp publication.</p>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+            <a asp-controller="Admin" asp-action="UserManagement" class="btn btn-outline-secondary btn-sm-custom">
+                <i class="fa-solid fa-users me-1"></i> User Management
+            </a>
+            <a asp-controller="Account" asp-action="RegisterHost" class="btn btn-sapphire btn-sm-custom shadow-sm" target="_blank">
+                <i class="fa-solid fa-plus me-1"></i> Test Host Register Form
+            </a>
+        </div>
+    </div>
+
+    <!-- Metric Summary Bar -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="p-3 rounded-4 bg-white border shadow-sm text-center border-start border-4 border-warning">
+                <span class="d-block text-muted small fw-bold"><i class="fa-solid fa-hourglass-half text-warning me-1"></i>Pending Approvals</span>
+                <span class="fs-3 fw-bold text-warning">@Model.PendingCount</span>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="p-3 rounded-4 bg-white border shadow-sm text-center border-start border-4 border-success">
+                <span class="d-block text-muted small fw-bold"><i class="fa-solid fa-circle-check text-success me-1"></i>Approved Hosts</span>
+                <span class="fs-3 fw-bold text-success">@Model.ApprovedCount</span>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="p-3 rounded-4 bg-white border shadow-sm text-center border-start border-4 border-danger">
+                <span class="d-block text-muted small fw-bold"><i class="fa-solid fa-circle-xmark text-danger me-1"></i>Rejected Applications</span>
+                <span class="fs-3 fw-bold text-danger">@Model.RejectedCount</span>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="p-3 rounded-4 bg-white border shadow-sm text-center border-start border-4 border-primary">
+                <span class="d-block text-muted small fw-bold"><i class="fa-solid fa-building text-primary me-1"></i>Total Host Registrations</span>
+                <span class="fs-3 fw-bold text-primary">@Model.TotalCount</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs & Search Toolbar -->
+    <div class="glass-card mb-4">
+        <div class="glass-card-header p-3 border-bottom d-flex flex-wrap align-items-center justify-content-between gap-3">
+            
+            <!-- Filter Tabs -->
+            <ul class="nav nav-pills gap-2">
+                <li class="nav-item">
+                    <a class="nav-link @(Model.ActiveTab == "Pending" ? "active bg-warning text-dark fw-bold" : "text-secondary")" asp-controller="Admin" asp-action="HostApprovals" asp-route-tab="Pending" asp-route-search="@Model.SearchTerm">
+                        <i class="fa-solid fa-clock me-1"></i> Pending Queue 
+                        <span class="badge @(Model.ActiveTab == "Pending" ? "bg-dark text-white" : "bg-warning text-dark") ms-1">@Model.PendingCount</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(Model.ActiveTab == "Approved" ? "active bg-success text-white fw-bold" : "text-secondary")" asp-controller="Admin" asp-action="HostApprovals" asp-route-tab="Approved" asp-route-search="@Model.SearchTerm">
+                        <i class="fa-solid fa-check-circle me-1"></i> Approved History 
+                        <span class="badge @(Model.ActiveTab == "Approved" ? "bg-white text-success" : "bg-success text-white") ms-1">@Model.ApprovedCount</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(Model.ActiveTab == "Rejected" ? "active bg-danger text-white fw-bold" : "text-secondary")" asp-controller="Admin" asp-action="HostApprovals" asp-route-tab="Rejected" asp-route-search="@Model.SearchTerm">
+                        <i class="fa-solid fa-times-circle me-1"></i> Rejected History 
+                        <span class="badge @(Model.ActiveTab == "Rejected" ? "bg-white text-danger" : "bg-danger text-white") ms-1">@Model.RejectedCount</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(Model.ActiveTab == "All" ? "active bg-primary text-white fw-bold" : "text-secondary")" asp-controller="Admin" asp-action="HostApprovals" asp-route-tab="All" asp-route-search="@Model.SearchTerm">
+                        <i class="fa-solid fa-list me-1"></i> All Records 
+                        <span class="badge bg-light text-dark ms-1">@Model.TotalCount</span>
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Search Form -->
+            <form method="get" asp-controller="Admin" asp-action="HostApprovals" class="d-flex align-items-center gap-2">
+                <input type="hidden" name="tab" value="@Model.ActiveTab" />
+                <div class="input-group input-group-sm" style="max-width: 280px;">
+                    <span class="input-group-text bg-white border-end-0 text-muted">
+                        <i class="fa-solid fa-search"></i>
+                    </span>
+                    <input type="text" name="search" value="@Model.SearchTerm" class="form-control form-control-custom border-start-0 py-1" placeholder="Search organization, email, license..." />
+                </div>
+                <button type="submit" class="btn btn-sapphire btn-sm">Search</button>
+                @if (!string.IsNullOrEmpty(Model.SearchTerm))
+                {
+                    <a asp-controller="Admin" asp-action="HostApprovals" asp-route-tab="@Model.ActiveTab" class="btn btn-light btn-sm border" title="Clear Search">
+                        <i class="fa-solid fa-times"></i>
+                    </a>
+                }
+            </form>
+        </div>
+
+        <!-- Table View -->
+        <div class="table-responsive">
+            <table class="table table-custom align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Organization Name & Type</th>
+                        <th>License / Reg No.</th>
+                        <th>Focal Person Contact</th>
+                        <th>Head Office Location</th>
+                        <th>Submitted Date</th>
+                        <th>Approval Status</th>
+                        <th class="text-end">Verification Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var targetList = Model.ActiveTab switch
+                        {
+                            "Approved" => Model.ApprovedHosts,
+                            "Rejected" => Model.RejectedHosts,
+                            "All" => Model.AllHosts,
+                            _ => Model.PendingHosts
+                        };
+                    }
+
+                    @if (!targetList.Any())
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <i class="fa-solid fa-folder-open fs-1 d-block mb-2 opacity-50"></i>
+                                <span class="fw-bold fs-6">No @Model.ActiveTab.ToLower() host organization records found.</span>
+                                <p class="small mb-0">All submitted applications in this queue have been processed or non-existent.</p>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var host in targetList)
+                        {
+                            var statusBadgeClass = host.HostApprovalStatus switch
+                            {
+                                "Approved" => "badge-status-active",
+                                "Rejected" => "badge-status-disabled",
+                                _ => "badge-status-pending"
+                            };
+
+                            var statusIcon = host.HostApprovalStatus switch
+                            {
+                                "Approved" => "fa-circle-check",
+                                "Rejected" => "fa-circle-xmark",
+                                _ => "fa-hourglass-half"
+                            };
+
+                            var orgTypeBadge = host.OrganizationType switch
+                            {
+                                "Hospital" => "bg-info-subtle text-info border-info-subtle",
+                                "Corporate" => "bg-primary-subtle text-primary border-primary-subtle",
+                                "Community Group" => "bg-secondary-subtle text-secondary border-secondary-subtle",
+                                _ => "bg-teal-subtle text-teal border-teal-subtle"
+                            };
+
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="avatar-initials" style="background: linear-gradient(135deg, #1e3a8a, #0d9488); width: 44px; height: 44px; font-size: 1.1rem;">
+                                            @((host.OrganizationName ?? host.FullName)[0])
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-dark mb-0 fs-6">@(host.OrganizationName ?? host.FullName)</div>
+                                            <div class="d-flex align-items-center gap-2 mt-1">
+                                                <span class="badge border px-2 py-0 small @orgTypeBadge">
+                                                    <i class="fa-solid fa-building me-1"></i>@(host.OrganizationType ?? "Organization")
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(host.OrganizationRegNo))
+                                    {
+                                        <span class="font-monospace small fw-bold text-dark bg-light px-2 py-1 rounded border">
+                                            <i class="fa-solid fa-id-card text-primary me-1"></i>@host.OrganizationRegNo
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small italic">N/A (Unlicensed / Optional)</span>
+                                    }
+                                </td>
+
+                                <td>
+                                    <div class="small">
+                                        <div class="fw-semibold text-dark">
+                                            <i class="fa-solid fa-user text-secondary me-1"></i>@host.FullName
+                                        </div>
+                                        <div class="text-muted">
+                                            <i class="fa-solid fa-phone text-success me-1"></i>@host.PhoneNumber
+                                        </div>
+                                        <div class="text-muted">
+                                            <i class="fa-solid fa-envelope text-info me-1"></i>@host.Email
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div class="small">
+                                        <div class="fw-semibold text-dark">
+                                            <i class="fa-solid fa-location-dot text-danger me-1"></i>
+                                            @(host.Upazila ?? "Area"), @(host.District ?? "District")
+                                        </div>
+                                        <div class="text-muted small text-truncate" style="max-width: 180px;">
+                                            @(host.Address ?? "N/A")
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <span class="small text-secondary">
+                                        <i class="fa-solid fa-calendar-day me-1"></i>
+                                        @host.CreatedAt.ToString("dd MMM yyyy, hh:mm tt")
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="badge @statusBadgeClass">
+                                        <i class="fa-solid @statusIcon"></i> @host.HostApprovalStatus
+                                    </span>
+                                    @if (host.HostApprovalStatus == "Rejected" && !string.IsNullOrEmpty(host.HostRejectionReason))
+                                    {
+                                        <div class="small text-danger mt-1" style="font-size: 0.75rem;" title="@host.HostRejectionReason">
+                                            <i class="fa-solid fa-circle-info me-1"></i>Reason: @host.HostRejectionReason
+                                        </div>
+                                    }
+                                </td>
+
+                                <td class="text-end">
+                                    @if (host.HostApprovalStatus == "Pending")
+                                    {
+                                        <div class="d-flex justify-content-end gap-2">
+                                            <!-- Approve Form -->
+                                            <form asp-controller="Admin" asp-action="ApproveHost" method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="userId" value="@host.Id" />
+                                                <button type="submit" class="btn btn-success btn-sm shadow-sm" onclick="return confirm('Approve @(host.OrganizationName ?? host.FullName) as a verified Host?');">
+                                                    <i class="fa-solid fa-check me-1"></i> Approve
+                                                </button>
+                                            </form>
+
+                                            <!-- Reject Trigger -->
+                                            <button type="button" class="btn btn-outline-danger btn-sm shadow-sm" onclick="openRejectModal('@host.Id', '@(host.OrganizationName ?? host.FullName)')">
+                                                <i class="fa-solid fa-times me-1"></i> Reject
+                                            </button>
+                                        </div>
+                                    }
+                                    else if (host.HostApprovalStatus == "Approved")
+                                    {
+                                        <div class="d-flex justify-content-end gap-2">
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 small">
+                                                <i class="fa-solid fa-check-double me-1"></i> Verified & Active
+                                            </span>
+                                            <button type="button" class="btn btn-outline-danger btn-sm py-0" style="font-size: 0.75rem;" onclick="openRejectModal('@host.Id', '@(host.OrganizationName ?? host.FullName)')">
+                                                Revoke
+                                            </button>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <!-- Re-Approve Option for Rejected Hosts -->
+                                        <form asp-controller="Admin" asp-action="ApproveHost" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="userId" value="@host.Id" />
+                                            <button type="submit" class="btn btn-outline-success btn-sm py-1">
+                                                <i class="fa-solid fa-rotate-left me-1"></i> Re-Approve
+                                            </button>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="glass-card-header p-3 border-top d-flex justify-content-between align-items-center">
+            <span class="small text-muted">Showing <strong>@targetList.Count</strong> host applications in <strong>@Model.ActiveTab</strong> tab</span>
+            <span class="small text-muted"><i class="fa-solid fa-shield-halved text-success me-1"></i>Enforced Access Control: Admin Only</span>
+        </div>
+    </div>
+</div>
+
+<!-- =========================================================================
+     MODAL: Reject Host Application Modal
+     ========================================================================= -->
+<div class="modal fade" id="rejectHostModal" tabindex="-1" aria-labelledby="rejectHostModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; background: #faf8f2;">
+            <div class="modal-header border-bottom px-4 py-3 bg-white" style="border-radius: 20px 20px 0 0;">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="stat-icon bg-danger-subtle text-danger" style="width: 38px; height: 38px; font-size: 1rem; border-radius: 12px;">
+                        <i class="fa-solid fa-circle-xmark"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold text-dark mb-0" id="rejectHostModalLabel">Reject Host Organization Application</h5>
+                        <p class="text-secondary small mb-0">Provide a clear reason for rejecting this application.</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form asp-controller="Admin" asp-action="RejectHost" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="userId" id="rejectUserId" />
+
+                <div class="modal-body p-4">
+                    <div class="p-3 rounded-3 bg-white border mb-3">
+                        <div class="text-muted small">Organization Being Rejected:</div>
+                        <div class="fw-bold text-dark fs-6" id="rejectOrgName">Loading...</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label-custom">Reason for Rejection *</label>
+                        <textarea name="rejectionReason" class="form-control form-control-custom" rows="3" placeholder="e.g. Invalid organization license number, unable to verify focal person contact, or duplicate submission..." required></textarea>
+                        <span class="text-muted small">This explanation will be displayed to the host if they attempt to sign in.</span>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-top px-4 py-3 bg-white" style="border-radius: 0 0 20px 20px;">
+                    <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger px-4">
+                        <i class="fa-solid fa-ban me-1"></i> Confirm Rejection
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function openRejectModal(userId, orgName) {
+            document.getElementById('rejectUserId').value = userId;
+            document.getElementById('rejectOrgName').innerText = orgName;
+            new bootstrap.Modal(document.getElementById('rejectHostModal')).show();
+        }
+    </script>
+}

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using MediCamp.Models.Domain;
 
 namespace MediCamp.Models.ViewModels
 {
@@ -72,11 +73,14 @@ namespace MediCamp.Models.ViewModels
         [Display(Name = "BMDC Registration Number")]
         public string? BMDCRegNo { get; set; }
 
-        // Host NGO Specific
-        [Display(Name = "Organization / NGO Legal Name")]
+        // Host Specific
+        [Display(Name = "Organization Name")]
         public string? OrganizationName { get; set; }
 
-        [Display(Name = "Registration / NGOAB License No")]
+        [Display(Name = "Organization Type")]
+        public string OrganizationType { get; set; } = "NGO"; // NGO, Hospital, Corporate, Community Group, Other
+
+        [Display(Name = "Registration / License No. (Optional)")]
         public string? OrganizationRegNo { get; set; }
 
         [Display(Name = "Opt-in as Voluntary Blood Donor in MediCamp Network")]
@@ -121,6 +125,21 @@ namespace MediCamp.Models.ViewModels
         }
 
         public string OperatingDistricts { get; set; } = "Kurigram, Sunamganj, Bandarban";
+    }
+
+    public class HostApprovalsViewModel
+    {
+        public List<ApplicationUser> PendingHosts { get; set; } = new();
+        public List<ApplicationUser> ApprovedHosts { get; set; } = new();
+        public List<ApplicationUser> RejectedHosts { get; set; } = new();
+        public List<ApplicationUser> AllHosts { get; set; } = new();
+        public string ActiveTab { get; set; } = "Pending";
+        public string? SearchTerm { get; set; }
+
+        public int PendingCount => PendingHosts.Count;
+        public int ApprovedCount => ApprovedHosts.Count;
+        public int RejectedCount => RejectedHosts.Count;
+        public int TotalCount => AllHosts.Count;
     }
 
     public class UserManagementViewModel
@@ -217,5 +236,103 @@ namespace MediCamp.Models.ViewModels
             "Completed" => "bg-secondary",
             _ => "bg-info"
         };
+    }
+
+    public class CreateCampViewModel
+    {
+        [Required(ErrorMessage = "Camp Title is required.")]
+        [StringLength(150, ErrorMessage = "Title cannot exceed 150 characters.")]
+        [Display(Name = "Camp Title")]
+        public string Title { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Please select a Camp Type.")]
+        [Display(Name = "Camp Type / Specialty")]
+        public string CampType { get; set; } = "General Healthcare & Triage";
+
+        [Required(ErrorMessage = "Please select a District.")]
+        [Display(Name = "Target District")]
+        public string District { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Please select an Upazila.")]
+        [Display(Name = "Target Upazila / Sub-district")]
+        public string Upazila { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Venue name or address is required.")]
+        [StringLength(150, ErrorMessage = "Venue cannot exceed 150 characters.")]
+        [Display(Name = "Specific Venue / Field Site")]
+        public string Venue { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Start Date is required.")]
+        [DataType(DataType.Date)]
+        [Display(Name = "Camp Start Date")]
+        public DateTime StartDate { get; set; } = DateTime.Today.AddDays(1);
+
+        [Required(ErrorMessage = "End Date is required.")]
+        [DataType(DataType.Date)]
+        [Display(Name = "Camp End Date")]
+        public DateTime EndDate { get; set; } = DateTime.Today.AddDays(3);
+
+        [Required(ErrorMessage = "Expected Patient Capacity is required.")]
+        [Range(1, 100000, ErrorMessage = "Expected capacity must be between 1 and 100,000 patients.")]
+        [Display(Name = "Expected Patient Capacity")]
+        public int ExpectedPatients { get; set; } = 500;
+
+        [Required(ErrorMessage = "Total Estimated Budget is required.")]
+        [Range(0, 100000000, ErrorMessage = "Budget must be a valid positive amount.")]
+        [Display(Name = "Total Estimated Budget (BDT)")]
+        public decimal TotalBudget { get; set; } = 100000.00m;
+
+        [StringLength(500, ErrorMessage = "Description cannot exceed 500 characters.")]
+        [Display(Name = "Camp Objectives & Target Community Needs")]
+        public string? Description { get; set; }
+
+        // Dropdown Sources (Dynamically Populated)
+        public List<string> AvailableCampTypes { get; set; } = new();
+        public List<string> AvailableDistricts { get; set; } = new();
+        public List<string> AvailableUpazilas { get; set; } = new();
+    }
+
+    public class HostDashboardViewModel
+    {
+        public ApplicationUser HostUser { get; set; } = new();
+        public List<Camp> MyCamps { get; set; } = new();
+        
+        public int TotalCampsCount => MyCamps.Count;
+        public int PendingCount => MyCamps.Count(c => c.Status == "Pending Admin Approval");
+        public int ScheduledCount => MyCamps.Count(c => c.Status == "Scheduled");
+        public int OngoingCount => MyCamps.Count(c => c.Status == "Ongoing");
+        public int CompletedCount => MyCamps.Count(c => c.Status == "Completed");
+        
+        public bool IsApproved => HostUser.HostApprovalStatus == "Approved";
+    }
+    public class AdminCampApprovalsViewModel
+    {
+        public string ActiveTab { get; set; } = "Pending";
+        public List<AdminCampApprovalItemViewModel> PendingCamps { get; set; } = new();
+        public List<AdminCampApprovalItemViewModel> ScheduledCamps { get; set; } = new();
+        public List<AdminCampApprovalItemViewModel> RejectedCamps { get; set; } = new();
+    }
+
+    public class AdminCampApprovalItemViewModel
+    {
+        public int Id { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string CampType { get; set; } = string.Empty;
+        public string HostOrganizationName { get; set; } = string.Empty;
+        public string District { get; set; } = string.Empty;
+        public string Upazila { get; set; } = string.Empty;
+        public string Venue { get; set; } = string.Empty;
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public int ExpectedPatients { get; set; }
+        public decimal TotalBudget { get; set; }
+        public DateTime SubmittedDate { get; set; }
+        public string? CampRejectionReason { get; set; }
+
+        // Automated Checks
+        public bool HasDateConflict { get; set; }
+        public string? ConflictWarningMessage { get; set; }
+        public bool HasCapacitySanityFlag { get; set; }
+        public string? CapacitySanityMessage { get; set; }
     }
 }

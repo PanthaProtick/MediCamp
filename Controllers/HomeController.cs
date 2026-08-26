@@ -25,7 +25,9 @@ namespace MediCamp.Controllers
 
         public IActionResult Camps(string? district, string? campType, string? search)
         {
-            var camps = _dataService.GetAllCamps();
+            var camps = _dataService.GetAllCamps()
+                .Where(c => c.Status == "Scheduled" || c.Status == "Ongoing" || c.Status == "Completed")
+                .ToList();
 
             if (!string.IsNullOrWhiteSpace(district) && district != "All")
             {

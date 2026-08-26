@@ -59,11 +59,39 @@
                                     <i class="fa-solid fa-tent me-1 text-champagne"></i> Find Camps
                                 </a>
                             </li>
+                            @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Host"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link nav-link-custom @(ViewContext.RouteData.Values["Action"]?.ToString() == "Dashboard" && ViewContext.RouteData.Values["Controller"]?.ToString() == "Host" ? "active" : "")" asp-controller="Host" asp-action="Dashboard">
+                                        <i class="fa-solid fa-gauge me-1 text-champagne"></i> Host Dashboard
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link nav-link-custom @(ViewContext.RouteData.Values["Action"]?.ToString() == "MyCamps" && ViewContext.RouteData.Values["Controller"]?.ToString() == "Host" ? "active" : "")" asp-controller="Host" asp-action="MyCamps">
+                                        <i class="fa-solid fa-list-check me-1 text-champagne"></i> My Camps
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link nav-link-custom @(ViewContext.RouteData.Values["Action"]?.ToString() == "CreateCamp" && ViewContext.RouteData.Values["Controller"]?.ToString() == "Host" ? "active" : "")" asp-controller="Host" asp-action="CreateCamp">
+                                        <i class="fa-solid fa-plus-circle me-1 text-champagne"></i> Create New Camp
+                                    </a>
+                                </li>
+                            }
                             @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin"))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link nav-link-custom @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" ? "active" : "")" asp-controller="Admin" asp-action="UserManagement">
+                                    <a class="nav-link nav-link-custom @(ViewContext.RouteData.Values["Action"]?.ToString() == "UserManagement" && ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" ? "active" : "")" asp-controller="Admin" asp-action="UserManagement">
                                         <i class="fa-solid fa-users-gear me-1 text-champagne"></i> User Management
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link nav-link-custom @(ViewContext.RouteData.Values["Action"]?.ToString() == "HostApprovals" && ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" ? "active" : "")" asp-controller="Admin" asp-action="HostApprovals">
+                                        <i class="fa-solid fa-building-circle-check me-1 text-champagne"></i> Host Approvals
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link nav-link-custom @(ViewContext.RouteData.Values["Action"]?.ToString() == "CampApprovals" && ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" ? "active" : "")" asp-controller="Admin" asp-action="CampApprovals">
+                                        <i class="fa-solid fa-tent-arrow-turn-left me-1 text-champagne"></i> Camp Approvals
                                     </a>
                                 </li>
                             }

@@ -14,7 +14,7 @@ namespace MediCamp.Models.Domain
 
         [Required]
         [MaxLength(100)]
-        public string CampType { get; set; } = "General Healthcare"; // General, Eye Camp, Maternal Care, Dental, Blood Drive
+        public string CampType { get; set; } = "General Healthcare & Triage";
 
         [Required]
         [MaxLength(50)]
@@ -43,8 +43,8 @@ namespace MediCamp.Models.Domain
         [Column(TypeName = "decimal(18,2)")]
         public decimal UtilizedBudget { get; set; }
 
-        [MaxLength(20)]
-        public string Status { get; set; } = "Scheduled"; // Scheduled, Ongoing, Completed, Cancelled
+        [MaxLength(50)]
+        public string Status { get; set; } = "Scheduled"; // Scheduled, Ongoing, Completed, Cancelled, Pending Admin Approval
 
         public string? HostId { get; set; }
 
@@ -54,7 +54,25 @@ namespace MediCamp.Models.Domain
         [MaxLength(500)]
         public string? Description { get; set; }
 
+        [MaxLength(500)]
+        public string? CampRejectionReason { get; set; }
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    }
+
+    public static class CampTypes
+    {
+        public static readonly List<string> AllTypes = new()
+        {
+            "General Healthcare & Triage",
+            "Eye Specialist & Vision Care",
+            "Dental Care & Oral Hygiene",
+            "Maternal & Child Healthcare",
+            "Blood Drive & Donor Screening",
+            "Surgical & Specialized Outreach",
+            "Pediatric Care & Immunization",
+            "Geriatric & Chronic Disease Management"
+        };
     }
 
     public class Location
@@ -133,5 +151,159 @@ namespace MediCamp.Models.Domain
         public int TotalDonationsCount { get; set; } = 0;
 
         public double? WeightKg { get; set; }
+    }
+
+    public class CampInventory
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        public int CampId { get; set; }
+        [ForeignKey("CampId")]
+        public Camp? Camp { get; set; }
+
+        [Required]
+        public int MasterMedicineId { get; set; }
+        [ForeignKey("MasterMedicineId")]
+        public MasterMedicine? MasterMedicine { get; set; }
+
+        public int QuantityAllocated { get; set; }
+        public int QuantityDispensed { get; set; } = 0;
+    }
+
+    public class TriageRecord
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        public int CampId { get; set; }
+        [ForeignKey("CampId")]
+        public Camp? Camp { get; set; }
+
+        [Required]
+        public string PatientId { get; set; } = string.Empty;
+        [ForeignKey("PatientId")]
+        public ApplicationUser? Patient { get; set; }
+
+        [Required]
+        public string VolunteerId { get; set; } = string.Empty;
+        [ForeignKey("VolunteerId")]
+        public ApplicationUser? Volunteer { get; set; }
+
+        public DateTime RecordedAt { get; set; } = DateTime.UtcNow;
+        
+        [MaxLength(20)]
+        public string? BloodPressure { get; set; }
+        
+        public double? TemperatureF { get; set; }
+        public double? WeightKg { get; set; }
+        public double? HeightCm { get; set; }
+        public double? BMI { get; set; }
+        
+        [MaxLength(500)]
+        public string? PresentingSymptoms { get; set; }
+        
+        [MaxLength(20)]
+        public string UrgencyLevel { get; set; } = "Normal"; // Normal, Urgent, Emergency
+        
+        public int TokenNumber { get; set; }
+        
+        public bool IsSeenByDoctor { get; set; } = false;
+    }
+
+    public class Consultation
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        public int TriageRecordId { get; set; }
+        [ForeignKey("TriageRecordId")]
+        public TriageRecord? TriageRecord { get; set; }
+
+        [Required]
+        public string DoctorId { get; set; } = string.Empty;
+        [ForeignKey("DoctorId")]
+        public ApplicationUser? Doctor { get; set; }
+
+        public DateTime ConsultedAt { get; set; } = DateTime.UtcNow;
+
+        [MaxLength(500)]
+        public string? ClinicalNotes { get; set; }
+
+        [MaxLength(250)]
+        public string? Diagnosis { get; set; }
+
+        [MaxLength(500)]
+        public string? Advice { get; set; }
+    }
+
+    public class Prescription
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        public int ConsultationId { get; set; }
+        [ForeignKey("ConsultationId")]
+        public Consultation? Consultation { get; set; }
+
+        public bool IsDispensed { get; set; } = false;
+        
+        public string? DispensedByPharmacistId { get; set; }
+        [ForeignKey("DispensedByPharmacistId")]
+        public ApplicationUser? Pharmacist { get; set; }
+        
+        public DateTime? DispensedAt { get; set; }
+    }
+
+    public class PrescriptionItem
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        public int PrescriptionId { get; set; }
+        [ForeignKey("PrescriptionId")]
+        public Prescription? Prescription { get; set; }
+
+        [Required]
+        public int MasterMedicineId { get; set; }
+        [ForeignKey("MasterMedicineId")]
+        public MasterMedicine? MasterMedicine { get; set; }
+
+        [MaxLength(50)]
+        public string Dosage { get; set; } = string.Empty; // e.g. "1+0+1"
+
+        public int DurationDays { get; set; }
+        
+        [MaxLength(150)]
+        public string? Instructions { get; set; } // e.g. "After meal"
+        
+        public int QuantityPrescribed { get; set; }
+        public int QuantityDispensed { get; set; } = 0;
+    }
+
+    public class Referral
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        public int ConsultationId { get; set; }
+        [ForeignKey("ConsultationId")]
+        public Consultation? Consultation { get; set; }
+
+        [Required]
+        [MaxLength(150)]
+        public string ReferredHospital { get; set; } = string.Empty;
+
+        [MaxLength(500)]
+        public string? Reason { get; set; }
+        
+        [MaxLength(20)]
+        public string Urgency { get; set; } = "Routine"; // Routine, Urgent
     }
 }

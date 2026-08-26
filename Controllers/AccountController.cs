@@ -149,21 +149,27 @@ namespace MediCamp.Controllers
         public IActionResult RegisterHost(RegisterHostViewModel model)
         {
             model.Role = SystemRoles.Host;
-            if (string.IsNullOrWhiteSpace(model.OrganizationName) || string.IsNullOrWhiteSpace(model.OrganizationRegNo))
+            if (string.IsNullOrWhiteSpace(model.OrganizationName))
             {
-                ModelState.AddModelError("OrganizationName", "Organization Name and Registration / NGOAB License No are required.");
+                ModelState.AddModelError("OrganizationName", "Organization Name is required.");
                 return View("RegisterHost", model);
             }
 
-            var (success, message, user) = _dataService.RegisterUser(model);
+            var (success, message, user) = _dataService.RegisterHost(model);
             if (!success || user == null)
             {
                 ModelState.AddModelError(string.Empty, message);
                 return View("RegisterHost", model);
             }
 
-            TempData["SuccessMessage"] = "NGO Host registration submitted successfully! Pending Admin verification.";
-            return RedirectToAction(nameof(Login));
+            TempData["SuccessMessage"] = "Host Organization registration submitted successfully! Pending System Admin approval.";
+            return View("HostRegistrationPending", user);
+        }
+
+        [HttpGet]
+        public IActionResult HostRegistrationPending()
+        {
+            return View();
         }
 
         // 4. Volunteer Registration
@@ -265,6 +271,7 @@ namespace MediCamp.Controllers
             return role switch
             {
                 SystemRoles.Admin => RedirectToAction("UserManagement", "Admin"),
+                SystemRoles.Host => RedirectToAction("Dashboard", "Host"),
                 _ => RedirectToAction("Index", "Home")
             };
         }

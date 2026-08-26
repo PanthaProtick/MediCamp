@@ -19,6 +19,9 @@ namespace MediCamp.Services
         (bool Success, string Message) ToggleUserStatus(string userId);
         (bool Success, string Message) ResetUserPassword(string userId, string newPassword);
         (bool Success, string Message) DeleteUser(string userId);
+        (bool Success, string Message) ApproveHost(string userId);
+        (bool Success, string Message) RejectHost(string userId, string rejectionReason);
+        List<ApplicationUser> GetHostsByStatus(string? status);
 
         // System Metrics & Camps
         HomeLandingViewModel GetHomeLandingData();

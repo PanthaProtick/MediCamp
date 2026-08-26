@@ -1,99 +1,289 @@
-D:\3.2\MediCamp\bin\Debug\net10.0\appsettings.Development.json
-D:\3.2\MediCamp\bin\Debug\net10.0\appsettings.json
-D:\3.2\MediCamp\bin\Debug\net10.0\MediCamp.staticwebassets.runtime.json
-D:\3.2\MediCamp\bin\Debug\net10.0\MediCamp.staticwebassets.endpoints.json
-D:\3.2\MediCamp\bin\Debug\net10.0\MediCamp.exe
-D:\3.2\MediCamp\bin\Debug\net10.0\MediCamp.deps.json
-D:\3.2\MediCamp\bin\Debug\net10.0\MediCamp.runtimeconfig.json
-D:\3.2\MediCamp\bin\Debug\net10.0\MediCamp.dll
-D:\3.2\MediCamp\bin\Debug\net10.0\MediCamp.pdb
-D:\3.2\MediCamp\obj\Debug\net10.0\rpswa.dswa.cache.json
-D:\3.2\MediCamp\obj\Debug\net10.0\MediCamp.GeneratedMSBuildEditorConfig.editorconfig
-D:\3.2\MediCamp\obj\Debug\net10.0\MediCamp.AssemblyInfoInputs.cache
-D:\3.2\MediCamp\obj\Debug\net10.0\MediCamp.AssemblyInfo.cs
-D:\3.2\MediCamp\obj\Debug\net10.0\MediCamp.csproj.CoreCompileInputs.cache
-D:\3.2\MediCamp\obj\Debug\net10.0\MediCamp.MvcApplicationPartsAssemblyInfo.cache
-D:\3.2\MediCamp\obj\Debug\net10.0\MediCamp.RazorAssemblyInfo.cache
-D:\3.2\MediCamp\obj\Debug\net10.0\MediCamp.RazorAssemblyInfo.cs
-D:\3.2\MediCamp\obj\Debug\net10.0\MediCamp.sourcelink.json
-D:\3.2\MediCamp\obj\Debug\net10.0\rjimswa.dswa.cache.json
-D:\3.2\MediCamp\obj\Debug\net10.0\rjsmrazor.dswa.cache.json
-D:\3.2\MediCamp\obj\Debug\net10.0\rjsmcshtml.dswa.cache.json
-D:\3.2\MediCamp\obj\Debug\net10.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css
-D:\3.2\MediCamp\obj\Debug\net10.0\scopedcss\bundle\MediCamp.styles.css
-D:\3.2\MediCamp\obj\Debug\net10.0\scopedcss\projectbundle\MediCamp.bundle.scp.css
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\bt9hhnvs4i-{0}-b9sayid5wm-b9sayid5wm.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\2mb5515aqh-{0}-61n19gt1b8-61n19gt1b8.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\bzhkr1d6no-{0}-xtxxf3hu2r-xtxxf3hu2r.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\z983zekxqp-{0}-bqjiyaj88i-bqjiyaj88i.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\39ik3u6u5g-{0}-c2jlpeoesf-c2jlpeoesf.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\aj2ndzffqg-{0}-erw9l3u2r3-erw9l3u2r3.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\08ewbvcas2-{0}-aexeepp0ev-aexeepp0ev.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\l3x6bcs2z9-{0}-d7shbmvgxk-d7shbmvgxk.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\0753e1d5f2-{0}-ausgxo2sd3-ausgxo2sd3.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\wplgkppsha-{0}-k8d9w2qqmf-k8d9w2qqmf.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\oayj3plqq8-{0}-cosvhxvwiu-cosvhxvwiu.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\v0qcfnl04c-{0}-ub07r2b239-ub07r2b239.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\kcqprdd6dc-{0}-fvhpjtyr6v-fvhpjtyr6v.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\8j4snrfu88-{0}-b7pk76d08c-b7pk76d08c.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\9ufi4s46d0-{0}-fsbi9cje9m-fsbi9cje9m.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\6c7zj7iz5d-{0}-rzd6atqjts-rzd6atqjts.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\9br77z1qi1-{0}-ee0r1s7dh0-ee0r1s7dh0.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\2vewkc03or-{0}-dxx9fxp4il-dxx9fxp4il.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\axg0n9viac-{0}-jd9uben2k1-jd9uben2k1.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\pslyldydmd-{0}-khv3u5hwcm-khv3u5hwcm.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\k2v82kwgga-{0}-r4e9w2rdcm-r4e9w2rdcm.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\dql5rq804b-{0}-lcd1t2u6c8-lcd1t2u6c8.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\3r5eqp2jkl-{0}-c2oey78nd0-c2oey78nd0.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\z1xgm2wzd6-{0}-tdbxkamptv-tdbxkamptv.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\ct87fy0hdq-{0}-j5mq2jizvt-j5mq2jizvt.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\n0wv77kxyk-{0}-06098lyss8-06098lyss8.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\a4ysgll0cz-{0}-nvvlpmu67g-nvvlpmu67g.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\lyhs3bexxp-{0}-s35ty4nyc5-s35ty4nyc5.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\tdrxwfokdh-{0}-pj5nd1wqec-pj5nd1wqec.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\j3h02gm1kd-{0}-46ein0sx1k-46ein0sx1k.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\f7i1r2dy0p-{0}-v0zj4ognzu-v0zj4ognzu.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\uzi3lf15q7-{0}-37tfw0ft22-37tfw0ft22.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\znyzr6fbqd-{0}-hrwsygsryq-hrwsygsryq.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\84iqjeoenp-{0}-pk9g2wxc8p-pk9g2wxc8p.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\yzh8ybtiy5-{0}-ft3s53vfgj-ft3s53vfgj.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\6or5cbcjhx-{0}-6cfz1n2cew-6cfz1n2cew.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\xn9u4nyjuk-{0}-6pdc2jztkx-6pdc2jztkx.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\rfwesv79hx-{0}-493y06b0oq-493y06b0oq.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\k6yvyrqf5e-{0}-iovd86k7lj-iovd86k7lj.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\465y4u4lbz-{0}-vr1egmr9el-vr1egmr9el.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\qxo5t0gjkb-{0}-kbrnm935zg-kbrnm935zg.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\zltgqzoqyz-{0}-jj8uyg4cgr-jj8uyg4cgr.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\7ngy1v6234-{0}-y7v9cxd14o-y7v9cxd14o.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\ek2tp1loqo-{0}-notf2xhcfb-notf2xhcfb.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\ojirm3bw84-{0}-h1s4sie4z3-h1s4sie4z3.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\u4bujgljjn-{0}-63fj8s7r0e-63fj8s7r0e.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\npxd5ui306-{0}-0j3bgjxly4-0j3bgjxly4.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\9dk1dnn3vk-{0}-47otxtyo56-47otxtyo56.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\ooe62s3ny9-{0}-4v8eqarkd7-4v8eqarkd7.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\xv2ifzdoqw-{0}-356vix0kms-356vix0kms.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\r2a0z30mot-{0}-83jwlth58m-83jwlth58m.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\api8jj712d-{0}-mrlpezrjn3-mrlpezrjn3.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\c1bsrcu2op-{0}-lzl9nlhx6b-lzl9nlhx6b.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\ksvlqo8u2r-{0}-ag7o75518u-ag7o75518u.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\z5q35n1x3m-{0}-x0q3zqp4vz-x0q3zqp4vz.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\8zc3p9ozac-{0}-0i3buxo5is-0i3buxo5is.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\7i0lzdk5wj-{0}-o1o13a6vjx-o1o13a6vjx.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\7yfi09mvbl-{0}-ttgo8qnofa-ttgo8qnofa.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\9ca2ouwe3i-{0}-2z0ns9nrw6-2z0ns9nrw6.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\6actlbsu10-{0}-muycvpuwrr-muycvpuwrr.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\243nl992ok-{0}-87fc7y1x7t-87fc7y1x7t.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\l22wcym9wu-{0}-mlv21k5csn-mlv21k5csn.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\4lpcinqsfj-{0}-p9brrngdcq-p9brrngdcq.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\g1kyeld32d-{0}-p9brrngdcq-p9brrngdcq.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\staticwebassets.build.json
-D:\3.2\MediCamp\obj\Debug\net10.0\staticwebassets.build.json.cache
-D:\3.2\MediCamp\obj\Debug\net10.0\staticwebassets.development.json
-D:\3.2\MediCamp\obj\Debug\net10.0\staticwebassets.build.endpoints.json
-D:\3.2\MediCamp\obj\Debug\net10.0\swae.build.ex.cache
-D:\3.2\MediCamp\obj\Debug\net10.0\MediCamp.dll
-D:\3.2\MediCamp\obj\Debug\net10.0\refint\MediCamp.dll
-D:\3.2\MediCamp\obj\Debug\net10.0\MediCamp.pdb
-D:\3.2\MediCamp\obj\Debug\net10.0\MediCamp.genruntimeconfig.cache
-D:\3.2\MediCamp\obj\Debug\net10.0\ref\MediCamp.dll
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\bvnugnltr5-{0}-ofe07h6k3c-ofe07h6k3c.gz
+D:/3.2/MediCamp/bin/Debug/net10.0/appsettings.Development.json
+D:/3.2/MediCamp/bin/Debug/net10.0/appsettings.json
+D:/3.2/MediCamp/bin/Debug/net10.0/MediCamp.staticwebassets.runtime.json
+D:/3.2/MediCamp/bin/Debug/net10.0/MediCamp.staticwebassets.endpoints.json
+D:/3.2/MediCamp/bin/Debug/net10.0/MediCamp.exe
+D:/3.2/MediCamp/bin/Debug/net10.0/MediCamp.deps.json
+D:/3.2/MediCamp/bin/Debug/net10.0/MediCamp.runtimeconfig.json
+D:/3.2/MediCamp/bin/Debug/net10.0/MediCamp.dll
+D:/3.2/MediCamp/bin/Debug/net10.0/MediCamp.pdb
+D:/3.2/MediCamp/obj/Debug/net10.0/rpswa.dswa.cache.json
+D:/3.2/MediCamp/obj/Debug/net10.0/MediCamp.GeneratedMSBuildEditorConfig.editorconfig
+D:/3.2/MediCamp/obj/Debug/net10.0/MediCamp.AssemblyInfoInputs.cache
+D:/3.2/MediCamp/obj/Debug/net10.0/MediCamp.AssemblyInfo.cs
+D:/3.2/MediCamp/obj/Debug/net10.0/MediCamp.csproj.CoreCompileInputs.cache
+D:/3.2/MediCamp/obj/Debug/net10.0/MediCamp.MvcApplicationPartsAssemblyInfo.cache
+D:/3.2/MediCamp/obj/Debug/net10.0/MediCamp.RazorAssemblyInfo.cache
+D:/3.2/MediCamp/obj/Debug/net10.0/MediCamp.RazorAssemblyInfo.cs
+D:/3.2/MediCamp/obj/Debug/net10.0/MediCamp.sourcelink.json
+D:/3.2/MediCamp/obj/Debug/net10.0/rjimswa.dswa.cache.json
+D:/3.2/MediCamp/obj/Debug/net10.0/rjsmrazor.dswa.cache.json
+D:/3.2/MediCamp/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json
+D:/3.2/MediCamp/obj/Debug/net10.0/scopedcss/Views/Shared/_Layout.cshtml.rz.scp.css
+D:/3.2/MediCamp/obj/Debug/net10.0/scopedcss/bundle/MediCamp.styles.css
+D:/3.2/MediCamp/obj/Debug/net10.0/scopedcss/projectbundle/MediCamp.bundle.scp.css
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/bt9hhnvs4i-{0}-b9sayid5wm-b9sayid5wm.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/2mb5515aqh-{0}-61n19gt1b8-61n19gt1b8.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/bzhkr1d6no-{0}-xtxxf3hu2r-xtxxf3hu2r.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/z983zekxqp-{0}-bqjiyaj88i-bqjiyaj88i.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/39ik3u6u5g-{0}-c2jlpeoesf-c2jlpeoesf.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/aj2ndzffqg-{0}-erw9l3u2r3-erw9l3u2r3.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/08ewbvcas2-{0}-aexeepp0ev-aexeepp0ev.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/l3x6bcs2z9-{0}-d7shbmvgxk-d7shbmvgxk.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/0753e1d5f2-{0}-ausgxo2sd3-ausgxo2sd3.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/wplgkppsha-{0}-k8d9w2qqmf-k8d9w2qqmf.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/oayj3plqq8-{0}-cosvhxvwiu-cosvhxvwiu.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/v0qcfnl04c-{0}-ub07r2b239-ub07r2b239.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/kcqprdd6dc-{0}-fvhpjtyr6v-fvhpjtyr6v.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/8j4snrfu88-{0}-b7pk76d08c-b7pk76d08c.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/9ufi4s46d0-{0}-fsbi9cje9m-fsbi9cje9m.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/6c7zj7iz5d-{0}-rzd6atqjts-rzd6atqjts.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/9br77z1qi1-{0}-ee0r1s7dh0-ee0r1s7dh0.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/2vewkc03or-{0}-dxx9fxp4il-dxx9fxp4il.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/axg0n9viac-{0}-jd9uben2k1-jd9uben2k1.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/pslyldydmd-{0}-khv3u5hwcm-khv3u5hwcm.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/k2v82kwgga-{0}-r4e9w2rdcm-r4e9w2rdcm.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/dql5rq804b-{0}-lcd1t2u6c8-lcd1t2u6c8.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/3r5eqp2jkl-{0}-c2oey78nd0-c2oey78nd0.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/z1xgm2wzd6-{0}-tdbxkamptv-tdbxkamptv.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/ct87fy0hdq-{0}-j5mq2jizvt-j5mq2jizvt.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/n0wv77kxyk-{0}-06098lyss8-06098lyss8.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/a4ysgll0cz-{0}-nvvlpmu67g-nvvlpmu67g.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/lyhs3bexxp-{0}-s35ty4nyc5-s35ty4nyc5.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/tdrxwfokdh-{0}-pj5nd1wqec-pj5nd1wqec.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/j3h02gm1kd-{0}-46ein0sx1k-46ein0sx1k.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/f7i1r2dy0p-{0}-v0zj4ognzu-v0zj4ognzu.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/uzi3lf15q7-{0}-37tfw0ft22-37tfw0ft22.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/znyzr6fbqd-{0}-hrwsygsryq-hrwsygsryq.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/84iqjeoenp-{0}-pk9g2wxc8p-pk9g2wxc8p.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/yzh8ybtiy5-{0}-ft3s53vfgj-ft3s53vfgj.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/6or5cbcjhx-{0}-6cfz1n2cew-6cfz1n2cew.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/xn9u4nyjuk-{0}-6pdc2jztkx-6pdc2jztkx.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/rfwesv79hx-{0}-493y06b0oq-493y06b0oq.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/k6yvyrqf5e-{0}-iovd86k7lj-iovd86k7lj.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/465y4u4lbz-{0}-vr1egmr9el-vr1egmr9el.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/qxo5t0gjkb-{0}-kbrnm935zg-kbrnm935zg.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/zltgqzoqyz-{0}-jj8uyg4cgr-jj8uyg4cgr.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/7ngy1v6234-{0}-y7v9cxd14o-y7v9cxd14o.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/ek2tp1loqo-{0}-notf2xhcfb-notf2xhcfb.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/ojirm3bw84-{0}-h1s4sie4z3-h1s4sie4z3.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/u4bujgljjn-{0}-63fj8s7r0e-63fj8s7r0e.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/npxd5ui306-{0}-0j3bgjxly4-0j3bgjxly4.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/9dk1dnn3vk-{0}-47otxtyo56-47otxtyo56.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/ooe62s3ny9-{0}-4v8eqarkd7-4v8eqarkd7.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/xv2ifzdoqw-{0}-356vix0kms-356vix0kms.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/r2a0z30mot-{0}-83jwlth58m-83jwlth58m.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/api8jj712d-{0}-mrlpezrjn3-mrlpezrjn3.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/c1bsrcu2op-{0}-lzl9nlhx6b-lzl9nlhx6b.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/ksvlqo8u2r-{0}-ag7o75518u-ag7o75518u.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/z5q35n1x3m-{0}-x0q3zqp4vz-x0q3zqp4vz.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/8zc3p9ozac-{0}-0i3buxo5is-0i3buxo5is.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/7i0lzdk5wj-{0}-o1o13a6vjx-o1o13a6vjx.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/7yfi09mvbl-{0}-ttgo8qnofa-ttgo8qnofa.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/9ca2ouwe3i-{0}-2z0ns9nrw6-2z0ns9nrw6.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/6actlbsu10-{0}-muycvpuwrr-muycvpuwrr.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/243nl992ok-{0}-87fc7y1x7t-87fc7y1x7t.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/l22wcym9wu-{0}-mlv21k5csn-mlv21k5csn.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/4lpcinqsfj-{0}-p9brrngdcq-p9brrngdcq.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/g1kyeld32d-{0}-p9brrngdcq-p9brrngdcq.gz
+D:/3.2/MediCamp/obj/Debug/net10.0/staticwebassets.build.json
+D:/3.2/MediCamp/obj/Debug/net10.0/staticwebassets.build.json.cache
+D:/3.2/MediCamp/obj/Debug/net10.0/staticwebassets.development.json
+D:/3.2/MediCamp/obj/Debug/net10.0/staticwebassets.build.endpoints.json
+D:/3.2/MediCamp/obj/Debug/net10.0/swae.build.ex.cache
+D:/3.2/MediCamp/obj/Debug/net10.0/MediCamp.dll
+D:/3.2/MediCamp/obj/Debug/net10.0/refint/MediCamp.dll
+D:/3.2/MediCamp/obj/Debug/net10.0/MediCamp.pdb
+D:/3.2/MediCamp/obj/Debug/net10.0/MediCamp.genruntimeconfig.cache
+D:/3.2/MediCamp/obj/Debug/net10.0/ref/MediCamp.dll
+D:/3.2/MediCamp/obj/Debug/net10.0/compressed/bvnugnltr5-{0}-ofe07h6k3c-ofe07h6k3c.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/appsettings.Development.json
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/appsettings.json
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/MediCamp.staticwebassets.runtime.json
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/MediCamp.staticwebassets.endpoints.json
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/MediCamp
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/MediCamp.deps.json
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/MediCamp.runtimeconfig.json
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/MediCamp.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/MediCamp.pdb
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/rpswa.dswa.cache.json
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/MediCamp.GeneratedMSBuildEditorConfig.editorconfig
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/MediCamp.AssemblyInfoInputs.cache
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/MediCamp.AssemblyInfo.cs
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/MediCamp.csproj.CoreCompileInputs.cache
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/MediCamp.MvcApplicationPartsAssemblyInfo.cache
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/MediCamp.RazorAssemblyInfo.cache
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/MediCamp.RazorAssemblyInfo.cs
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/MediCamp.sourcelink.json
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/rjimswa.dswa.cache.json
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/rjsmrazor.dswa.cache.json
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/rjsmcshtml.dswa.cache.json
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/scopedcss/Views/Shared/_Layout.cshtml.rz.scp.css
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/scopedcss/bundle/MediCamp.styles.css
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/scopedcss/projectbundle/MediCamp.bundle.scp.css
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/bvnugnltr5-{0}-ofe07h6k3c-ofe07h6k3c.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/bt9hhnvs4i-{0}-lugek5hnai-lugek5hnai.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/2mb5515aqh-{0}-61n19gt1b8-61n19gt1b8.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/bzhkr1d6no-{0}-fr7q2aak1r-fr7q2aak1r.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/z983zekxqp-{0}-bqjiyaj88i-bqjiyaj88i.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/39ik3u6u5g-{0}-c2jlpeoesf-c2jlpeoesf.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/aj2ndzffqg-{0}-erw9l3u2r3-erw9l3u2r3.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/08ewbvcas2-{0}-aexeepp0ev-aexeepp0ev.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/l3x6bcs2z9-{0}-d7shbmvgxk-d7shbmvgxk.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/0753e1d5f2-{0}-ausgxo2sd3-ausgxo2sd3.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/wplgkppsha-{0}-k8d9w2qqmf-k8d9w2qqmf.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/oayj3plqq8-{0}-cosvhxvwiu-cosvhxvwiu.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/v0qcfnl04c-{0}-ub07r2b239-ub07r2b239.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/kcqprdd6dc-{0}-fvhpjtyr6v-fvhpjtyr6v.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/8j4snrfu88-{0}-b7pk76d08c-b7pk76d08c.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/9ufi4s46d0-{0}-fsbi9cje9m-fsbi9cje9m.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/6c7zj7iz5d-{0}-rzd6atqjts-rzd6atqjts.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/9br77z1qi1-{0}-ee0r1s7dh0-ee0r1s7dh0.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/2vewkc03or-{0}-dxx9fxp4il-dxx9fxp4il.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/axg0n9viac-{0}-jd9uben2k1-jd9uben2k1.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/pslyldydmd-{0}-khv3u5hwcm-khv3u5hwcm.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/k2v82kwgga-{0}-r4e9w2rdcm-r4e9w2rdcm.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/dql5rq804b-{0}-lcd1t2u6c8-lcd1t2u6c8.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/3r5eqp2jkl-{0}-c2oey78nd0-c2oey78nd0.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/z1xgm2wzd6-{0}-tdbxkamptv-tdbxkamptv.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/ct87fy0hdq-{0}-j5mq2jizvt-j5mq2jizvt.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/n0wv77kxyk-{0}-06098lyss8-06098lyss8.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/a4ysgll0cz-{0}-nvvlpmu67g-nvvlpmu67g.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/lyhs3bexxp-{0}-s35ty4nyc5-s35ty4nyc5.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/tdrxwfokdh-{0}-pj5nd1wqec-pj5nd1wqec.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/j3h02gm1kd-{0}-46ein0sx1k-46ein0sx1k.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/f7i1r2dy0p-{0}-v0zj4ognzu-v0zj4ognzu.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/uzi3lf15q7-{0}-37tfw0ft22-37tfw0ft22.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/znyzr6fbqd-{0}-hrwsygsryq-hrwsygsryq.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/84iqjeoenp-{0}-pk9g2wxc8p-pk9g2wxc8p.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/yzh8ybtiy5-{0}-ft3s53vfgj-ft3s53vfgj.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/6or5cbcjhx-{0}-6cfz1n2cew-6cfz1n2cew.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/xn9u4nyjuk-{0}-6pdc2jztkx-6pdc2jztkx.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/rfwesv79hx-{0}-493y06b0oq-493y06b0oq.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/k6yvyrqf5e-{0}-iovd86k7lj-iovd86k7lj.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/465y4u4lbz-{0}-vr1egmr9el-vr1egmr9el.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/qxo5t0gjkb-{0}-kbrnm935zg-kbrnm935zg.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/zltgqzoqyz-{0}-jj8uyg4cgr-jj8uyg4cgr.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/7ngy1v6234-{0}-y7v9cxd14o-y7v9cxd14o.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/ek2tp1loqo-{0}-notf2xhcfb-notf2xhcfb.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/ojirm3bw84-{0}-h1s4sie4z3-h1s4sie4z3.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/u4bujgljjn-{0}-63fj8s7r0e-63fj8s7r0e.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/npxd5ui306-{0}-0j3bgjxly4-0j3bgjxly4.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/9dk1dnn3vk-{0}-47otxtyo56-47otxtyo56.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/ooe62s3ny9-{0}-4v8eqarkd7-4v8eqarkd7.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/xv2ifzdoqw-{0}-l3n5xuwxn8-l3n5xuwxn8.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/r2a0z30mot-{0}-ilo7uva0vt-ilo7uva0vt.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/api8jj712d-{0}-qlccset4i1-qlccset4i1.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/c1bsrcu2op-{0}-lzl9nlhx6b-lzl9nlhx6b.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/ksvlqo8u2r-{0}-ag7o75518u-ag7o75518u.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/z5q35n1x3m-{0}-xzw0cte36n-xzw0cte36n.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/8zc3p9ozac-{0}-0i3buxo5is-0i3buxo5is.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/7i0lzdk5wj-{0}-o1o13a6vjx-o1o13a6vjx.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/7yfi09mvbl-{0}-ttgo8qnofa-ttgo8qnofa.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/9ca2ouwe3i-{0}-2z0ns9nrw6-2z0ns9nrw6.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/6actlbsu10-{0}-muycvpuwrr-muycvpuwrr.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/243nl992ok-{0}-87fc7y1x7t-87fc7y1x7t.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/l22wcym9wu-{0}-jfsiqqwiad-jfsiqqwiad.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/4lpcinqsfj-{0}-kdq8lz8gaf-kdq8lz8gaf.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/compressed/g1kyeld32d-{0}-kdq8lz8gaf-kdq8lz8gaf.gz
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/staticwebassets.build.json
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/staticwebassets.build.json.cache
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/staticwebassets.development.json
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/staticwebassets.build.endpoints.json
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/swae.build.ex.cache
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/MediCamp.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/refint/MediCamp.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/MediCamp.pdb
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/MediCamp.genruntimeconfig.cache
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/ref/MediCamp.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/Humanizer.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/Microsoft.Build.Framework.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/Microsoft.CodeAnalysis.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/Microsoft.CodeAnalysis.CSharp.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/Microsoft.CodeAnalysis.CSharp.Workspaces.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/Microsoft.CodeAnalysis.Workspaces.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/Microsoft.CodeAnalysis.ExternalAccess.RazorCompiler.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/Microsoft.CodeAnalysis.Workspaces.MSBuild.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/Microsoft.EntityFrameworkCore.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/Microsoft.EntityFrameworkCore.Abstractions.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/Microsoft.EntityFrameworkCore.Design.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/Microsoft.EntityFrameworkCore.Relational.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/Microsoft.Extensions.DependencyModel.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/Microsoft.VisualStudio.SolutionPersistence.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/Mono.TextTemplating.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/Newtonsoft.Json.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/Npgsql.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/Npgsql.EntityFrameworkCore.PostgreSQL.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/System.CodeDom.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/System.Composition.AttributedModel.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/System.Composition.Convention.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/System.Composition.Hosting.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/System.Composition.Runtime.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/System.Composition.TypedParts.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/cs/Microsoft.CodeAnalysis.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/de/Microsoft.CodeAnalysis.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/es/Microsoft.CodeAnalysis.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/fr/Microsoft.CodeAnalysis.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/it/Microsoft.CodeAnalysis.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/ja/Microsoft.CodeAnalysis.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/ko/Microsoft.CodeAnalysis.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/pl/Microsoft.CodeAnalysis.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/pt-BR/Microsoft.CodeAnalysis.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/ru/Microsoft.CodeAnalysis.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/tr/Microsoft.CodeAnalysis.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/zh-Hans/Microsoft.CodeAnalysis.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/zh-Hant/Microsoft.CodeAnalysis.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/cs/Microsoft.CodeAnalysis.CSharp.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/de/Microsoft.CodeAnalysis.CSharp.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/es/Microsoft.CodeAnalysis.CSharp.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/fr/Microsoft.CodeAnalysis.CSharp.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/it/Microsoft.CodeAnalysis.CSharp.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/ja/Microsoft.CodeAnalysis.CSharp.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/ko/Microsoft.CodeAnalysis.CSharp.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/pl/Microsoft.CodeAnalysis.CSharp.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/pt-BR/Microsoft.CodeAnalysis.CSharp.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/ru/Microsoft.CodeAnalysis.CSharp.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/tr/Microsoft.CodeAnalysis.CSharp.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/zh-Hans/Microsoft.CodeAnalysis.CSharp.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/zh-Hant/Microsoft.CodeAnalysis.CSharp.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/cs/Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/de/Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/es/Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/fr/Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/it/Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/ja/Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/ko/Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/pl/Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/pt-BR/Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/ru/Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/tr/Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/zh-Hans/Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/zh-Hant/Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/cs/Microsoft.CodeAnalysis.Workspaces.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/de/Microsoft.CodeAnalysis.Workspaces.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/es/Microsoft.CodeAnalysis.Workspaces.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/fr/Microsoft.CodeAnalysis.Workspaces.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/it/Microsoft.CodeAnalysis.Workspaces.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/ja/Microsoft.CodeAnalysis.Workspaces.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/ko/Microsoft.CodeAnalysis.Workspaces.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/pl/Microsoft.CodeAnalysis.Workspaces.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/pt-BR/Microsoft.CodeAnalysis.Workspaces.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/ru/Microsoft.CodeAnalysis.Workspaces.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/tr/Microsoft.CodeAnalysis.Workspaces.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/zh-Hans/Microsoft.CodeAnalysis.Workspaces.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/zh-Hant/Microsoft.CodeAnalysis.Workspaces.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/cs/Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/de/Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/es/Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/fr/Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/it/Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/ja/Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/ko/Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/pl/Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/pt-BR/Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/ru/Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/tr/Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/zh-Hans/Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/bin/Debug/net10.0/zh-Hant/Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/MediCamp.csproj.AssemblyReference.cache
+/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/Debug/net10.0/MediCamp.csproj.Up2Date
