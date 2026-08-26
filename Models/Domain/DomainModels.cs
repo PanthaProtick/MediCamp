@@ -328,4 +328,26 @@ namespace MediCamp.Models.Domain
         public DateTime RequestedAt { get; set; } = DateTime.UtcNow;
         public DateTime? RespondedAt { get; set; }
     }
+
+    public class CampVolunteerRequest
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        public int CampId { get; set; }
+        [ForeignKey("CampId")]
+        public Camp? Camp { get; set; }
+
+        [Required]
+        public string VolunteerId { get; set; } = string.Empty;
+        [ForeignKey("VolunteerId")]
+        public ApplicationUser? Volunteer { get; set; }
+
+        [MaxLength(20)]
+        public string Status { get; set; } = "Pending"; // Pending, Approved, Denied
+
+        public DateTime RequestedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? RespondedAt { get; set; }
+    }
 }

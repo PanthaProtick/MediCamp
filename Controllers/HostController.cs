@@ -329,7 +329,9 @@ namespace MediCamp.Controllers
             {
                 Camp = camp,
                 CurrentRequests = _mockDataService.GetRequestsForCamp(id),
-                AvailableDoctors = _dbContext.Users.Where(u => u.Role == SystemRoles.Doctor && u.IsActive).ToList()
+                AvailableDoctors = _dbContext.Users.Where(u => u.Role == SystemRoles.Doctor && u.IsActive).ToList(),
+                CurrentVolunteerRequests = _mockDataService.GetVolunteerRequestsForCamp(id),
+                AvailableVolunteers = _dbContext.Users.Where(u => u.Role == SystemRoles.Volunteer && u.IsActive).ToList()
             };
 
             return View(model);
@@ -353,6 +355,37 @@ namespace MediCamp.Controllers
             }
 
             var result = _mockDataService.SendCampStaffRequest(campId, doctorId);
+            
+            if (result.Success)
+            {
+                TempData["SuccessMessage"] = result.Message;
+            }
+            else
+            {
+                TempData["ErrorMessage"] = result.Message;
+            }
+
+            return RedirectToAction(nameof(ManageStaff), new { id = campId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult SendVolunteerRequest(int campId, string volunteerId)
+        {
+            var currentHost = GetCurrentHostUser();
+            if (currentHost == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var camp = _dbContext.Camps.FirstOrDefault(c => c.Id == campId && c.HostId == currentHost.Id);
+            if (camp == null)
+            {
+                TempData["ErrorMessage"] = "Camp not found or access denied.";
+                return RedirectToAction(nameof(MyCamps));
+            }
+
+            var result = _mockDataService.SendCampVolunteerRequest(campId, volunteerId);
             
             if (result.Success)
             {

@@ -1,0 +1,155 @@
+@model MediCamp.Models.ViewModels.VolunteerRequestsViewModel
+
+@{
+    ViewData["Title"] = "Camp Invitations - Volunteer Portal";
+    Layout = "_Layout";
+}
+
+<div class="container py-5">
+    <div class="d-flex align-items-center gap-2 mb-2">
+        <span class="badge badge-role-volunteer"><i class="fa-solid fa-hand-holding-heart"></i> Volunteer Portal</span>
+        <span class="text-muted small">Recruitment System</span>
+    </div>
+    <h2 class="fw-bold text-dark mb-4">Camp Invitations</h2>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <ul class="nav nav-pills mb-4" id="requestsTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active fw-bold" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab" aria-controls="pending" aria-selected="true">
+                Pending Invitations (@Model.PendingRequests.Count)
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold" id="responded-tab" data-bs-toggle="tab" data-bs-target="#responded" type="button" role="tab" aria-controls="responded" aria-selected="false">
+                Past Responses (@Model.RespondedRequests.Count)
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="requestsTabContent">
+        <!-- Pending Tab -->
+        <div class="tab-pane fade show active" id="pending" role="tabpanel" aria-labelledby="pending-tab">
+            @if (Model.PendingRequests.Any())
+            {
+                <div class="row g-4">
+                    @foreach (var req in Model.PendingRequests)
+                    {
+                        <div class="col-md-6">
+                            <div class="card shadow-sm border-warning border-top border-4">
+                                <div class="card-body">
+                                    <h5 class="card-title fw-bold text-dark mb-3">@req.Camp?.Title</h5>
+                                    
+                                    <div class="mb-3">
+                                        <div class="small mb-1"><i class="fa-solid fa-location-dot text-danger me-2"></i><strong>Location:</strong> @req.Camp?.Upazila, @req.Camp?.District</div>
+                                        <div class="small mb-1"><i class="fa-solid fa-calendar-days text-primary me-2"></i><strong>Dates:</strong> @req.Camp?.StartDate.ToString("MMM dd, yyyy") to @req.Camp?.EndDate.ToString("MMM dd, yyyy")</div>
+                                        <div class="small mb-1"><i class="fa-solid fa-users text-info me-2"></i><strong>Target Patients:</strong> @req.Camp?.ExpectedPatients</div>
+                                    </div>
+                                    
+                                    <p class="small text-muted mb-4">Requested on: @req.RequestedAt.ToLocalTime().ToString("MMM dd, yyyy hh:mm tt")</p>
+
+                                    <div class="d-flex gap-2">
+                                        <form asp-action="RespondToRequest" method="post" class="flex-grow-1">
+                                            <input type="hidden" name="requestId" value="@req.Id" />
+                                            <input type="hidden" name="status" value="Approved" />
+                                            <button type="submit" class="btn btn-success w-100 fw-bold">
+                                                <i class="fa-solid fa-check me-1"></i> Accept
+                                            </button>
+                                        </form>
+                                        
+                                        <form asp-action="RespondToRequest" method="post" class="flex-grow-1">
+                                            <input type="hidden" name="requestId" value="@req.Id" />
+                                            <input type="hidden" name="status" value="Denied" />
+                                            <button type="submit" class="btn btn-outline-danger w-100 fw-bold">
+                                                <i class="fa-solid fa-xmark me-1"></i> Decline
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="glass-card text-center py-5">
+                    <i class="fa-solid fa-envelope-open text-muted fs-1 mb-3 opacity-50"></i>
+                    <h5 class="text-secondary fw-bold">No pending invitations</h5>
+                    <p class="text-muted small">When a host invites you to a camp, it will appear here.</p>
+                </div>
+            }
+        </div>
+
+        <!-- Responded Tab -->
+        <div class="tab-pane fade" id="responded" role="tabpanel" aria-labelledby="responded-tab">
+            @if (Model.RespondedRequests.Any())
+            {
+                <div class="table-responsive glass-card p-3">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Camp Title</th>
+                                <th>Location</th>
+                                <th>Dates</th>
+                                <th>Status</th>
+                                <th>Responded At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var req in Model.RespondedRequests)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold text-dark">@req.Camp?.Title</div>
+                                    </td>
+                                    <td>
+                                        <div class="small">@req.Camp?.Upazila, @req.Camp?.District</div>
+                                    </td>
+                                    <td>
+                                        <div class="small">@req.Camp?.StartDate.ToString("MMM dd") - @req.Camp?.EndDate.ToString("MMM dd, yyyy")</div>
+                                    </td>
+                                    <td>
+                                        @if (req.Status == "Approved")
+                                        {
+                                            <span class="badge bg-success"><i class="fa-solid fa-check me-1"></i>Accepted</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger"><i class="fa-solid fa-xmark me-1"></i>Declined</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="small text-muted">@req.RespondedAt?.ToLocalTime().ToString("MMM dd, yyyy hh:mm tt")</div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="glass-card text-center py-5">
+                    <i class="fa-solid fa-clock-rotate-left text-muted fs-1 mb-3 opacity-50"></i>
+                    <h5 class="text-secondary fw-bold">No history found</h5>
+                    <p class="text-muted small">You haven't responded to any invitations yet.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

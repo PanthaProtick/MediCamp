@@ -137,4 +137,117 @@
             </div>
         </div>
     </div>
+
+    <!-- Volunteers Section -->
+    <h3 class="mt-5 mb-4 border-bottom pb-2">Volunteer Recruitment</h3>
+    <div class="row">
+        <!-- Sent Volunteer Requests Section -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Current Volunteer Requests</h5>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.CurrentVolunteerRequests.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Volunteer Name</th>
+                                        <th>Status</th>
+                                        <th>Requested At</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var req in Model.CurrentVolunteerRequests)
+                                    {
+                                        <tr>
+                                            <td>@(req.Volunteer?.FullName ?? "Unknown")</td>
+                                            <td>
+                                                @if (req.Status == "Pending")
+                                                {
+                                                    <span class="badge bg-warning text-dark">Pending</span>
+                                                }
+                                                else if (req.Status == "Approved")
+                                                {
+                                                    <span class="badge bg-success">Approved</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-danger">Denied</span>
+                                                }
+                                            </td>
+                                            <td>@req.RequestedAt.ToLocalTime().ToString("MMM dd, yyyy HH:mm")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="p-4 text-center text-muted">
+                            <p>No volunteer requests have been sent for this camp yet.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Available Volunteers Section -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-teal text-white">
+                    <h5 class="mb-0">Available Volunteers</h5>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.AvailableVolunteers.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Volunteer Name</th>
+                                        <th>District</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var vol in Model.AvailableVolunteers)
+                                    {
+                                        var existingRequest = Model.CurrentVolunteerRequests.FirstOrDefault(r => r.VolunteerId == vol.Id);
+                                        <tr>
+                                            <td>@vol.FullName</td>
+                                            <td>@(vol.District ?? "Unknown")</td>
+                                            <td>
+                                                @if (existingRequest != null)
+                                                {
+                                                    <button class="btn btn-sm btn-secondary" disabled>Request Sent</button>
+                                                }
+                                                else
+                                                {
+                                                    <form asp-action="SendVolunteerRequest" method="post">
+                                                        <input type="hidden" name="campId" value="@Model.Camp.Id" />
+                                                        <input type="hidden" name="volunteerId" value="@vol.Id" />
+                                                        <button type="submit" class="btn btn-sm btn-success">Send Request</button>
+                                                    </form>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="p-4 text-center text-muted">
+                            <p>No active volunteers found in the system.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

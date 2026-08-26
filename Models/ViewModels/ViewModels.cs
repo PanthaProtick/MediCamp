@@ -341,11 +341,19 @@ namespace MediCamp.Models.ViewModels
         public Camp Camp { get; set; } = new();
         public List<CampStaffRequest> CurrentRequests { get; set; } = new();
         public List<ApplicationUser> AvailableDoctors { get; set; } = new();
+        public List<CampVolunteerRequest> CurrentVolunteerRequests { get; set; } = new();
+        public List<ApplicationUser> AvailableVolunteers { get; set; } = new();
     }
 
     public class DoctorRequestsViewModel
     {
         public List<CampStaffRequest> PendingRequests { get; set; } = new();
         public List<CampStaffRequest> RespondedRequests { get; set; } = new();
+    }
+
+    public class VolunteerRequestsViewModel
+    {
+        public List<CampVolunteerRequest> PendingRequests { get; set; } = new();
+        public List<CampVolunteerRequest> RespondedRequests { get; set; } = new();
     }
 }

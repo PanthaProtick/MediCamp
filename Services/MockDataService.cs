@@ -381,5 +381,65 @@ namespace MediCamp.Services
 
             return (true, $"Request {status.ToLower()} successfully.");
         }
+
+        // --- Volunteer Requests ---
+        public List<CampVolunteerRequest> GetVolunteerRequestsForCamp(int campId)
+        {
+            return _dbContext.CampVolunteerRequests
+                .Include(r => r.Volunteer)
+                .Where(r => r.CampId == campId)
+                .ToList();
+        }
+
+        public List<CampVolunteerRequest> GetRequestsForVolunteer(string volunteerId)
+        {
+            return _dbContext.CampVolunteerRequests
+                .Include(r => r.Camp)
+                .Where(r => r.VolunteerId == volunteerId)
+                .OrderByDescending(r => r.RequestedAt)
+                .ToList();
+        }
+
+        public (bool Success, string Message) SendCampVolunteerRequest(int campId, string volunteerId)
+        {
+            var camp = _dbContext.Camps.FirstOrDefault(c => c.Id == campId);
+            if (camp == null) return (false, "Camp not found.");
+
+            var existingRequest = _dbContext.CampVolunteerRequests
+                .FirstOrDefault(r => r.CampId == campId && r.VolunteerId == volunteerId);
+
+            if (existingRequest != null)
+            {
+                return (false, "A request has already been sent to this volunteer.");
+            }
+
+            var request = new CampVolunteerRequest
+            {
+                CampId = campId,
+                VolunteerId = volunteerId,
+                Status = "Pending",
+                RequestedAt = DateTime.UtcNow
+            };
+
+            _dbContext.CampVolunteerRequests.Add(request);
+            _dbContext.SaveChanges();
+
+            return (true, "Invitation sent successfully.");
+        }
+
+        public (bool Success, string Message) RespondToCampVolunteerRequest(int requestId, string volunteerId, string status)
+        {
+            var request = _dbContext.CampVolunteerRequests.FirstOrDefault(r => r.Id == requestId && r.VolunteerId == volunteerId);
+            if (request == null) return (false, "Request not found.");
+
+            if (request.Status != "Pending") return (false, "Request has already been processed.");
+
+            request.Status = status;
+            request.RespondedAt = DateTime.UtcNow;
+
+            _dbContext.SaveChanges();
+
+            return (true, $"Request {status.ToLower()} successfully.");
+        }
     }
 }
