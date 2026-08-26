@@ -34,7 +34,8 @@ namespace MediCamp.Services
                 searchTerm = searchTerm.ToLower();
                 query = query.Where(u => u.FullName.ToLower().Contains(searchTerm) || 
                                          u.Email.ToLower().Contains(searchTerm) || 
-                                         (u.PhoneNumber != null && u.PhoneNumber.Contains(searchTerm)));
+                                         (u.PhoneNumber != null && u.PhoneNumber.Contains(searchTerm)) ||
+                                         (u.NID != null && u.NID.Contains(searchTerm)));
             }
 
             if (!string.IsNullOrWhiteSpace(role) && role != "All")

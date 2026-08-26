@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MediCamp.Models;
 using MediCamp.Models.Domain;
 using MediCamp.Models.ViewModels;
 using MediCamp.Services;
@@ -20,6 +21,22 @@ namespace MediCamp.Controllers
         private string? GetCurrentUserId()
         {
             return User.FindFirstValue(ClaimTypes.NameIdentifier);
+        }
+
+        [HttpGet]
+        public IActionResult Dashboard(string searchQuery)
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null) return RedirectToAction("Login", "Account");
+
+            var patients = new List<ApplicationUser>();
+            if (!string.IsNullOrWhiteSpace(searchQuery))
+            {
+                patients = _mockDataService.GetFilteredUsers(searchQuery, SystemRoles.Patient, "All");
+            }
+
+            ViewData["SearchQuery"] = searchQuery;
+            return View(patients);
         }
 
         [HttpGet]

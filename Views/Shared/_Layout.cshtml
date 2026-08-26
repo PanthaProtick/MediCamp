@@ -97,6 +97,11 @@
                                 var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                                 var volunteerPendingCount = currentUserId != null ? MockDataService.GetRequestsForVolunteer(currentUserId).Count(r => r.Status == "Pending") : 0;
                                 <li class="nav-item">
+                                    <a class="nav-link nav-link-custom @(ViewContext.RouteData.Values["Action"]?.ToString() == "Dashboard" && ViewContext.RouteData.Values["Controller"]?.ToString() == "Volunteer" ? "active" : "")" asp-controller="Volunteer" asp-action="Dashboard">
+                                        <i class="fa-solid fa-gauge me-1 text-champagne"></i> Patient Lookup
+                                    </a>
+                                </li>
+                                <li class="nav-item">
                                     <a class="nav-link nav-link-custom @(ViewContext.RouteData.Values["Action"]?.ToString() == "Requests" && ViewContext.RouteData.Values["Controller"]?.ToString() == "Volunteer" ? "active" : "")" asp-controller="Volunteer" asp-action="Requests">
                                         <i class="fa-solid fa-hand-holding-heart me-1 text-champagne"></i> Camp Invitations
                                         @if (volunteerPendingCount > 0)
