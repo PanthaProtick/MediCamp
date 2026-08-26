@@ -1,0 +1,124 @@
+@model MediCamp.Models.ViewModels.DoctorRequestsViewModel
+
+@{
+    ViewData["Title"] = "Camp Participation Requests";
+    Layout = "_Layout";
+}
+
+<div class="container mt-4">
+    <div class="mb-4">
+        <h2>Camp Participation Requests</h2>
+        <p class="text-muted">Review and respond to invitations from NGOs to participate in their medical camps.</p>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-12 mb-5">
+            <h4 class="mb-3">Pending Invitations</h4>
+            @if (Model.PendingRequests.Any())
+            {
+                <div class="row">
+                    @foreach (var req in Model.PendingRequests)
+                    {
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card shadow-sm h-100 border-warning border-start border-4">
+                                <div class="card-body">
+                                    <h5 class="card-title">@req.Camp?.Title</h5>
+                                    <h6 class="card-subtitle mb-2 text-muted">@req.Camp?.Host?.OrganizationName</h6>
+                                    
+                                    <ul class="list-unstyled mt-3 mb-4">
+                                        <li><i class="bi bi-geo-alt me-2"></i>@req.Camp?.District, @req.Camp?.Upazila</li>
+                                        <li><i class="bi bi-calendar-event me-2"></i>@req.Camp?.StartDate.ToString("MMM dd, yyyy") - @req.Camp?.EndDate.ToString("MMM dd, yyyy")</li>
+                                        <li><i class="bi bi-tags me-2"></i>@req.Camp?.CampType</li>
+                                    </ul>
+
+                                    <div class="d-flex gap-2 mt-auto">
+                                        <form asp-action="RespondToRequest" method="post" class="flex-grow-1">
+                                            <input type="hidden" name="requestId" value="@req.Id" />
+                                            <input type="hidden" name="status" value="Approved" />
+                                            <button type="submit" class="btn btn-success w-100"><i class="bi bi-check-circle me-1"></i> Accept</button>
+                                        </form>
+                                        <form asp-action="RespondToRequest" method="post" class="flex-grow-1">
+                                            <input type="hidden" name="requestId" value="@req.Id" />
+                                            <input type="hidden" name="status" value="Denied" />
+                                            <button type="submit" class="btn btn-outline-danger w-100"><i class="bi bi-x-circle me-1"></i> Decline</button>
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="card-footer text-muted small">
+                                    Requested: @req.RequestedAt.ToLocalTime().ToString("MMM dd, yyyy")
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-light border text-center p-4">
+                    <p class="mb-0 text-muted">You have no pending camp invitations at the moment.</p>
+                </div>
+            }
+        </div>
+
+        <div class="col-12">
+            <h4 class="mb-3">Previous Responses</h4>
+            @if (Model.RespondedRequests.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Camp Title</th>
+                                <th>NGO / Host</th>
+                                <th>Dates</th>
+                                <th>Status</th>
+                                <th>Responded On</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var req in Model.RespondedRequests)
+                            {
+                                <tr>
+                                    <td>@req.Camp?.Title</td>
+                                    <td>@req.Camp?.Host?.OrganizationName</td>
+                                    <td>@req.Camp?.StartDate.ToString("MMM dd") - @req.Camp?.EndDate.ToString("MMM dd")</td>
+                                    <td>
+                                        @if (req.Status == "Approved")
+                                        {
+                                            <span class="badge bg-success"><i class="bi bi-check me-1"></i>Approved</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger"><i class="bi bi-x me-1"></i>Declined</span>
+                                        }
+                                    </td>
+                                    <td>@(req.RespondedAt?.ToLocalTime().ToString("MMM dd, yyyy") ?? "N/A")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-muted">No past request history found.</p>
+            }
+        </div>
+    </div>
+</div>

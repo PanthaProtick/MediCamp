@@ -77,6 +77,14 @@
                                     </a>
                                 </li>
                             }
+                            @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Doctor"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link nav-link-custom @(ViewContext.RouteData.Values["Action"]?.ToString() == "Requests" && ViewContext.RouteData.Values["Controller"]?.ToString() == "Doctor" ? "active" : "")" asp-controller="Doctor" asp-action="Requests">
+                                        <i class="fa-solid fa-envelope-open-text me-1 text-champagne"></i> Camp Invitations
+                                    </a>
+                                </li>
+                            }
                             @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin"))
                             {
                                 <li class="nav-item">

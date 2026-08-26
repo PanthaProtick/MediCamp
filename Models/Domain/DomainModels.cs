@@ -306,4 +306,26 @@ namespace MediCamp.Models.Domain
         [MaxLength(20)]
         public string Urgency { get; set; } = "Routine"; // Routine, Urgent
     }
+
+    public class CampStaffRequest
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        public int CampId { get; set; }
+        [ForeignKey("CampId")]
+        public Camp? Camp { get; set; }
+
+        [Required]
+        public string DoctorId { get; set; } = string.Empty;
+        [ForeignKey("DoctorId")]
+        public ApplicationUser? Doctor { get; set; }
+
+        [MaxLength(20)]
+        public string Status { get; set; } = "Pending"; // Pending, Approved, Denied
+
+        public DateTime RequestedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? RespondedAt { get; set; }
+    }
 }

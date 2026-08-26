@@ -22,6 +22,7 @@ namespace MediCamp.Data
         public DbSet<Prescription> Prescriptions { get; set; }
         public DbSet<PrescriptionItem> PrescriptionItems { get; set; }
         public DbSet<Referral> Referrals { get; set; }
+        public DbSet<CampStaffRequest> CampStaffRequests { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

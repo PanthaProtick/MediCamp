@@ -173,8 +173,11 @@
                                     }
                                     else
                                     {
-                                        <a asp-controller="Host" asp-action="CampSubmitted" asp-route-id="@camp.Id" class="btn btn-light btn-sm border">
+                                        <a asp-controller="Host" asp-action="CampSubmitted" asp-route-id="@camp.Id" class="btn btn-light btn-sm border mb-1">
                                             <i class="fa-solid fa-eye me-1"></i> View Summary
+                                        </a>
+                                        <a asp-controller="Host" asp-action="ManageStaff" asp-route-id="@camp.Id" class="btn btn-primary btn-sm border mb-1">
+                                            <i class="fa-solid fa-users me-1"></i> Manage Staff
                                         </a>
                                     }
                                 </td>

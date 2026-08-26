@@ -38,7 +38,7 @@ Accessible to NGO organizers. Focuses on planning, staffing, and monitoring spec
 *   **Camp Management (List & Setup)**
     *   *Content:* Form to create a new camp (Name, Type, Location, Dates, Expected Patients, Total Budget). List of all camps owned by the Host.
 *   **Camp Details & Staffing**
-    *   *Content:* For a specific camp: UI to assign specific Doctors, Volunteers, and Pharmacists from the user pool.
+    *   *Content:* For a specific camp: UI to send participation requests to Doctors, Volunteers, and Pharmacists from the user pool, and track their response status (Pending, Approved, Denied).
 *   **Camp Inventory Allocation**
     *   *Content:* Interface to allocate medicines and equipment from the NGO's central stock to a specific camp.
 *   **Camp Monitoring & Financials**
@@ -65,6 +65,8 @@ Accessible to Volunteers. Focuses on fast data entry in the field.
 ## 5. Doctor Dashboard
 Accessible to Doctors. Focuses on clinical history and consultation.
 
+*   **Camp Participation Requests**
+    *   *Content:* List of incoming requests from Hosts to participate in camps. Interface to approve or deny these requests.
 *   **Patient Queue**
     *   *Content:* Live, auto-updating list of patients waiting to be seen, ordered by token number or triage urgency.
 *   **Consultation Workspace**

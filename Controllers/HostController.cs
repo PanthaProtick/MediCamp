@@ -305,5 +305,65 @@ namespace MediCamp.Controllers
             TempData["SuccessMessage"] = $"Camp '{camp.Title}' has been resubmitted for Admin Approval.";
             return RedirectToAction(nameof(MyCamps), new { status = "Pending Admin Approval" });
         }
+
+        // =========================================================================
+        // 6. MANAGE CAMP STAFF (/Host/ManageStaff/{id})
+        // =========================================================================
+        [HttpGet]
+        public IActionResult ManageStaff(int id)
+        {
+            var currentHost = GetCurrentHostUser();
+            if (currentHost == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var camp = _dbContext.Camps.FirstOrDefault(c => c.Id == id && c.HostId == currentHost.Id);
+            if (camp == null)
+            {
+                TempData["ErrorMessage"] = "Camp not found or access denied.";
+                return RedirectToAction(nameof(MyCamps));
+            }
+
+            var model = new HostManageStaffViewModel
+            {
+                Camp = camp,
+                CurrentRequests = _mockDataService.GetRequestsForCamp(id),
+                AvailableDoctors = _dbContext.Users.Where(u => u.Role == SystemRoles.Doctor && u.IsActive).ToList()
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult SendStaffRequest(int campId, string doctorId)
+        {
+            var currentHost = GetCurrentHostUser();
+            if (currentHost == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var camp = _dbContext.Camps.FirstOrDefault(c => c.Id == campId && c.HostId == currentHost.Id);
+            if (camp == null)
+            {
+                TempData["ErrorMessage"] = "Camp not found or access denied.";
+                return RedirectToAction(nameof(MyCamps));
+            }
+
+            var result = _mockDataService.SendCampStaffRequest(campId, doctorId);
+            
+            if (result.Success)
+            {
+                TempData["SuccessMessage"] = result.Message;
+            }
+            else
+            {
+                TempData["ErrorMessage"] = result.Message;
+            }
+
+            return RedirectToAction(nameof(ManageStaff), new { id = campId });
+        }
     }
 }

@@ -313,5 +313,73 @@ namespace MediCamp.Services
         {
             return GetAllCamps().FirstOrDefault(c => c.Id == id);
         }
+
+        public List<CampStaffRequest> GetRequestsForCamp(int campId)
+        {
+            return _dbContext.CampStaffRequests
+                .Include(r => r.Doctor)
+                .Where(r => r.CampId == campId)
+                .OrderByDescending(r => r.RequestedAt)
+                .ToList();
+        }
+
+        public List<CampStaffRequest> GetRequestsForDoctor(string doctorId)
+        {
+            return _dbContext.CampStaffRequests
+                .Include(r => r.Camp)
+                    .ThenInclude(c => c.Host)
+                .Where(r => r.DoctorId == doctorId)
+                .OrderByDescending(r => r.RequestedAt)
+                .ToList();
+        }
+
+        public (bool Success, string Message) SendCampStaffRequest(int campId, string doctorId)
+        {
+            var existingRequest = _dbContext.CampStaffRequests
+                .FirstOrDefault(r => r.CampId == campId && r.DoctorId == doctorId);
+
+            if (existingRequest != null)
+            {
+                return (false, $"A request to this doctor is already {existingRequest.Status}.");
+            }
+
+            var newRequest = new CampStaffRequest
+            {
+                CampId = campId,
+                DoctorId = doctorId,
+                Status = "Pending",
+                RequestedAt = DateTime.UtcNow
+            };
+
+            _dbContext.CampStaffRequests.Add(newRequest);
+            _dbContext.SaveChanges();
+
+            return (true, "Staff request sent successfully.");
+        }
+
+        public (bool Success, string Message) RespondToCampStaffRequest(int requestId, string doctorId, string status)
+        {
+            var request = _dbContext.CampStaffRequests.FirstOrDefault(r => r.Id == requestId && r.DoctorId == doctorId);
+            if (request == null)
+            {
+                return (false, "Request not found.");
+            }
+
+            if (request.Status != "Pending")
+            {
+                return (false, $"Request is already {request.Status}.");
+            }
+
+            if (status != "Approved" && status != "Denied")
+            {
+                return (false, "Invalid status response.");
+            }
+
+            request.Status = status;
+            request.RespondedAt = DateTime.UtcNow;
+            _dbContext.SaveChanges();
+
+            return (true, $"Request {status.ToLower()} successfully.");
+        }
     }
 }

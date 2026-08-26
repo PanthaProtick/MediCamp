@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MediCamp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+99680d6cb28c9f0519d0c19cb3820679be8e9c3e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5c940e6e91a1e822e4d9db9214c943e430fda2b0")]
 [assembly: System.Reflection.AssemblyProductAttribute("MediCamp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MediCamp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

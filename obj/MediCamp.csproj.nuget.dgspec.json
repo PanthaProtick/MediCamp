@@ -1,30 +1,32 @@
 {
   "format": 1,
   "restore": {
-    "/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/MediCamp.csproj": {}
+    "D:\\SD\\MediCamp\\MediCamp.csproj": {}
   },
   "projects": {
-    "/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/MediCamp.csproj": {
+    "D:\\SD\\MediCamp\\MediCamp.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/MediCamp.csproj",
+        "projectUniqueName": "D:\\SD\\MediCamp\\MediCamp.csproj",
         "projectName": "MediCamp",
-        "projectPath": "/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/MediCamp.csproj",
-        "packagesPath": "/home/akif/.nuget/packages/",
-        "outputPath": "/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/obj/",
+        "projectPath": "D:\\SD\\MediCamp\\MediCamp.csproj",
+        "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
+        "outputPath": "D:\\SD\\MediCamp\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/akif/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\Administrator\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
-          "/usr/lib/dotnet/library-packs": {},
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net10.0": {
+            "framework": "net10.0",
             "targetAlias": "net10.0",
             "projectReferences": {}
           }
@@ -39,10 +41,11 @@
           "auditLevel": "low",
           "auditMode": "all"
         },
-        "SdkAnalysisLevel": "10.0.100"
+        "SdkAnalysisLevel": "10.0.300"
       },
       "frameworks": {
         "net10.0": {
+          "framework": "net10.0",
           "targetAlias": "net10.0",
           "dependencies": {
             "Microsoft.EntityFrameworkCore": {
@@ -85,7 +88,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/10.0.111/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.302/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.AspNetCore": "(,10.0.32767]",
             "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",

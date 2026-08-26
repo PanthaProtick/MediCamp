@@ -1,0 +1,140 @@
+@model MediCamp.Models.ViewModels.HostManageStaffViewModel
+
+@{
+    ViewData["Title"] = "Manage Camp Staff";
+    Layout = "_Layout";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Manage Staff: @Model.Camp.Title</h2>
+        <a asp-action="MyCamps" class="btn btn-outline-secondary">Back to My Camps</a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row">
+        <!-- Sent Requests Section -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Current Requests for this Camp</h5>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.CurrentRequests.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Doctor Name</th>
+                                        <th>Status</th>
+                                        <th>Requested At</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var req in Model.CurrentRequests)
+                                    {
+                                        <tr>
+                                            <td>@(req.Doctor?.FullName ?? "Unknown")</td>
+                                            <td>
+                                                @if (req.Status == "Pending")
+                                                {
+                                                    <span class="badge bg-warning text-dark">Pending</span>
+                                                }
+                                                else if (req.Status == "Approved")
+                                                {
+                                                    <span class="badge bg-success">Approved</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-danger">Denied</span>
+                                                }
+                                            </td>
+                                            <td>@req.RequestedAt.ToLocalTime().ToString("MMM dd, yyyy HH:mm")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="p-4 text-center text-muted">
+                            <p>No staff requests have been sent for this camp yet.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Available Doctors Section -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Available Doctors in System</h5>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.AvailableDoctors.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Doctor Name</th>
+                                        <th>Specialization</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var doc in Model.AvailableDoctors)
+                                    {
+                                        var existingRequest = Model.CurrentRequests.FirstOrDefault(r => r.DoctorId == doc.Id);
+                                        <tr>
+                                            <td>@doc.FullName</td>
+                                            <td>@(doc.MedicalSpecialization ?? "General")</td>
+                                            <td>
+                                                @if (existingRequest != null)
+                                                {
+                                                    <button class="btn btn-sm btn-secondary" disabled>Request Sent</button>
+                                                }
+                                                else
+                                                {
+                                                    <form asp-action="SendStaffRequest" method="post">
+                                                        <input type="hidden" name="campId" value="@Model.Camp.Id" />
+                                                        <input type="hidden" name="doctorId" value="@doc.Id" />
+                                                        <button type="submit" class="btn btn-sm btn-primary">Send Request</button>
+                                                    </form>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="p-4 text-center text-muted">
+                            <p>No active doctors found in the system.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

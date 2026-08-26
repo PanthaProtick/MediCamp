@@ -258,5 +258,16 @@ For patients needing advanced care outside the camp.
 
 ---
 
+### Table: `CampStaffRequests`
+Tracks participation requests sent by Hosts to Doctors for a specific camp.
+- `Id` (integer, Primary Key, Auto-increment)
+- `CampId` (integer, Required, Foreign Key -> `Camps.Id`)
+- `DoctorId` (text, Required, Foreign Key -> `Users.Id`)
+- `Status` (character varying 20) - "Pending", "Approved", "Denied"
+- `RequestedAt` (timestamp without time zone)
+- `RespondedAt` (timestamp without time zone, Nullable)
+
+---
+
 ## Next Steps
 Once the database is set up and the tables are generated via migrations, the final step is to rewrite the `AccountController` and authentication flows to save and query users directly from `ApplicationDbContext` instead of the `MockDataService`.

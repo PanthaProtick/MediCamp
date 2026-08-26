@@ -335,4 +335,17 @@ namespace MediCamp.Models.ViewModels
         public bool HasCapacitySanityFlag { get; set; }
         public string? CapacitySanityMessage { get; set; }
     }
+
+    public class HostManageStaffViewModel
+    {
+        public Camp Camp { get; set; } = new();
+        public List<CampStaffRequest> CurrentRequests { get; set; } = new();
+        public List<ApplicationUser> AvailableDoctors { get; set; } = new();
+    }
+
+    public class DoctorRequestsViewModel
+    {
+        public List<CampStaffRequest> PendingRequests { get; set; } = new();
+        public List<CampStaffRequest> RespondedRequests { get; set; } = new();
+    }
 }

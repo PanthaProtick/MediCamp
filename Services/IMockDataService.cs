@@ -1,4 +1,5 @@
 using MediCamp.Models;
+using MediCamp.Models.Domain;
 using MediCamp.Models.ViewModels;
 
 namespace MediCamp.Services
@@ -27,5 +28,11 @@ namespace MediCamp.Services
         HomeLandingViewModel GetHomeLandingData();
         List<CampOverviewItem> GetAllCamps();
         CampOverviewItem? GetCampById(int id);
+        
+        // Camp Staff Requests
+        List<CampStaffRequest> GetRequestsForCamp(int campId);
+        List<CampStaffRequest> GetRequestsForDoctor(string doctorId);
+        (bool Success, string Message) SendCampStaffRequest(int campId, string doctorId);
+        (bool Success, string Message) RespondToCampStaffRequest(int requestId, string doctorId, string status);
     }
 }
