@@ -24,19 +24,40 @@ namespace MediCamp.Controllers
         }
 
         [HttpGet]
-        public IActionResult Dashboard(string searchQuery)
+        public IActionResult Dashboard(int? campId, string? searchQuery)
         {
             var userId = GetCurrentUserId();
             if (userId == null) return RedirectToAction("Login", "Account");
 
-            var patients = new List<ApplicationUser>();
-            if (!string.IsNullOrWhiteSpace(searchQuery))
+            var model = new VolunteerDashboardViewModel
             {
-                patients = _mockDataService.GetFilteredUsers(searchQuery, SystemRoles.Patient, "All");
+                SearchQuery = searchQuery,
+                SelectedCampId = campId
+            };
+
+            // Get all approved camps for this volunteer
+            var volunteerRequests = _mockDataService.GetRequestsForVolunteer(userId);
+            model.ApprovedCamps = volunteerRequests
+                .Where(r => r.Status == "Approved" && r.Camp != null)
+                .Select(r => r.Camp!)
+                .ToList();
+
+            if (campId.HasValue)
+            {
+                model.SelectedCamp = model.ApprovedCamps.FirstOrDefault(c => c.Id == campId.Value);
+                if (model.SelectedCamp == null)
+                {
+                    // Volunteer is not approved for this camp or it doesn't exist
+                    return RedirectToAction("Dashboard");
+                }
+
+                if (!string.IsNullOrWhiteSpace(searchQuery))
+                {
+                    model.PatientSearchResults = _mockDataService.GetFilteredUsers(searchQuery, SystemRoles.Patient, "All");
+                }
             }
 
-            ViewData["SearchQuery"] = searchQuery;
-            return View(patients);
+            return View(model);
         }
 
         [HttpGet]

@@ -360,6 +360,15 @@ namespace MediCamp.Models.ViewModels
         public List<CampStaffRequest> RespondedRequests { get; set; } = new();
     }
 
+    public class VolunteerDashboardViewModel
+    {
+        public int? SelectedCampId { get; set; }
+        public Camp? SelectedCamp { get; set; }
+        public List<Camp> ApprovedCamps { get; set; } = new();
+        public List<ApplicationUser> PatientSearchResults { get; set; } = new();
+        public string? SearchQuery { get; set; }
+    }
+
     public class VolunteerRequestsViewModel
     {
         public List<CampVolunteerRequest> PendingRequests { get; set; } = new();

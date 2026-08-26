@@ -1,99 +1,156 @@
-@model IEnumerable<MediCamp.Models.ApplicationUser>
+@model MediCamp.Models.ViewModels.VolunteerDashboardViewModel
 @{
-    ViewData["Title"] = "Volunteer Dashboard - Patient Lookup";
+    ViewData["Title"] = "Volunteer Dashboard";
 }
 
 <div class="container mt-4">
     <div class="row mb-4 align-items-center">
         <div class="col">
             <h2 class="brand-font fw-bold text-dark mb-0">
-                <i class="fa-solid fa-users text-champagne me-2"></i> Patient Lookup
+                <i class="fa-solid fa-users text-champagne me-2"></i> 
+                @(Model.SelectedCampId.HasValue ? $"Patient Lookup: {Model.SelectedCamp?.Title}" : "Volunteer Dashboard")
             </h2>
-            <p class="text-secondary mt-1">Search for existing patients by Name, Phone Number, or NID.</p>
+            @if (Model.SelectedCampId.HasValue)
+            {
+                <p class="text-secondary mt-1">Search for existing patients by Name, Phone Number, or NID to add to the triage queue.</p>
+                <a asp-action="Dashboard" asp-route-campId="" class="btn btn-sm btn-outline-secondary mt-2">
+                    <i class="fa-solid fa-arrow-left me-1"></i> Back to Camp Selection
+                </a>
+            }
+            else
+            {
+                <p class="text-secondary mt-1">Select an active camp to begin registering and looking up patients.</p>
+            }
         </div>
     </div>
 
-    <div class="card border-0 shadow-sm rounded-4 mb-4">
-        <div class="card-body p-4">
-            <form method="get" asp-action="Dashboard" class="row g-3 align-items-end">
-                <div class="col-md-9">
-                    <label for="searchQuery" class="form-label fw-bold text-secondary small">Search Patient</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-search text-muted"></i></span>
-                        <input type="text" class="form-control border-start-0 ps-0" id="searchQuery" name="searchQuery" value="@ViewData["SearchQuery"]" placeholder="Enter NID, Phone Number, or Name..." />
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <button type="submit" class="btn btn-champagne w-100 fw-bold rounded-3 py-2">
-                        <i class="fa-solid fa-magnifying-glass me-1"></i> Search
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    @if (Model != null)
+    @if (!Model.SelectedCampId.HasValue)
     {
-        <div class="card border-0 shadow-sm rounded-4">
-            <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
-                <h5 class="fw-bold mb-0">Search Results</h5>
-            </div>
+        <!-- Camp Selection State -->
+        <div class="row g-4">
+            @if (Model.ApprovedCamps.Any())
+            {
+                @foreach (var camp in Model.ApprovedCamps)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 border-0 shadow-sm rounded-4">
+                            <div class="card-body p-4 d-flex flex-column">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <h5 class="fw-bold mb-0">@camp.Title</h5>
+                                    <span class="badge bg-primary rounded-pill px-3 py-2">@camp.Status</span>
+                                </div>
+                                <p class="text-muted small mb-2"><i class="fa-solid fa-location-dot me-2 text-champagne"></i>@camp.Venue, @camp.Upazila, @camp.District</p>
+                                <p class="text-muted small mb-3"><i class="fa-regular fa-calendar me-2 text-champagne"></i>@camp.StartDate.ToString("MMM dd, yyyy")</p>
+                                
+                                <div class="mt-auto pt-3 border-top">
+                                    <a asp-action="Dashboard" asp-route-campId="@camp.Id" class="btn btn-champagne w-100 fw-bold rounded-pill">
+                                        Select Camp <i class="fa-solid fa-arrow-right ms-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center py-5">
+                    <i class="fa-solid fa-tent fs-1 text-muted mb-3 opacity-50"></i>
+                    <h6 class="fw-bold text-secondary">No approved camps found.</h6>
+                    <p class="text-muted small mb-0">You are not currently assigned to any active camps.</p>
+                    <a asp-action="Requests" class="btn btn-outline-champagne mt-3 rounded-pill btn-sm">
+                        <i class="fa-solid fa-envelope-open-text me-1"></i> View Requests
+                    </a>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <!-- Patient Lookup State -->
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
             <div class="card-body p-4">
-                @if (Model.Any())
-                {
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Name</th>
-                                    <th>NID</th>
-                                    <th>Phone</th>
-                                    <th>Blood Group</th>
-                                    <th>District</th>
-                                    <th class="text-end">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var patient in Model)
-                                {
-                                    <tr>
-                                        <td class="fw-semibold">@patient.FullName</td>
-                                        <td>@(patient.NID ?? "N/A")</td>
-                                        <td>@patient.PhoneNumber</td>
-                                        <td>
-                                            @if (!string.IsNullOrEmpty(patient.BloodGroup))
-                                            {
-                                                <span class="badge bg-danger rounded-pill">@patient.BloodGroup</span>
-                                            }
-                                            else
-                                            {
-                                                <span class="text-muted small">Unknown</span>
-                                            }
-                                        </td>
-                                        <td>@patient.District</td>
-                                        <td class="text-end">
-                                            <button class="btn btn-sm btn-outline-champagne rounded-pill">
-                                                <i class="fa-solid fa-arrow-right"></i> Select
-                                            </button>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
+                <form method="get" asp-action="Dashboard" class="row g-3 align-items-end">
+                    <input type="hidden" name="campId" value="@Model.SelectedCampId" />
+                    <div class="col-md-9">
+                        <label for="searchQuery" class="form-label fw-bold text-secondary small">Search Patient</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-search text-muted"></i></span>
+                            <input type="text" class="form-control border-start-0 ps-0" id="searchQuery" name="searchQuery" value="@Model.SearchQuery" placeholder="Enter NID, Phone Number, or Name..." />
+                        </div>
                     </div>
-                }
-                else
-                {
-                    <div class="text-center py-5">
-                        <i class="fa-solid fa-user-xmark fs-1 text-muted mb-3 opacity-50"></i>
-                        <h6 class="fw-bold text-secondary">No patients found.</h6>
-                        <p class="text-muted small mb-0">Try adjusting your search criteria or register a new patient.</p>
-                        <a asp-controller="Account" asp-action="RegisterPatient" class="btn btn-outline-champagne mt-3 rounded-pill btn-sm">
-                            <i class="fa-solid fa-user-plus me-1"></i> Register New Patient
-                        </a>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-champagne w-100 fw-bold rounded-3 py-2">
+                            <i class="fa-solid fa-magnifying-glass me-1"></i> Search
+                        </button>
                     </div>
-                }
+                </form>
             </div>
         </div>
+
+        @if (!string.IsNullOrWhiteSpace(Model.SearchQuery))
+        {
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-white border-bottom-0 pt-4 pb-0 px-4">
+                    <h5 class="fw-bold mb-0">Search Results</h5>
+                </div>
+                <div class="card-body p-4">
+                    @if (Model.PatientSearchResults.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>NID</th>
+                                        <th>Phone</th>
+                                        <th>Blood Group</th>
+                                        <th>District</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var patient in Model.PatientSearchResults)
+                                    {
+                                        <tr>
+                                            <td class="fw-semibold">@patient.FullName</td>
+                                            <td>@(patient.NID ?? "N/A")</td>
+                                            <td>@patient.PhoneNumber</td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(patient.BloodGroup))
+                                                {
+                                                    <span class="badge bg-danger rounded-pill">@patient.BloodGroup</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted small">Unknown</span>
+                                                }
+                                            </td>
+                                            <td>@patient.District</td>
+                                            <td class="text-end">
+                                                <button class="btn btn-sm btn-outline-champagne rounded-pill" onclick="alert('Proceeding to triage registration...')">
+                                                    <i class="fa-solid fa-arrow-right"></i> Select
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fa-solid fa-user-xmark fs-1 text-muted mb-3 opacity-50"></i>
+                            <h6 class="fw-bold text-secondary">No patients found.</h6>
+                            <p class="text-muted small mb-0">Try adjusting your search criteria or register a new patient.</p>
+                            <a asp-controller="Account" asp-action="RegisterPatient" class="btn btn-outline-champagne mt-3 rounded-pill btn-sm">
+                                <i class="fa-solid fa-user-plus me-1"></i> Register New Patient
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
     }
 </div>
