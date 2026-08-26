@@ -40,5 +40,11 @@ namespace MediCamp.Services
         List<CampVolunteerRequest> GetRequestsForVolunteer(string volunteerId);
         (bool Success, string Message) SendCampVolunteerRequest(int campId, string volunteerId);
         (bool Success, string Message) RespondToCampVolunteerRequest(int requestId, string volunteerId, string status);
+
+        // Camp Pharmacist Requests
+        List<CampPharmacistRequest> GetPharmacistRequestsForCamp(int campId);
+        List<CampPharmacistRequest> GetRequestsForPharmacist(string pharmacistId);
+        (bool Success, string Message) SendCampPharmacistRequest(int campId, string pharmacistId);
+        (bool Success, string Message) RespondToCampPharmacistRequest(int requestId, string pharmacistId, string status);
     }
 }

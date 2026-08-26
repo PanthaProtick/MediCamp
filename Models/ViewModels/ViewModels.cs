@@ -343,6 +343,8 @@ namespace MediCamp.Models.ViewModels
         public List<ApplicationUser> AvailableDoctors { get; set; } = new();
         public List<CampVolunteerRequest> CurrentVolunteerRequests { get; set; } = new();
         public List<ApplicationUser> AvailableVolunteers { get; set; } = new();
+        public List<CampPharmacistRequest> CurrentPharmacistRequests { get; set; } = new();
+        public List<ApplicationUser> AvailablePharmacists { get; set; } = new();
         
         // Pagination properties
         public int CurrentDoctorPage { get; set; } = 1;
@@ -352,6 +354,10 @@ namespace MediCamp.Models.ViewModels
         public int CurrentVolunteerPage { get; set; } = 1;
         public int TotalVolunteerPages { get; set; } = 1;
         public int VolunteerPageSize { get; set; } = 5;
+
+        public int CurrentPharmacistPage { get; set; } = 1;
+        public int TotalPharmacistPages { get; set; } = 1;
+        public int PharmacistPageSize { get; set; } = 5;
     }
 
     public class DoctorRequestsViewModel
@@ -364,5 +370,11 @@ namespace MediCamp.Models.ViewModels
     {
         public List<CampVolunteerRequest> PendingRequests { get; set; } = new();
         public List<CampVolunteerRequest> RespondedRequests { get; set; } = new();
+    }
+
+    public class PharmacistRequestsViewModel
+    {
+        public List<CampPharmacistRequest> PendingRequests { get; set; } = new();
+        public List<CampPharmacistRequest> RespondedRequests { get; set; } = new();
     }
 }

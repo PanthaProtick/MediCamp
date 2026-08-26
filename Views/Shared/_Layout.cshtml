@@ -111,6 +111,20 @@
                                     </a>
                                 </li>
                             }
+                            @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Pharmacist"))
+                            {
+                                var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                                var pharmacistPendingCount = currentUserId != null ? MockDataService.GetRequestsForPharmacist(currentUserId).Count(r => r.Status == "Pending") : 0;
+                                <li class="nav-item">
+                                    <a class="nav-link nav-link-custom @(ViewContext.RouteData.Values["Action"]?.ToString() == "Requests" && ViewContext.RouteData.Values["Controller"]?.ToString() == "Pharmacist" ? "active" : "")" asp-controller="Pharmacist" asp-action="Requests">
+                                        <i class="fa-solid fa-pills me-1 text-champagne"></i> Camp Invitations
+                                        @if (pharmacistPendingCount > 0)
+                                        {
+                                            <span class="badge bg-danger rounded-pill ms-1">@pharmacistPendingCount</span>
+                                        }
+                                    </a>
+                                </li>
+                            }
                             @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin"))
                             {
                                 <li class="nav-item">
