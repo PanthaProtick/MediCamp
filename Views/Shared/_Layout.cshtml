@@ -1,4 +1,5 @@
 @using System.Security.Claims
+@inject MediCamp.Services.IMockDataService MockDataService
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -79,17 +80,29 @@
                             }
                             @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Doctor"))
                             {
+                                var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                                var doctorPendingCount = currentUserId != null ? MockDataService.GetRequestsForDoctor(currentUserId).Count(r => r.Status == "Pending") : 0;
                                 <li class="nav-item">
                                     <a class="nav-link nav-link-custom @(ViewContext.RouteData.Values["Action"]?.ToString() == "Requests" && ViewContext.RouteData.Values["Controller"]?.ToString() == "Doctor" ? "active" : "")" asp-controller="Doctor" asp-action="Requests">
                                         <i class="fa-solid fa-envelope-open-text me-1 text-champagne"></i> Camp Invitations
+                                        @if (doctorPendingCount > 0)
+                                        {
+                                            <span class="badge bg-danger rounded-pill ms-1">@doctorPendingCount</span>
+                                        }
                                     </a>
                                 </li>
                             }
                             @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Volunteer"))
                             {
+                                var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                                var volunteerPendingCount = currentUserId != null ? MockDataService.GetRequestsForVolunteer(currentUserId).Count(r => r.Status == "Pending") : 0;
                                 <li class="nav-item">
                                     <a class="nav-link nav-link-custom @(ViewContext.RouteData.Values["Action"]?.ToString() == "Requests" && ViewContext.RouteData.Values["Controller"]?.ToString() == "Volunteer" ? "active" : "")" asp-controller="Volunteer" asp-action="Requests">
                                         <i class="fa-solid fa-hand-holding-heart me-1 text-champagne"></i> Camp Invitations
+                                        @if (volunteerPendingCount > 0)
+                                        {
+                                            <span class="badge bg-danger rounded-pill ms-1">@volunteerPendingCount</span>
+                                        }
                                     </a>
                                 </li>
                             }

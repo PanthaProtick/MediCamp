@@ -310,7 +310,7 @@ namespace MediCamp.Controllers
         // 6. MANAGE CAMP STAFF (/Host/ManageStaff/{id})
         // =========================================================================
         [HttpGet]
-        public IActionResult ManageStaff(int id)
+        public IActionResult ManageStaff(int id, string? doctorSearch, string? volunteerSearch)
         {
             var currentHost = GetCurrentHostUser();
             if (currentHost == null)
@@ -325,14 +325,33 @@ namespace MediCamp.Controllers
                 return RedirectToAction(nameof(MyCamps));
             }
 
+            var doctorsQuery = _dbContext.Users.Where(u => u.Role == SystemRoles.Doctor && u.IsActive);
+            if (!string.IsNullOrWhiteSpace(doctorSearch))
+            {
+                var lowerSearch = doctorSearch.ToLower();
+                doctorsQuery = doctorsQuery.Where(u => u.FullName.ToLower().Contains(lowerSearch) || 
+                                                       (u.MedicalSpecialization != null && u.MedicalSpecialization.ToLower().Contains(lowerSearch)));
+            }
+
+            var volunteersQuery = _dbContext.Users.Where(u => u.Role == SystemRoles.Volunteer && u.IsActive);
+            if (!string.IsNullOrWhiteSpace(volunteerSearch))
+            {
+                var lowerSearch = volunteerSearch.ToLower();
+                volunteersQuery = volunteersQuery.Where(u => u.FullName.ToLower().Contains(lowerSearch) || 
+                                                             (u.District != null && u.District.ToLower().Contains(lowerSearch)));
+            }
+
             var model = new HostManageStaffViewModel
             {
                 Camp = camp,
                 CurrentRequests = _mockDataService.GetRequestsForCamp(id),
-                AvailableDoctors = _dbContext.Users.Where(u => u.Role == SystemRoles.Doctor && u.IsActive).ToList(),
+                AvailableDoctors = doctorsQuery.ToList(),
                 CurrentVolunteerRequests = _mockDataService.GetVolunteerRequestsForCamp(id),
-                AvailableVolunteers = _dbContext.Users.Where(u => u.Role == SystemRoles.Volunteer && u.IsActive).ToList()
+                AvailableVolunteers = volunteersQuery.ToList()
             };
+
+            ViewBag.DoctorSearch = doctorSearch;
+            ViewBag.VolunteerSearch = volunteerSearch;
 
             return View(model);
         }
