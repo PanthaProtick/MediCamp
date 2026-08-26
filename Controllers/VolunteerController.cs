@@ -65,5 +65,44 @@ namespace MediCamp.Controllers
 
             return RedirectToAction(nameof(Requests));
         }
+        [HttpGet]
+        public IActionResult CreatePatient()
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null) return RedirectToAction("Login", "Account");
+
+            var model = new RegisterPatientViewModel();
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult CreatePatient(RegisterPatientViewModel model)
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null) return RedirectToAction("Login", "Account");
+
+            // Remove password validation errors as we auto-generate it
+            ModelState.Remove("Password");
+            ModelState.Remove("ConfirmPassword");
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            model.Password = "Patient@123";
+            model.ConfirmPassword = "Patient@123";
+
+            var result = _mockDataService.RegisterPatient(model);
+            if (result.Success)
+            {
+                TempData["SuccessMessage"] = "Patient profile created successfully.";
+                return RedirectToAction(nameof(CreatePatient));
+            }
+            
+            ModelState.AddModelError(string.Empty, result.Message);
+            return View(model);
+        }
     }
 }
