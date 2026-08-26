@@ -1,0 +1,95 @@
+@model MediCamp.Models.Domain.Camp
+@{
+    ViewData["Title"] = "Camp Application Submitted - MediCamp";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="glass-card text-center p-4 p-md-5">
+                
+                <div class="stat-icon stat-icon-amber mx-auto mb-4" style="width: 76px; height: 76px; font-size: 2.2rem; background: rgba(217, 119, 6, 0.15); color: #d97706; border: 2px solid rgba(217, 119, 6, 0.3);">
+                    <i class="fa-solid fa-hourglass-half"></i>
+                </div>
+
+                <span class="badge badge-status-pending px-3 py-2 fs-6 mb-3">
+                    <i class="fa-solid fa-clock me-1"></i> Pending Admin Approval
+                </span>
+
+                <h2 class="fw-bold text-dark mb-2">Camp Application Successfully Submitted!</h2>
+                <p class="text-secondary mb-4">
+                    Your medical camp proposal has been logged and sent to System Governance for clinical and logistical approval.
+                </p>
+
+                <!-- Submitted Camp Details Summary Card -->
+                <div class="p-4 rounded-4 bg-white border text-start mb-4 shadow-sm">
+                    <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">
+                        <i class="fa-solid fa-tent text-teal me-2"></i>Submitted Camp Details Summary
+                    </h6>
+
+                    <div class="row g-3">
+                        <div class="col-sm-8">
+                            <span class="text-muted small d-block">Camp Title:</span>
+                            <strong class="text-dark fs-6">@Model.Title</strong>
+                        </div>
+                        <div class="col-sm-4">
+                            <span class="text-muted small d-block">Specialty / Type:</span>
+                            <span class="badge bg-teal-subtle text-teal border border-teal-subtle">@Model.CampType</span>
+                        </div>
+                        <div class="col-sm-6">
+                            <span class="text-muted small d-block">Location & Field Venue:</span>
+                            <span class="text-dark fw-semibold">
+                                <i class="fa-solid fa-location-dot text-danger me-1"></i>@Model.Venue, @Model.Upazila, @Model.District
+                            </span>
+                        </div>
+                        <div class="col-sm-6">
+                            <span class="text-muted small d-block">Camp Duration Schedule:</span>
+                            <span class="text-dark fw-semibold">
+                                <i class="fa-solid fa-calendar-days me-1 text-primary"></i>
+                                @Model.StartDate.ToString("dd MMM yyyy") to @Model.EndDate.ToString("dd MMM yyyy")
+                            </span>
+                        </div>
+                        <div class="col-sm-6">
+                            <span class="text-muted small d-block">Target Patient Capacity:</span>
+                            <span class="fw-bold text-dark">
+                                <i class="fa-solid fa-users me-1 text-secondary"></i>@Model.ExpectedPatients.ToString("N0") Patients
+                            </span>
+                        </div>
+                        <div class="col-sm-6">
+                            <span class="text-muted small d-block">Total Estimated Budget:</span>
+                            <span class="fw-bold text-success">
+                                ৳ @Model.TotalBudget.ToString("N2") BDT
+                            </span>
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(Model.Description))
+                        {
+                            <div class="col-12 border-top pt-2 mt-2">
+                                <span class="text-muted small d-block">Camp Description / Purpose:</span>
+                                <p class="small text-secondary mb-0">@Model.Description</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Info Alert -->
+                <div class="alert alert-info text-start small mb-4 rounded-3 d-flex gap-3 align-items-center" style="background: rgba(13, 148, 136, 0.08); border-left: 4px solid #0d9488; color: #0f766e;">
+                    <i class="fa-solid fa-shield-halved fs-3 text-teal"></i>
+                    <div>
+                        <strong>What happens next?</strong> System Administrators will review your camp schedule and location to ensure no overlap with existing medical drives. You can track your camp status under <strong>My Camps</strong>.
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex flex-wrap justify-content-center gap-3">
+                    <a asp-controller="Host" asp-action="Dashboard" class="btn btn-sapphire btn-lg px-4 shadow">
+                        <i class="fa-solid fa-gauge me-2"></i> Go to Host Dashboard
+                    </a>
+                    <a asp-controller="Host" asp-action="MyCamps" class="btn btn-light border btn-lg px-4">
+                        <i class="fa-solid fa-list-check me-2"></i> View My Camps
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

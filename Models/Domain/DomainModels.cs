@@ -14,7 +14,7 @@ namespace MediCamp.Models.Domain
 
         [Required]
         [MaxLength(100)]
-        public string CampType { get; set; } = "General Healthcare"; // General, Eye Camp, Maternal Care, Dental, Blood Drive
+        public string CampType { get; set; } = "General Healthcare & Triage";
 
         [Required]
         [MaxLength(50)]
@@ -43,8 +43,8 @@ namespace MediCamp.Models.Domain
         [Column(TypeName = "decimal(18,2)")]
         public decimal UtilizedBudget { get; set; }
 
-        [MaxLength(20)]
-        public string Status { get; set; } = "Scheduled"; // Scheduled, Ongoing, Completed, Cancelled
+        [MaxLength(50)]
+        public string Status { get; set; } = "Scheduled"; // Scheduled, Ongoing, Completed, Cancelled, Pending Admin Approval
 
         public string? HostId { get; set; }
 
@@ -54,7 +54,25 @@ namespace MediCamp.Models.Domain
         [MaxLength(500)]
         public string? Description { get; set; }
 
+        [MaxLength(500)]
+        public string? CampRejectionReason { get; set; }
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    }
+
+    public static class CampTypes
+    {
+        public static readonly List<string> AllTypes = new()
+        {
+            "General Healthcare & Triage",
+            "Eye Specialist & Vision Care",
+            "Dental Care & Oral Hygiene",
+            "Maternal & Child Healthcare",
+            "Blood Drive & Donor Screening",
+            "Surgical & Specialized Outreach",
+            "Pediatric Care & Immunization",
+            "Geriatric & Chronic Disease Management"
+        };
     }
 
     public class Location

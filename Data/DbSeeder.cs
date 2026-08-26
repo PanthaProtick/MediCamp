@@ -60,11 +60,33 @@ namespace MediCamp.Data
                         Upazila = "Kotwali",
                         Address = "Green Crescent Foundation, Zindabazar, Sylhet",
                         OrganizationName = "Green Crescent Humanitarian Aid",
+                        OrganizationType = "NGO",
                         OrganizationRegNo = "NGOAB-2024-1180",
                         FocalPersonContact = "01912000003",
                         HostApprovalStatus = "Pending",
                         IsActive = true,
                         CreatedAt = DateTime.UtcNow.AddDays(-2),
+                        PasswordHash = "Host@123"
+                    },
+                    new ApplicationUser
+                    {
+                        Id = "usr-host-03",
+                        FullName = "Mahmudur Rahman",
+                        Email = "contact@carebd.org",
+                        PhoneNumber = "01711000099",
+                        NID = "19852690099887766",
+                        Role = SystemRoles.Host,
+                        District = "Chittagong",
+                        Upazila = "Agrabad",
+                        Address = "Agrabad Commercial Area, Chittagong",
+                        OrganizationName = "Care BD Relief Trust",
+                        OrganizationType = "Community Group",
+                        OrganizationRegNo = "COMM-2023-88",
+                        FocalPersonContact = "01711000099",
+                        HostApprovalStatus = "Rejected",
+                        HostRejectionReason = "Organization registration documents could not be verified.",
+                        IsActive = false,
+                        CreatedAt = DateTime.UtcNow.AddDays(-10),
                         PasswordHash = "Host@123"
                     },
                     new ApplicationUser
@@ -274,6 +296,76 @@ namespace MediCamp.Data
                 };
 
                 dbContext.MasterMedicines.AddRange(medicines);
+                dbContext.SaveChanges();
+            }
+
+            // 4. Seed Locations (Divisions, Districts, Upazilas for dynamic lookup)
+            if (!dbContext.Locations.Any())
+            {
+                var locations = new List<Location>
+                {
+                    // Dhaka Division
+                    new Location { Division = "Dhaka", District = "Dhaka", Upazila = "Dhanmondi" },
+                    new Location { Division = "Dhaka", District = "Dhaka", Upazila = "Mohakhali" },
+                    new Location { Division = "Dhaka", District = "Dhaka", Upazila = "Gulshan" },
+                    new Location { Division = "Dhaka", District = "Dhaka", Upazila = "Uttara" },
+                    new Location { Division = "Dhaka", District = "Dhaka", Upazila = "Mirpur" },
+                    new Location { Division = "Dhaka", District = "Dhaka", Upazila = "Savar" },
+                    new Location { Division = "Dhaka", District = "Gazipur", Upazila = "Gazipur Sadar" },
+                    new Location { Division = "Dhaka", District = "Gazipur", Upazila = "Sreepur" },
+                    new Location { Division = "Dhaka", District = "Gazipur", Upazila = "Kaliakair" },
+                    new Location { Division = "Dhaka", District = "Narayanganj", Upazila = "Narayanganj Sadar" },
+                    new Location { Division = "Dhaka", District = "Narayanganj", Upazila = "Rupganj" },
+                    new Location { Division = "Dhaka", District = "Narayanganj", Upazila = "Sonargaon" },
+
+                    // Rangpur Division
+                    new Location { Division = "Rangpur", District = "Kurigram", Upazila = "Chilmari" },
+                    new Location { Division = "Rangpur", District = "Kurigram", Upazila = "Nageswari" },
+                    new Location { Division = "Rangpur", District = "Kurigram", Upazila = "Bhurungamari" },
+                    new Location { Division = "Rangpur", District = "Kurigram", Upazila = "Kurigram Sadar" },
+                    new Location { Division = "Rangpur", District = "Kurigram", Upazila = "Ulipur" },
+                    new Location { Division = "Rangpur", District = "Rangpur", Upazila = "Kotwali" },
+                    new Location { Division = "Rangpur", District = "Rangpur", Upazila = "Mithapukur" },
+                    new Location { Division = "Rangpur", District = "Rangpur", Upazila = "Pirganj" },
+
+                    // Sylhet Division
+                    new Location { Division = "Sylhet", District = "Sunamganj", Upazila = "Tahirpur" },
+                    new Location { Division = "Sylhet", District = "Sunamganj", Upazila = "Bishwamvarpur" },
+                    new Location { Division = "Sylhet", District = "Sunamganj", Upazila = "Chhatak" },
+                    new Location { Division = "Sylhet", District = "Sunamganj", Upazila = "Sunamganj Sadar" },
+                    new Location { Division = "Sylhet", District = "Sylhet", Upazila = "Kotwali" },
+                    new Location { Division = "Sylhet", District = "Sylhet", Upazila = "Beanibazar" },
+                    new Location { Division = "Sylhet", District = "Sylhet", Upazila = "Gowainghat" },
+
+                    // Chittagong Division
+                    new Location { Division = "Chittagong", District = "Bandarban", Upazila = "Ruma" },
+                    new Location { Division = "Chittagong", District = "Bandarban", Upazila = "Thanchi" },
+                    new Location { Division = "Chittagong", District = "Bandarban", Upazila = "Lama" },
+                    new Location { Division = "Chittagong", District = "Bandarban", Upazila = "Bandarban Sadar" },
+                    new Location { Division = "Chittagong", District = "Chittagong", Upazila = "Panchlaish" },
+                    new Location { Division = "Chittagong", District = "Chittagong", Upazila = "Agrabad" },
+                    new Location { Division = "Chittagong", District = "Chittagong", Upazila = "Hathazari" },
+                    new Location { Division = "Chittagong", District = "Chittagong", Upazila = "Sitakunda" },
+
+                    // Khulna Division
+                    new Location { Division = "Khulna", District = "Khulna", Upazila = "Khulna Sadar" },
+                    new Location { Division = "Khulna", District = "Khulna", Upazila = "Rupsha" },
+                    new Location { Division = "Khulna", District = "Khulna", Upazila = "Batiaghata" },
+
+                    // Barisal Division
+                    new Location { Division = "Barisal", District = "Barisal", Upazila = "Barisal Sadar" },
+                    new Location { Division = "Barisal", District = "Barisal", Upazila = "Bakerganj" },
+
+                    // Rajshahi Division
+                    new Location { Division = "Rajshahi", District = "Rajshahi", Upazila = "Boalia" },
+                    new Location { Division = "Rajshahi", District = "Rajshahi", Upazila = "Paba" },
+
+                    // Mymensingh Division
+                    new Location { Division = "Mymensingh", District = "Mymensingh", Upazila = "Mymensingh Sadar" },
+                    new Location { Division = "Mymensingh", District = "Mymensingh", Upazila = "Muktagacha" }
+                };
+
+                dbContext.Locations.AddRange(locations);
                 dbContext.SaveChanges();
             }
         }

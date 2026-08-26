@@ -1,0 +1,273 @@
+@model CreateCampViewModel
+@{
+    ViewData["Title"] = "Create New Medical Camp Application - MediCamp";
+}
+
+<div class="container py-4 py-md-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-9">
+            
+            <!-- Card Header Header -->
+            <div class="glass-card">
+                <div class="glass-card-header p-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <span class="badge badge-role-host"><i class="fa-solid fa-building me-1"></i> Host Portal</span>
+                            <span class="badge bg-teal-subtle text-teal border border-teal-subtle px-2 py-0.5" style="font-size: 0.75rem;">
+                                <i class="fa-solid fa-shield-halved me-1"></i> Governance Enforced
+                            </span>
+                        </div>
+                        <h3 class="fw-bold mb-1 text-dark">Submit New Medical Camp Application</h3>
+                        <p class="text-secondary small mb-0">Complete all section details to submit your healthcare camp for System Governance verification.</p>
+                    </div>
+                    <div class="stat-icon stat-icon-sapphire d-none d-sm-flex" style="width: 56px; height: 56px; font-size: 1.6rem;">
+                        <i class="fa-solid fa-tent"></i>
+                    </div>
+                </div>
+
+                <div class="glass-card-body p-4 p-md-5">
+                    
+                    <form asp-controller="Host" asp-action="CreateCamp" method="post" id="createCampForm">
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 px-3 small rounded-3 mb-4"></div>
+
+                        <!-- =========================================================================
+                             SECTION 1: CAMP INFO & SPECIALTY
+                             ========================================================================= -->
+                        <div class="card border rounded-4 mb-4 shadow-sm bg-white overflow-hidden">
+                            <div class="card-header bg-light py-3 px-4 border-bottom">
+                                <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2 fs-6">
+                                    <span class="badge bg-primary text-white rounded-circle p-2" style="width: 28px; height: 28px; font-size: 0.8rem; display: inline-flex; align-items: center; justify-content: center;">1</span>
+                                    Camp Classification & Basic Info
+                                </h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="row g-3">
+                                    <div class="col-md-7">
+                                        <label asp-for="Title" class="form-label-custom">Camp Title / Official Name *</label>
+                                        <input asp-for="Title" class="form-control form-control-custom" placeholder="e.g. Kurigram Chilmari Char Free Healthcare & Screening Camp" required />
+                                        <span asp-validation-for="Title" class="text-danger small d-block mt-1"></span>
+                                    </div>
+
+                                    <div class="col-md-5">
+                                        <label asp-for="CampType" class="form-label-custom">Camp Type / Clinical Specialty *</label>
+                                        <select asp-for="CampType" class="form-select form-select-custom" required>
+                                            @foreach (var typeItem in Model.AvailableCampTypes)
+                                            {
+                                                <option value="@typeItem" selected="@(typeItem == Model.CampType)">@typeItem</option>
+                                            }
+                                        </select>
+                                        <span asp-validation-for="CampType" class="text-danger small d-block mt-1"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- =========================================================================
+                             SECTION 2: GEOGRAPHICAL LOCATION & VENUE (DYNAMIC CASCADING)
+                             ========================================================================= -->
+                        <div class="card border rounded-4 mb-4 shadow-sm bg-white overflow-hidden">
+                            <div class="card-header bg-light py-3 px-4 border-bottom">
+                                <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2 fs-6">
+                                    <span class="badge bg-primary text-white rounded-circle p-2" style="width: 28px; height: 28px; font-size: 0.8rem; display: inline-flex; align-items: center; justify-content: center;">2</span>
+                                    Geographical Location & Field Site
+                                </h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label asp-for="District" class="form-label-custom">Target District *</label>
+                                        <select asp-for="District" class="form-select form-select-custom" id="districtSelect" required>
+                                            @foreach (var dist in Model.AvailableDistricts)
+                                            {
+                                                <option value="@dist" selected="@(dist == Model.District)">@dist</option>
+                                            }
+                                        </select>
+                                        <span asp-validation-for="District" class="text-danger small d-block mt-1"></span>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label asp-for="Upazila" class="form-label-custom">Target Upazila / Sub-District *</label>
+                                        <select asp-for="Upazila" class="form-select form-select-custom" id="upazilaSelect" required>
+                                            @foreach (var upa in Model.AvailableUpazilas)
+                                            {
+                                                <option value="@upa" selected="@(upa == Model.Upazila)">@upa</option>
+                                            }
+                                        </select>
+                                        <span asp-validation-for="Upazila" class="text-danger small d-block mt-1"></span>
+                                        <span id="upazilaSpinner" class="spinner-border spinner-border-sm text-primary d-none mt-1" role="status"></span>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <label asp-for="Venue" class="form-label-custom">Field Venue / Facility Location *</label>
+                                        <input asp-for="Venue" class="form-control form-control-custom" placeholder="e.g. Chilmari High School Ground, Ward 3" required />
+                                        <span asp-validation-for="Venue" class="text-danger small d-block mt-1"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- =========================================================================
+                             SECTION 3: SCHEDULE & DURATION
+                             ========================================================================= -->
+                        <div class="card border rounded-4 mb-4 shadow-sm bg-white overflow-hidden">
+                            <div class="card-header bg-light py-3 px-4 border-bottom">
+                                <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2 fs-6">
+                                    <span class="badge bg-primary text-white rounded-circle p-2" style="width: 28px; height: 28px; font-size: 0.8rem; display: inline-flex; align-items: center; justify-content: center;">3</span>
+                                    Camp Schedule & Duration
+                                </h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label asp-for="StartDate" class="form-label-custom">Camp Start Date *</label>
+                                        <input asp-for="StartDate" type="date" class="form-control form-control-custom" id="startDateInput" required />
+                                        <span asp-validation-for="StartDate" class="text-danger small d-block mt-1"></span>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label asp-for="EndDate" class="form-label-custom">Camp End Date *</label>
+                                        <input asp-for="EndDate" type="date" class="form-control form-control-custom" id="endDateInput" required />
+                                        <span asp-validation-for="EndDate" class="text-danger small d-block mt-1"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- =========================================================================
+                             SECTION 4: CAPACITY & FINANCIAL BUDGET
+                             ========================================================================= -->
+                        <div class="card border rounded-4 mb-4 shadow-sm bg-white overflow-hidden">
+                            <div class="card-header bg-light py-3 px-4 border-bottom">
+                                <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2 fs-6">
+                                    <span class="badge bg-primary text-white rounded-circle p-2" style="width: 28px; height: 28px; font-size: 0.8rem; display: inline-flex; align-items: center; justify-content: center;">4</span>
+                                    Target Capacity & Financial Budget
+                                </h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label asp-for="ExpectedPatients" class="form-label-custom">Expected Patient Target Capacity *</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white text-muted"><i class="fa-solid fa-users"></i></span>
+                                            <input asp-for="ExpectedPatients" type="number" min="1" max="100000" class="form-control form-control-custom" placeholder="e.g. 1200" required />
+                                        </div>
+                                        <span asp-validation-for="ExpectedPatients" class="text-danger small d-block mt-1"></span>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label asp-for="TotalBudget" class="form-label-custom">Total Estimated Budget (BDT) *</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white text-muted fw-bold">৳</span>
+                                            <input asp-for="TotalBudget" type="number" step="100" min="0" class="form-control form-control-custom" placeholder="e.g. 150000" required />
+                                        </div>
+                                        <span asp-validation-for="TotalBudget" class="text-danger small d-block mt-1"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- =========================================================================
+                             SECTION 5: OBJECTIVES & COMMUNITY DESCRIPTION
+                             ========================================================================= -->
+                        <div class="card border rounded-4 mb-4 shadow-sm bg-white overflow-hidden">
+                            <div class="card-header bg-light py-3 px-4 border-bottom">
+                                <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2 fs-6">
+                                    <span class="badge bg-primary text-white rounded-circle p-2" style="width: 28px; height: 28px; font-size: 0.8rem; display: inline-flex; align-items: center; justify-content: center;">5</span>
+                                    Purpose & Target Community Needs
+                                </h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="mb-2">
+                                    <label asp-for="Description" class="form-label-custom">Camp Description & Needs Summary</label>
+                                    <textarea asp-for="Description" class="form-control form-control-custom" rows="3" placeholder="Describe the health challenges in the target community, specialized care needed, and logistical plans..."></textarea>
+                                    <span asp-validation-for="Description" class="text-danger small d-block mt-1"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Governance Notice Banner -->
+                        <div class="alert alert-info rounded-3 p-3 mb-4 d-flex align-items-center gap-3" style="background: rgba(13, 148, 136, 0.08); border-left: 4px solid #0d9488; color: #0f766e;">
+                            <i class="fa-solid fa-circle-info fs-4 text-teal"></i>
+                            <div class="small">
+                                <strong>Submission Rule:</strong> Once submitted, your camp status will be set to <strong>Pending Admin Approval</strong>. System Administrators review equipment, doctor allocation, and venue readiness before approving the camp for public registration.
+                            </div>
+                        </div>
+
+                        <!-- Form Actions Toolbar -->
+                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pt-3 border-top">
+                            <a asp-controller="Host" asp-action="Dashboard" class="btn btn-light border px-4">
+                                <i class="fa-solid fa-arrow-left me-1"></i> Cancel & Return to Dashboard
+                            </a>
+                            <button type="submit" class="btn btn-sapphire btn-lg px-5 shadow">
+                                <i class="fa-solid fa-paper-plane me-2"></i> Submit Camp Application
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const districtSelect = document.getElementById("districtSelect");
+            const upazilaSelect = document.getElementById("upazilaSelect");
+            const upazilaSpinner = document.getElementById("upazilaSpinner");
+            const startDateInput = document.getElementById("startDateInput");
+            const endDateInput = document.getElementById("endDateInput");
+
+            // Dynamic Cascading Dropdown (District -> Upazila)
+            districtSelect.addEventListener("change", function () {
+                const selectedDistrict = this.value;
+                if (!selectedDistrict) return;
+
+                upazilaSpinner.classList.remove("d-none");
+                upazilaSelect.disabled = true;
+
+                fetch(`/Host/GetUpazilas?district=${encodeURIComponent(selectedDistrict)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        upazilaSelect.innerHTML = "";
+                        if (data && data.length > 0) {
+                            data.forEach(upazila => {
+                                const option = document.createElement("option");
+                                option.value = upazila;
+                                option.textContent = upazila;
+                                upazilaSelect.appendChild(option);
+                            });
+                        } else {
+                            const option = document.createElement("option");
+                            option.value = selectedDistrict + " Sadar";
+                            option.textContent = selectedDistrict + " Sadar";
+                            upazilaSelect.appendChild(option);
+                        }
+                    })
+                    .catch(err => {
+                        console.error("Error fetching upazilas:", err);
+                    })
+                    .finally(() => {
+                        upazilaSpinner.classList.add("d-none");
+                        upazilaSelect.disabled = false;
+                    });
+            });
+
+            // Date Picker Validation Enforcement: EndDate >= StartDate
+            startDateInput.addEventListener("change", function () {
+                if (startDateInput.value && endDateInput.value) {
+                    if (endDateInput.value < startDateInput.value) {
+                        endDateInput.value = startDateInput.value;
+                    }
+                }
+                endDateInput.min = startDateInput.value;
+            });
+        });
+    </script>
+}

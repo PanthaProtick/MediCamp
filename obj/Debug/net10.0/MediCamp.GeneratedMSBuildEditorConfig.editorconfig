@@ -34,6 +34,10 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudC9BY2Nlc3NEZW5pZWQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/Views/Account/HostRegistrationPending.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudC9Ib3N0UmVnaXN0cmF0aW9uUGVuZGluZy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/Views/Account/Login.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudC9Mb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
@@ -62,6 +66,14 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudC9SZWdpc3RlclZvbHVudGVlci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/Views/Admin/CampApprovals.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vQ2FtcEFwcHJvdmFscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/Views/Admin/HostApprovals.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vSG9zdEFwcHJvdmFscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/Views/Admin/UserManagement.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vVXNlck1hbmFnZW1lbnQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
@@ -80,6 +92,22 @@ build_metadata.AdditionalFiles.CssScope =
 
 [/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/Views/Home/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9Qcml2YWN5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/Views/Host/CampSubmitted.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9zdC9DYW1wU3VibWl0dGVkLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/Views/Host/CreateCamp.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9zdC9DcmVhdGVDYW1wLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/Views/Host/Dashboard.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9zdC9EYXNoYm9hcmQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/Views/Host/MyCamps.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9zdC9NeUNhbXBzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/akif/Desktop/A/Project/RUNNING PROJECTS/MediCamp/Views/Shared/Error.cshtml]

@@ -46,13 +46,17 @@ namespace MediCamp.Models
 
         public string Role { get; set; } = SystemRoles.Patient;
 
-        // Fields specific to Host (NGO)
+        // Fields specific to Host (Organization)
         [MaxLength(150)]
-        [Display(Name = "Organization / NGO Name")]
+        [Display(Name = "Organization Name")]
         public string? OrganizationName { get; set; }
 
         [MaxLength(50)]
-        [Display(Name = "Registration / NGOAB License No")]
+        [Display(Name = "Organization Type")]
+        public string? OrganizationType { get; set; } = "NGO"; // NGO, Hospital, Corporate, Community Group, Other
+
+        [MaxLength(50)]
+        [Display(Name = "Registration / License No")]
         public string? OrganizationRegNo { get; set; }
 
         [MaxLength(50)]

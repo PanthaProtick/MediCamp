@@ -12,8 +12,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Register In-Memory Mock Data Service
-builder.Services.AddSingleton<IMockDataService, MockDataService>();
+// Register Mock Data Service (Now backed by EF Core, so it must be Scoped)
+builder.Services.AddScoped<IMockDataService, MockDataService>();
 
 // Cookie Authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

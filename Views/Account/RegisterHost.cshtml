@@ -1,6 +1,6 @@
 @model RegisterHostViewModel
 @{
-    ViewData["Title"] = "NGO Host Registration - MediCamp";
+    ViewData["Title"] = "Host Organization Registration - MediCamp";
 }
 
 <div class="container py-5">
@@ -9,9 +9,9 @@
             <div class="glass-card">
                 <div class="glass-card-header d-flex justify-content-between align-items-center">
                     <div>
-                        <span class="badge badge-role-host mb-2"><i class="fa-solid fa-building-ngo"></i> Organizing NGO Host</span>
-                        <h3 class="fw-bold mb-1 text-dark">NGO Host Registration</h3>
-                        <p class="text-secondary small mb-0">Register your organization to plan camps, allocate medicine inventory, and monitor field clinics.</p>
+                        <span class="badge badge-role-host mb-2"><i class="fa-solid fa-building"></i> Organizing Host Entity</span>
+                        <h3 class="fw-bold mb-1 text-dark">Host Organization Registration</h3>
+                        <p class="text-secondary small mb-0">Register your organizing entity (NGO, Hospital, Corporate CSR, or Community Group) to host healthcare camps.</p>
                     </div>
                     <div class="stat-icon stat-icon-sapphire d-none d-sm-flex">
                         <i class="fa-solid fa-handshake-angle"></i>
@@ -22,7 +22,7 @@
                     <div class="alert alert-info py-2 px-3 small rounded-3 mb-4 d-flex align-items-center gap-2" style="background: rgba(6, 78, 59, 0.08); border-left: 4px solid #064e3b; color: #064e3b;">
                         <i class="fa-solid fa-shield-halved text-success fs-5"></i>
                         <div>
-                            <strong>Governance Verification:</strong> Host NGO accounts are verified by System Administrators upon registration before camps can be officially published.
+                            <strong>Governance Verification:</strong> Host organization accounts are reviewed and verified by System Administrators before camps can be created or published.
                         </div>
                     </div>
 
@@ -32,38 +32,32 @@
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 px-3 small rounded-3 mb-4"></div>
 
                         <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">
-                            <i class="fa-solid fa-building text-primary me-2"></i>1. Organization Details & License
+                            <i class="fa-solid fa-building text-primary me-2"></i>1. Organization Details & Classification
                         </h5>
 
                         <div class="row g-3 mb-4">
                             <div class="col-md-6">
-                                <label asp-for="OrganizationName" class="form-label-custom">Organization / NGO Legal Name *</label>
-                                <input asp-for="OrganizationName" class="form-control form-control-custom" placeholder="e.g. BRAC Community Health Initiative" required />
+                                <label asp-for="OrganizationName" class="form-label-custom">Organization Name *</label>
+                                <input asp-for="OrganizationName" class="form-control form-control-custom" placeholder="e.g. BRAC Health, Square CSR, Hope Foundation" required />
                                 <span asp-validation-for="OrganizationName" class="text-danger small"></span>
                             </div>
 
                             <div class="col-md-6">
-                                <label asp-for="OrganizationRegNo" class="form-label-custom">NGOAB Registration / License No *</label>
-                                <input asp-for="OrganizationRegNo" class="form-control form-control-custom" placeholder="e.g. NGOAB-2024-0492" required />
+                                <label asp-for="OrganizationType" class="form-label-custom">Organization Type *</label>
+                                <select asp-for="OrganizationType" class="form-select form-select-custom" required>
+                                    <option value="NGO">Non-Governmental Organization (NGO)</option>
+                                    <option value="Hospital">Hospital / Medical Center</option>
+                                    <option value="Corporate">Corporate CSR Team</option>
+                                    <option value="Community Group">Community Action Group</option>
+                                    <option value="Other">Other Entity</option>
+                                </select>
+                                <span asp-validation-for="OrganizationType" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="OrganizationRegNo" class="form-label-custom">Registration / License No. <span class="text-muted fw-normal">(Optional)</span></label>
+                                <input asp-for="OrganizationRegNo" class="form-control form-control-custom" placeholder="e.g. NGOAB-2024-0492 / Govt Reg No." />
                                 <span asp-validation-for="OrganizationRegNo" class="text-danger small"></span>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label asp-for="ContactPersonName" class="form-label-custom">Authorized Focal Person Full Name *</label>
-                                <input asp-for="ContactPersonName" class="form-control form-control-custom" placeholder="e.g. Shahidul Alam" required />
-                                <span asp-validation-for="ContactPersonName" class="text-danger small"></span>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label asp-for="Email" class="form-label-custom">Official NGO Email Address *</label>
-                                <input asp-for="Email" type="email" class="form-control form-control-custom" placeholder="e.g. host@ngo-bd.org" required />
-                                <span asp-validation-for="Email" class="text-danger small"></span>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label asp-for="PhoneNumber" class="form-label-custom">Official Mobile Number *</label>
-                                <input asp-for="PhoneNumber" class="form-control form-control-custom" placeholder="e.g. 01819000002" required />
-                                <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
                             </div>
 
                             <div class="col-md-6">
@@ -73,7 +67,31 @@
                         </div>
 
                         <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">
-                            <i class="fa-solid fa-map-location-dot text-primary me-2"></i>2. Head Office Address
+                            <i class="fa-solid fa-id-card text-primary me-2"></i>2. Authorized Focal Person & Contact
+                        </h5>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="ContactPersonName" class="form-label-custom">Focal Person Full Name *</label>
+                                <input asp-for="ContactPersonName" class="form-control form-control-custom" placeholder="e.g. Shahidul Alam" required />
+                                <span asp-validation-for="ContactPersonName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="PhoneNumber" class="form-label-custom">Focal Person Contact (Phone) *</label>
+                                <input asp-for="PhoneNumber" class="form-control form-control-custom" placeholder="e.g. 01819000002" required />
+                                <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label asp-for="Email" class="form-label-custom">Official Account Email Address *</label>
+                                <input asp-for="Email" type="email" class="form-control form-control-custom" placeholder="e.g. host@organization.org" required />
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">
+                            <i class="fa-solid fa-map-location-dot text-primary me-2"></i>3. Head Office Address
                         </h5>
 
                         <div class="row g-3 mb-4">
@@ -84,22 +102,26 @@
                                     <option value="Chittagong">Chittagong</option>
                                     <option value="Sylhet">Sylhet</option>
                                     <option value="Rangpur">Rangpur</option>
+                                    <option value="Khulna">Khulna</option>
+                                    <option value="Barisal">Barisal</option>
+                                    <option value="Rajshahi">Rajshahi</option>
+                                    <option value="Mymensingh">Mymensingh</option>
                                 </select>
                             </div>
 
                             <div class="col-md-6">
                                 <label asp-for="Upazila" class="form-label-custom">Head Office Upazila / Area *</label>
-                                <input asp-for="Upazila" class="form-control form-control-custom" placeholder="e.g. Mohakhali, Gulshan, Banani" required />
+                                <input asp-for="Upazila" class="form-control form-control-custom" placeholder="e.g. Mohakhali, Gulshan, Agrabad" required />
                             </div>
 
                             <div class="col-12">
                                 <label asp-for="HeadOfficeAddress" class="form-label-custom">Head Office Street Address *</label>
-                                <input asp-for="HeadOfficeAddress" class="form-control form-control-custom" placeholder="e.g. 75 Mohakhali, Dhaka-1212" required />
+                                <input asp-for="HeadOfficeAddress" class="form-control form-control-custom" placeholder="e.g. House 42, Road 11, Block C" required />
                             </div>
                         </div>
 
                         <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">
-                            <i class="fa-solid fa-lock text-primary me-2"></i>3. Password
+                            <i class="fa-solid fa-lock text-primary me-2"></i>4. Security & Account Password
                         </h5>
 
                         <div class="row g-3 mb-4">
@@ -119,7 +141,7 @@
                                 <i class="fa-solid fa-arrow-left me-1"></i> Return to Sign In
                             </a>
                             <button type="submit" class="btn btn-sapphire btn-lg px-4 shadow">
-                                <i class="fa-solid fa-paper-plane me-2"></i> Submit NGO Registration
+                                <i class="fa-solid fa-paper-plane me-2"></i> Submit Host Registration
                             </button>
                         </div>
                     </form>
