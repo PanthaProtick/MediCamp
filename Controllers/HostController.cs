@@ -310,7 +310,7 @@ namespace MediCamp.Controllers
         // 6. MANAGE CAMP STAFF (/Host/ManageStaff/{id})
         // =========================================================================
         [HttpGet]
-        public IActionResult ManageStaff(int id, string? doctorSearch, string? volunteerSearch)
+        public IActionResult ManageStaff(int id, string? doctorSearch, string? volunteerSearch, int doctorPage = 1, int volunteerPage = 1)
         {
             var currentHost = GetCurrentHostUser();
             if (currentHost == null)
@@ -340,14 +340,27 @@ namespace MediCamp.Controllers
                 volunteersQuery = volunteersQuery.Where(u => u.FullName.ToLower().Contains(lowerSearch) || 
                                                              (u.District != null && u.District.ToLower().Contains(lowerSearch)));
             }
+            
+            int pageSize = 6; // Changed to 6 so it displays well in a 2-column or 3-column grid
+
+            var totalDoctors = doctorsQuery.Count();
+            var totalVolunteers = volunteersQuery.Count();
 
             var model = new HostManageStaffViewModel
             {
                 Camp = camp,
                 CurrentRequests = _mockDataService.GetRequestsForCamp(id),
-                AvailableDoctors = doctorsQuery.ToList(),
+                AvailableDoctors = doctorsQuery.Skip((doctorPage - 1) * pageSize).Take(pageSize).ToList(),
                 CurrentVolunteerRequests = _mockDataService.GetVolunteerRequestsForCamp(id),
-                AvailableVolunteers = volunteersQuery.ToList()
+                AvailableVolunteers = volunteersQuery.Skip((volunteerPage - 1) * pageSize).Take(pageSize).ToList(),
+                
+                CurrentDoctorPage = doctorPage,
+                TotalDoctorPages = (int)Math.Ceiling(totalDoctors / (double)pageSize),
+                DoctorPageSize = pageSize,
+
+                CurrentVolunteerPage = volunteerPage,
+                TotalVolunteerPages = (int)Math.Ceiling(totalVolunteers / (double)pageSize),
+                VolunteerPageSize = pageSize
             };
 
             ViewBag.DoctorSearch = doctorSearch;

@@ -5,271 +5,341 @@
     Layout = "_Layout";
 }
 
-<div class="container mt-4">
+<style>
+    .staff-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+    .staff-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
+    }
+    .status-timeline-item {
+        border-left: 3px solid #dee2e6;
+        position: relative;
+        padding-left: 20px;
+        margin-bottom: 20px;
+    }
+    .status-timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -8px;
+        top: 0;
+        width: 13px;
+        height: 13px;
+        border-radius: 50%;
+        background-color: white;
+        border: 3px solid #dee2e6;
+    }
+    .status-timeline-item.status-Pending::before { border-color: #ffc107; }
+    .status-timeline-item.status-Approved::before { border-color: #198754; }
+    .status-timeline-item.status-Denied::before { border-color: #dc3545; }
+    
+    .glass-search {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+</style>
+
+<div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Manage Staff: @Model.Camp.Title</h2>
-        <a asp-action="MyCamps" class="btn btn-outline-secondary">Back to My Camps</a>
+        <div>
+            <h2 class="fw-bold mb-1">Manage Staff</h2>
+            <p class="text-muted mb-0"><i class="fa-solid fa-tent me-2"></i>@Model.Camp.Title</p>
+        </div>
+        <a asp-action="MyCamps" class="btn btn-outline-secondary rounded-pill px-4"><i class="fa-solid fa-arrow-left me-2"></i> Back</a>
     </div>
 
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            @TempData["SuccessMessage"]
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i> @TempData["SuccessMessage"]
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
     @if (TempData["ErrorMessage"] != null)
     {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            @TempData["ErrorMessage"]
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i> @TempData["ErrorMessage"]
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
-    <div class="row">
-        <!-- Sent Requests Section -->
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Current Requests for this Camp</h5>
-                </div>
-                <div class="card-body p-0">
-                    @if (Model.CurrentRequests.Any())
-                    {
-                        <div class="table-responsive">
-                            <table class="table table-hover table-striped mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>Doctor Name</th>
-                                        <th>Status</th>
-                                        <th>Requested At</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var req in Model.CurrentRequests)
-                                    {
-                                        <tr>
-                                            <td>@(req.Doctor?.FullName ?? "Unknown")</td>
-                                            <td>
-                                                @if (req.Status == "Pending")
-                                                {
-                                                    <span class="badge bg-warning text-dark">Pending</span>
-                                                }
-                                                else if (req.Status == "Approved")
-                                                {
-                                                    <span class="badge bg-success">Approved</span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="badge bg-danger">Denied</span>
-                                                }
-                                            </td>
-                                            <td>@req.RequestedAt.ToLocalTime().ToString("MMM dd, yyyy HH:mm")</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="p-4 text-center text-muted">
-                            <p>No staff requests have been sent for this camp yet.</p>
-                        </div>
-                    }
+    <!-- DOCTOR RECRUITMENT SECTION -->
+    <div class="mb-5">
+        <h3 class="fw-bold text-dark mb-4 pb-2 border-bottom"><i class="fa-solid fa-user-doctor text-primary me-2"></i> Doctor Recruitment</h3>
+        
+        <div class="row g-4">
+            <!-- Available Doctors -->
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0 h-100 rounded-4 overflow-hidden">
+                    <div class="card-header bg-white glass-search p-3 d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold text-dark"><i class="fa-solid fa-magnifying-glass text-primary me-2"></i> Find Doctors</h5>
+                        <form method="get" asp-action="ManageStaff" class="d-flex gap-2">
+                            <input type="hidden" name="id" value="@Model.Camp.Id" />
+                            <input type="hidden" name="volunteerSearch" value="@ViewBag.VolunteerSearch" />
+                            <input type="hidden" name="volunteerPage" value="@Model.CurrentVolunteerPage" />
+                            <div class="input-group input-group-sm">
+                                <input type="text" name="doctorSearch" class="form-control rounded-start-pill ps-3" placeholder="Search by name or specialty..." value="@ViewBag.DoctorSearch" style="width: 250px;" />
+                                <button type="submit" class="btn btn-primary"><i class="fa-solid fa-search"></i></button>
+                                @if (!string.IsNullOrEmpty((string)ViewBag.DoctorSearch))
+                                {
+                                    <a asp-action="ManageStaff" asp-route-id="@Model.Camp.Id" asp-route-volunteerSearch="@ViewBag.VolunteerSearch" asp-route-volunteerPage="@Model.CurrentVolunteerPage" class="btn btn-outline-secondary rounded-end-pill"><i class="fa-solid fa-xmark"></i></a>
+                                }
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div class="card-body bg-light p-4">
+                        @if (Model.AvailableDoctors.Any())
+                        {
+                            <div class="row g-3">
+                                @foreach (var doc in Model.AvailableDoctors)
+                                {
+                                    var existingRequest = Model.CurrentRequests.FirstOrDefault(r => r.DoctorId == doc.Id);
+                                    <div class="col-md-6">
+                                        <div class="card h-100 staff-card rounded-3 border-0 shadow-sm">
+                                            <div class="card-body p-3">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <h6 class="fw-bold mb-0 text-dark">@doc.FullName</h6>
+                                                    <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill"><i class="fa-solid fa-stethoscope me-1"></i> @(doc.MedicalSpecialization ?? "General")</span>
+                                                </div>
+                                                <p class="small text-muted mb-3"><i class="fa-solid fa-location-dot me-1"></i> @(doc.District ?? "Unknown District")</p>
+                                                
+                                                <div class="d-flex justify-content-end mt-auto">
+                                                    @if (existingRequest != null)
+                                                    {
+                                                        <button class="btn btn-sm btn-light text-muted fw-bold w-100 rounded-pill" disabled><i class="fa-solid fa-check me-1"></i> Invited</button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <form asp-action="SendStaffRequest" method="post" class="w-100">
+                                                            <input type="hidden" name="campId" value="@Model.Camp.Id" />
+                                                            <input type="hidden" name="doctorId" value="@doc.Id" />
+                                                            <button type="submit" class="btn btn-sm btn-primary w-100 fw-bold rounded-pill"><i class="fa-solid fa-paper-plane me-1"></i> Send Invite</button>
+                                                        </form>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Pagination -->
+                            @if (Model.TotalDoctorPages > 1)
+                            {
+                                <nav class="mt-4" aria-label="Doctor pagination">
+                                    <ul class="pagination pagination-sm justify-content-center mb-0">
+                                        <li class="page-item @(Model.CurrentDoctorPage == 1 ? "disabled" : "")">
+                                            <a class="page-link rounded-start-pill" asp-action="ManageStaff" asp-route-id="@Model.Camp.Id" asp-route-doctorSearch="@ViewBag.DoctorSearch" asp-route-volunteerSearch="@ViewBag.VolunteerSearch" asp-route-doctorPage="@(Model.CurrentDoctorPage - 1)" asp-route-volunteerPage="@Model.CurrentVolunteerPage">Previous</a>
+                                        </li>
+                                        @for (int i = 1; i <= Model.TotalDoctorPages; i++)
+                                        {
+                                            <li class="page-item @(i == Model.CurrentDoctorPage ? "active" : "")">
+                                                <a class="page-link" asp-action="ManageStaff" asp-route-id="@Model.Camp.Id" asp-route-doctorSearch="@ViewBag.DoctorSearch" asp-route-volunteerSearch="@ViewBag.VolunteerSearch" asp-route-doctorPage="@i" asp-route-volunteerPage="@Model.CurrentVolunteerPage">@i</a>
+                                            </li>
+                                        }
+                                        <li class="page-item @(Model.CurrentDoctorPage == Model.TotalDoctorPages ? "disabled" : "")">
+                                            <a class="page-link rounded-end-pill" asp-action="ManageStaff" asp-route-id="@Model.Camp.Id" asp-route-doctorSearch="@ViewBag.DoctorSearch" asp-route-volunteerSearch="@ViewBag.VolunteerSearch" asp-route-doctorPage="@(Model.CurrentDoctorPage + 1)" asp-route-volunteerPage="@Model.CurrentVolunteerPage">Next</a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            }
+                        }
+                        else
+                        {
+                            <div class="text-center py-5">
+                                <i class="fa-solid fa-user-slash fs-1 text-muted opacity-25 mb-3"></i>
+                                <h6 class="text-muted">No doctors found matching your criteria.</h6>
+                            </div>
+                        }
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Available Doctors Section -->
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Available Doctors in System</h5>
-                </div>
-                <div class="card-body p-3 bg-light border-bottom">
-                    <form method="get" asp-action="ManageStaff" class="d-flex gap-2">
-                        <input type="hidden" name="id" value="@Model.Camp.Id" />
-                        <input type="hidden" name="volunteerSearch" value="@ViewBag.VolunteerSearch" />
-                        <input type="text" name="doctorSearch" class="form-control form-control-sm" placeholder="Search doctor name or specialty..." value="@ViewBag.DoctorSearch" />
-                        <button type="submit" class="btn btn-sm btn-primary"><i class="fa-solid fa-search"></i></button>
-                        @if (!string.IsNullOrEmpty((string)ViewBag.DoctorSearch))
+            <!-- Sent Doctor Requests -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0 h-100 rounded-4">
+                    <div class="card-header bg-white border-bottom p-3">
+                        <h5 class="mb-0 fw-bold text-dark"><i class="fa-solid fa-clock-rotate-left text-secondary me-2"></i> Sent Invitations</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        @if (Model.CurrentRequests.Any())
                         {
-                            <a asp-action="ManageStaff" asp-route-id="@Model.Camp.Id" asp-route-volunteerSearch="@ViewBag.VolunteerSearch" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-xmark"></i></a>
+                            <div class="timeline">
+                                @foreach (var req in Model.CurrentRequests.OrderByDescending(r => r.RequestedAt))
+                                {
+                                    <div class="status-timeline-item status-@req.Status">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <strong class="text-dark">@(req.Doctor?.FullName ?? "Unknown")</strong>
+                                            @if (req.Status == "Pending")
+                                            {
+                                                <span class="badge bg-warning text-dark rounded-pill">Pending</span>
+                                            }
+                                            else if (req.Status == "Approved")
+                                            {
+                                                <span class="badge bg-success rounded-pill">Approved</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger rounded-pill">Denied</span>
+                                            }
+                                        </div>
+                                        <div class="small text-muted">@req.RequestedAt.ToLocalTime().ToString("MMM dd, hh:mm tt")</div>
+                                    </div>
+                                }
+                            </div>
                         }
-                    </form>
-                </div>
-                <div class="card-body p-0">
-                    @if (Model.AvailableDoctors.Any())
-                    {
-                        <div class="table-responsive">
-                            <table class="table table-hover table-striped mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>Doctor Name</th>
-                                        <th>Specialization</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var doc in Model.AvailableDoctors)
-                                    {
-                                        var existingRequest = Model.CurrentRequests.FirstOrDefault(r => r.DoctorId == doc.Id);
-                                        <tr>
-                                            <td>@doc.FullName</td>
-                                            <td>@(doc.MedicalSpecialization ?? "General")</td>
-                                            <td>
-                                                @if (existingRequest != null)
-                                                {
-                                                    <button class="btn btn-sm btn-secondary" disabled>Request Sent</button>
-                                                }
-                                                else
-                                                {
-                                                    <form asp-action="SendStaffRequest" method="post">
-                                                        <input type="hidden" name="campId" value="@Model.Camp.Id" />
-                                                        <input type="hidden" name="doctorId" value="@doc.Id" />
-                                                        <button type="submit" class="btn btn-sm btn-primary">Send Request</button>
-                                                    </form>
-                                                }
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="p-4 text-center text-muted">
-                            <p>No active doctors found matching your criteria.</p>
-                        </div>
-                    }
+                        else
+                        {
+                            <div class="text-center py-5">
+                                <i class="fa-regular fa-paper-plane fs-1 text-muted opacity-25 mb-3"></i>
+                                <p class="text-muted small mb-0">No invitations sent yet.</p>
+                            </div>
+                        }
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Volunteers Section -->
-    <h3 class="mt-5 mb-4 border-bottom pb-2">Volunteer Recruitment</h3>
-    <div class="row">
-        <!-- Sent Volunteer Requests Section -->
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0">Current Volunteer Requests</h5>
-                </div>
-                <div class="card-body p-0">
-                    @if (Model.CurrentVolunteerRequests.Any())
-                    {
-                        <div class="table-responsive">
-                            <table class="table table-hover table-striped mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>Volunteer Name</th>
-                                        <th>Status</th>
-                                        <th>Requested At</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var req in Model.CurrentVolunteerRequests)
-                                    {
-                                        <tr>
-                                            <td>@(req.Volunteer?.FullName ?? "Unknown")</td>
-                                            <td>
-                                                @if (req.Status == "Pending")
-                                                {
-                                                    <span class="badge bg-warning text-dark">Pending</span>
-                                                }
-                                                else if (req.Status == "Approved")
-                                                {
-                                                    <span class="badge bg-success">Approved</span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="badge bg-danger">Denied</span>
-                                                }
-                                            </td>
-                                            <td>@req.RequestedAt.ToLocalTime().ToString("MMM dd, yyyy HH:mm")</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="p-4 text-center text-muted">
-                            <p>No volunteer requests have been sent for this camp yet.</p>
-                        </div>
-                    }
+    <!-- VOLUNTEER RECRUITMENT SECTION -->
+    <div class="mb-5">
+        <h3 class="fw-bold text-dark mb-4 pb-2 border-bottom"><i class="fa-solid fa-handshake-angle text-teal me-2" style="color: #0d9488;"></i> Volunteer Recruitment</h3>
+        
+        <div class="row g-4">
+            <!-- Available Volunteers -->
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0 h-100 rounded-4 overflow-hidden">
+                    <div class="card-header bg-white glass-search p-3 d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold text-dark"><i class="fa-solid fa-magnifying-glass text-teal me-2" style="color: #0d9488;"></i> Find Volunteers</h5>
+                        <form method="get" asp-action="ManageStaff" class="d-flex gap-2">
+                            <input type="hidden" name="id" value="@Model.Camp.Id" />
+                            <input type="hidden" name="doctorSearch" value="@ViewBag.DoctorSearch" />
+                            <input type="hidden" name="doctorPage" value="@Model.CurrentDoctorPage" />
+                            <div class="input-group input-group-sm">
+                                <input type="text" name="volunteerSearch" class="form-control rounded-start-pill ps-3" placeholder="Search by name or district..." value="@ViewBag.VolunteerSearch" style="width: 250px;" />
+                                <button type="submit" class="btn text-white" style="background-color: #0d9488; border-color: #0d9488;"><i class="fa-solid fa-search"></i></button>
+                                @if (!string.IsNullOrEmpty((string)ViewBag.VolunteerSearch))
+                                {
+                                    <a asp-action="ManageStaff" asp-route-id="@Model.Camp.Id" asp-route-doctorSearch="@ViewBag.DoctorSearch" asp-route-doctorPage="@Model.CurrentDoctorPage" class="btn btn-outline-secondary rounded-end-pill"><i class="fa-solid fa-xmark"></i></a>
+                                }
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div class="card-body bg-light p-4">
+                        @if (Model.AvailableVolunteers.Any())
+                        {
+                            <div class="row g-3">
+                                @foreach (var vol in Model.AvailableVolunteers)
+                                {
+                                    var existingRequest = Model.CurrentVolunteerRequests.FirstOrDefault(r => r.VolunteerId == vol.Id);
+                                    <div class="col-md-6">
+                                        <div class="card h-100 staff-card rounded-3 border-0 shadow-sm">
+                                            <div class="card-body p-3">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <h6 class="fw-bold mb-0 text-dark">@vol.FullName</h6>
+                                                    <span class="badge bg-opacity-10 text-success rounded-pill" style="background-color: rgba(13, 148, 136, 0.1); color: #0d9488 !important;"><i class="fa-solid fa-location-dot me-1"></i> @(vol.District ?? "Unknown")</span>
+                                                </div>
+                                                <p class="small text-muted mb-3"><i class="fa-solid fa-phone me-1"></i> @vol.PhoneNumber</p>
+                                                
+                                                <div class="d-flex justify-content-end mt-auto">
+                                                    @if (existingRequest != null)
+                                                    {
+                                                        <button class="btn btn-sm btn-light text-muted fw-bold w-100 rounded-pill" disabled><i class="fa-solid fa-check me-1"></i> Invited</button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <form asp-action="SendVolunteerRequest" method="post" class="w-100">
+                                                            <input type="hidden" name="campId" value="@Model.Camp.Id" />
+                                                            <input type="hidden" name="volunteerId" value="@vol.Id" />
+                                                            <button type="submit" class="btn btn-sm w-100 fw-bold text-white rounded-pill" style="background-color: #0d9488;"><i class="fa-solid fa-paper-plane me-1"></i> Send Invite</button>
+                                                        </form>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Pagination -->
+                            @if (Model.TotalVolunteerPages > 1)
+                            {
+                                <nav class="mt-4" aria-label="Volunteer pagination">
+                                    <ul class="pagination pagination-sm justify-content-center mb-0">
+                                        <li class="page-item @(Model.CurrentVolunteerPage == 1 ? "disabled" : "")">
+                                            <a class="page-link rounded-start-pill" asp-action="ManageStaff" asp-route-id="@Model.Camp.Id" asp-route-doctorSearch="@ViewBag.DoctorSearch" asp-route-volunteerSearch="@ViewBag.VolunteerSearch" asp-route-doctorPage="@Model.CurrentDoctorPage" asp-route-volunteerPage="@(Model.CurrentVolunteerPage - 1)">Previous</a>
+                                        </li>
+                                        @for (int i = 1; i <= Model.TotalVolunteerPages; i++)
+                                        {
+                                            <li class="page-item @(i == Model.CurrentVolunteerPage ? "active" : "")">
+                                                <a class="page-link" asp-action="ManageStaff" asp-route-id="@Model.Camp.Id" asp-route-doctorSearch="@ViewBag.DoctorSearch" asp-route-volunteerSearch="@ViewBag.VolunteerSearch" asp-route-doctorPage="@Model.CurrentDoctorPage" asp-route-volunteerPage="@i">@i</a>
+                                            </li>
+                                        }
+                                        <li class="page-item @(Model.CurrentVolunteerPage == Model.TotalVolunteerPages ? "disabled" : "")">
+                                            <a class="page-link rounded-end-pill" asp-action="ManageStaff" asp-route-id="@Model.Camp.Id" asp-route-doctorSearch="@ViewBag.DoctorSearch" asp-route-volunteerSearch="@ViewBag.VolunteerSearch" asp-route-doctorPage="@Model.CurrentDoctorPage" asp-route-volunteerPage="@(Model.CurrentVolunteerPage + 1)">Next</a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            }
+                        }
+                        else
+                        {
+                            <div class="text-center py-5">
+                                <i class="fa-solid fa-users-slash fs-1 text-muted opacity-25 mb-3"></i>
+                                <h6 class="text-muted">No volunteers found matching your criteria.</h6>
+                            </div>
+                        }
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Available Volunteers Section -->
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-teal text-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Available Volunteers</h5>
-                </div>
-                <div class="card-body p-3 bg-light border-bottom">
-                    <form method="get" asp-action="ManageStaff" class="d-flex gap-2">
-                        <input type="hidden" name="id" value="@Model.Camp.Id" />
-                        <input type="hidden" name="doctorSearch" value="@ViewBag.DoctorSearch" />
-                        <input type="text" name="volunteerSearch" class="form-control form-control-sm" placeholder="Search volunteer name or district..." value="@ViewBag.VolunteerSearch" />
-                        <button type="submit" class="btn btn-sm btn-teal text-white" style="background-color: #0d9488; border-color: #0d9488;"><i class="fa-solid fa-search"></i></button>
-                        @if (!string.IsNullOrEmpty((string)ViewBag.VolunteerSearch))
+            <!-- Sent Volunteer Requests -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0 h-100 rounded-4">
+                    <div class="card-header bg-white border-bottom p-3">
+                        <h5 class="mb-0 fw-bold text-dark"><i class="fa-solid fa-clock-rotate-left text-secondary me-2"></i> Sent Invitations</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        @if (Model.CurrentVolunteerRequests.Any())
                         {
-                            <a asp-action="ManageStaff" asp-route-id="@Model.Camp.Id" asp-route-doctorSearch="@ViewBag.DoctorSearch" class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-xmark"></i></a>
+                            <div class="timeline">
+                                @foreach (var req in Model.CurrentVolunteerRequests.OrderByDescending(r => r.RequestedAt))
+                                {
+                                    <div class="status-timeline-item status-@req.Status">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <strong class="text-dark">@(req.Volunteer?.FullName ?? "Unknown")</strong>
+                                            @if (req.Status == "Pending")
+                                            {
+                                                <span class="badge bg-warning text-dark rounded-pill">Pending</span>
+                                            }
+                                            else if (req.Status == "Approved")
+                                            {
+                                                <span class="badge bg-success rounded-pill">Approved</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger rounded-pill">Denied</span>
+                                            }
+                                        </div>
+                                        <div class="small text-muted">@req.RequestedAt.ToLocalTime().ToString("MMM dd, hh:mm tt")</div>
+                                    </div>
+                                }
+                            </div>
                         }
-                    </form>
-                </div>
-                <div class="card-body p-0">
-                    @if (Model.AvailableVolunteers.Any())
-                    {
-                        <div class="table-responsive">
-                            <table class="table table-hover table-striped mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>Volunteer Name</th>
-                                        <th>District</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var vol in Model.AvailableVolunteers)
-                                    {
-                                        var existingRequest = Model.CurrentVolunteerRequests.FirstOrDefault(r => r.VolunteerId == vol.Id);
-                                        <tr>
-                                            <td>@vol.FullName</td>
-                                            <td>@(vol.District ?? "Unknown")</td>
-                                            <td>
-                                                @if (existingRequest != null)
-                                                {
-                                                    <button class="btn btn-sm btn-secondary" disabled>Request Sent</button>
-                                                }
-                                                else
-                                                {
-                                                    <form asp-action="SendVolunteerRequest" method="post">
-                                                        <input type="hidden" name="campId" value="@Model.Camp.Id" />
-                                                        <input type="hidden" name="volunteerId" value="@vol.Id" />
-                                                        <button type="submit" class="btn btn-sm btn-success">Send Request</button>
-                                                    </form>
-                                                }
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="p-4 text-center text-muted">
-                            <p>No active volunteers found matching your criteria.</p>
-                        </div>
-                    }
+                        else
+                        {
+                            <div class="text-center py-5">
+                                <i class="fa-regular fa-paper-plane fs-1 text-muted opacity-25 mb-3"></i>
+                                <p class="text-muted small mb-0">No invitations sent yet.</p>
+                            </div>
+                        }
+                    </div>
                 </div>
             </div>
         </div>

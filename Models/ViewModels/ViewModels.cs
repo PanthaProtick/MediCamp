@@ -343,6 +343,15 @@ namespace MediCamp.Models.ViewModels
         public List<ApplicationUser> AvailableDoctors { get; set; } = new();
         public List<CampVolunteerRequest> CurrentVolunteerRequests { get; set; } = new();
         public List<ApplicationUser> AvailableVolunteers { get; set; } = new();
+        
+        // Pagination properties
+        public int CurrentDoctorPage { get; set; } = 1;
+        public int TotalDoctorPages { get; set; } = 1;
+        public int DoctorPageSize { get; set; } = 5;
+
+        public int CurrentVolunteerPage { get; set; } = 1;
+        public int TotalVolunteerPages { get; set; } = 1;
+        public int VolunteerPageSize { get; set; } = 5;
     }
 
     public class DoctorRequestsViewModel
