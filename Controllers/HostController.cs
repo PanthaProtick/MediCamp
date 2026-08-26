@@ -310,7 +310,7 @@ namespace MediCamp.Controllers
         // 6. MANAGE CAMP STAFF (/Host/ManageStaff/{id})
         // =========================================================================
         [HttpGet]
-        public IActionResult ManageStaff(int id, string? doctorSearch, string? volunteerSearch, int doctorPage = 1, int volunteerPage = 1)
+        public IActionResult ManageStaff(int id, string? doctorSearch, string? volunteerSearch, string? pharmacistSearch, int doctorPage = 1, int volunteerPage = 1, int pharmacistPage = 1)
         {
             var currentHost = GetCurrentHostUser();
             if (currentHost == null)
@@ -340,11 +340,20 @@ namespace MediCamp.Controllers
                 volunteersQuery = volunteersQuery.Where(u => u.FullName.ToLower().Contains(lowerSearch) || 
                                                              (u.District != null && u.District.ToLower().Contains(lowerSearch)));
             }
+
+            var pharmacistsQuery = _dbContext.Users.Where(u => u.Role == "Pharmacist" && u.IsActive);
+            if (!string.IsNullOrWhiteSpace(pharmacistSearch))
+            {
+                var lowerSearch = pharmacistSearch.ToLower();
+                pharmacistsQuery = pharmacistsQuery.Where(u => u.FullName.ToLower().Contains(lowerSearch) || 
+                                                               (u.District != null && u.District.ToLower().Contains(lowerSearch)));
+            }
             
             int pageSize = 6; // Changed to 6 so it displays well in a 2-column or 3-column grid
 
             var totalDoctors = doctorsQuery.Count();
             var totalVolunteers = volunteersQuery.Count();
+            var totalPharmacists = pharmacistsQuery.Count();
 
             var model = new HostManageStaffViewModel
             {
@@ -353,6 +362,8 @@ namespace MediCamp.Controllers
                 AvailableDoctors = doctorsQuery.Skip((doctorPage - 1) * pageSize).Take(pageSize).ToList(),
                 CurrentVolunteerRequests = _mockDataService.GetVolunteerRequestsForCamp(id),
                 AvailableVolunteers = volunteersQuery.Skip((volunteerPage - 1) * pageSize).Take(pageSize).ToList(),
+                CurrentPharmacistRequests = _mockDataService.GetPharmacistRequestsForCamp(id),
+                AvailablePharmacists = pharmacistsQuery.Skip((pharmacistPage - 1) * pageSize).Take(pageSize).ToList(),
                 
                 CurrentDoctorPage = doctorPage,
                 TotalDoctorPages = (int)Math.Ceiling(totalDoctors / (double)pageSize),
@@ -360,11 +371,16 @@ namespace MediCamp.Controllers
 
                 CurrentVolunteerPage = volunteerPage,
                 TotalVolunteerPages = (int)Math.Ceiling(totalVolunteers / (double)pageSize),
-                VolunteerPageSize = pageSize
+                VolunteerPageSize = pageSize,
+
+                CurrentPharmacistPage = pharmacistPage,
+                TotalPharmacistPages = (int)Math.Ceiling(totalPharmacists / (double)pageSize),
+                PharmacistPageSize = pageSize
             };
 
             ViewBag.DoctorSearch = doctorSearch;
             ViewBag.VolunteerSearch = volunteerSearch;
+            ViewBag.PharmacistSearch = pharmacistSearch;
 
             return View(model);
         }
@@ -418,6 +434,37 @@ namespace MediCamp.Controllers
             }
 
             var result = _mockDataService.SendCampVolunteerRequest(campId, volunteerId);
+            
+            if (result.Success)
+            {
+                TempData["SuccessMessage"] = result.Message;
+            }
+            else
+            {
+                TempData["ErrorMessage"] = result.Message;
+            }
+
+            return RedirectToAction(nameof(ManageStaff), new { id = campId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult SendPharmacistRequest(int campId, string pharmacistId)
+        {
+            var currentHost = GetCurrentHostUser();
+            if (currentHost == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var camp = _dbContext.Camps.FirstOrDefault(c => c.Id == campId && c.HostId == currentHost.Id);
+            if (camp == null)
+            {
+                TempData["ErrorMessage"] = "Camp not found or access denied.";
+                return RedirectToAction(nameof(MyCamps));
+            }
+
+            var result = _mockDataService.SendCampPharmacistRequest(campId, pharmacistId);
             
             if (result.Success)
             {

@@ -441,5 +441,65 @@ namespace MediCamp.Services
 
             return (true, $"Request {status.ToLower()} successfully.");
         }
+
+        // --- Pharmacist Requests ---
+        public List<CampPharmacistRequest> GetPharmacistRequestsForCamp(int campId)
+        {
+            return _dbContext.CampPharmacistRequests
+                .Include(r => r.Pharmacist)
+                .Where(r => r.CampId == campId)
+                .ToList();
+        }
+
+        public List<CampPharmacistRequest> GetRequestsForPharmacist(string pharmacistId)
+        {
+            return _dbContext.CampPharmacistRequests
+                .Include(r => r.Camp)
+                .Where(r => r.PharmacistId == pharmacistId)
+                .OrderByDescending(r => r.RequestedAt)
+                .ToList();
+        }
+
+        public (bool Success, string Message) SendCampPharmacistRequest(int campId, string pharmacistId)
+        {
+            var camp = _dbContext.Camps.FirstOrDefault(c => c.Id == campId);
+            if (camp == null) return (false, "Camp not found.");
+
+            var existingRequest = _dbContext.CampPharmacistRequests
+                .FirstOrDefault(r => r.CampId == campId && r.PharmacistId == pharmacistId);
+
+            if (existingRequest != null)
+            {
+                return (false, "A request has already been sent to this pharmacist.");
+            }
+
+            var request = new CampPharmacistRequest
+            {
+                CampId = campId,
+                PharmacistId = pharmacistId,
+                Status = "Pending",
+                RequestedAt = DateTime.UtcNow
+            };
+
+            _dbContext.CampPharmacistRequests.Add(request);
+            _dbContext.SaveChanges();
+
+            return (true, "Invitation sent successfully.");
+        }
+
+        public (bool Success, string Message) RespondToCampPharmacistRequest(int requestId, string pharmacistId, string status)
+        {
+            var request = _dbContext.CampPharmacistRequests.FirstOrDefault(r => r.Id == requestId && r.PharmacistId == pharmacistId);
+            if (request == null) return (false, "Request not found.");
+
+            if (request.Status != "Pending") return (false, "Request has already been processed.");
+
+            request.Status = status;
+            request.RespondedAt = DateTime.UtcNow;
+
+            _dbContext.SaveChanges();
+
+            return (true, $"Request {status.ToLower()} successfully.");
+        }
     }
 }

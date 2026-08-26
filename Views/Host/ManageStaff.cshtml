@@ -344,4 +344,145 @@
             </div>
         </div>
     </div>
+
+    <!-- PHARMACIST RECRUITMENT SECTION -->
+    <div class="mb-5">
+        <h3 class="fw-bold text-dark mb-4 pb-2 border-bottom"><i class="fa-solid fa-pills text-indigo me-2" style="color: #6610f2;"></i> Pharmacist Recruitment</h3>
+        
+        <div class="row g-4">
+            <!-- Available Pharmacists -->
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0 h-100 rounded-4 overflow-hidden">
+                    <div class="card-header bg-white glass-search p-3 d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold text-dark"><i class="fa-solid fa-magnifying-glass text-indigo me-2" style="color: #6610f2;"></i> Find Pharmacists</h5>
+                        <form method="get" asp-action="ManageStaff" class="d-flex gap-2">
+                            <input type="hidden" name="id" value="@Model.Camp.Id" />
+                            <input type="hidden" name="doctorSearch" value="@ViewBag.DoctorSearch" />
+                            <input type="hidden" name="doctorPage" value="@Model.CurrentDoctorPage" />
+                            <input type="hidden" name="volunteerSearch" value="@ViewBag.VolunteerSearch" />
+                            <input type="hidden" name="volunteerPage" value="@Model.CurrentVolunteerPage" />
+                            <div class="input-group input-group-sm">
+                                <input type="text" name="pharmacistSearch" class="form-control rounded-start-pill ps-3" placeholder="Search by name or district..." value="@ViewBag.PharmacistSearch" style="width: 250px;" />
+                                <button type="submit" class="btn text-white" style="background-color: #6610f2; border-color: #6610f2;"><i class="fa-solid fa-search"></i></button>
+                                @if (!string.IsNullOrEmpty((string)ViewBag.PharmacistSearch))
+                                {
+                                    <a asp-action="ManageStaff" asp-route-id="@Model.Camp.Id" asp-route-doctorSearch="@ViewBag.DoctorSearch" asp-route-doctorPage="@Model.CurrentDoctorPage" asp-route-volunteerSearch="@ViewBag.VolunteerSearch" asp-route-volunteerPage="@Model.CurrentVolunteerPage" class="btn btn-outline-secondary rounded-end-pill"><i class="fa-solid fa-xmark"></i></a>
+                                }
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div class="card-body bg-light p-4">
+                        @if (Model.AvailablePharmacists.Any())
+                        {
+                            <div class="row g-3">
+                                @foreach (var pharm in Model.AvailablePharmacists)
+                                {
+                                    var existingRequest = Model.CurrentPharmacistRequests.FirstOrDefault(r => r.PharmacistId == pharm.Id);
+                                    <div class="col-md-6">
+                                        <div class="card h-100 staff-card rounded-3 border-0 shadow-sm">
+                                            <div class="card-body p-3">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <h6 class="fw-bold mb-0 text-dark">@pharm.FullName</h6>
+                                                    <span class="badge bg-opacity-10 text-indigo rounded-pill" style="background-color: rgba(102, 16, 242, 0.1); color: #6610f2 !important;"><i class="fa-solid fa-location-dot me-1"></i> @(pharm.District ?? "Unknown")</span>
+                                                </div>
+                                                <p class="small text-muted mb-3"><i class="fa-solid fa-phone me-1"></i> @pharm.PhoneNumber</p>
+                                                
+                                                <div class="d-flex justify-content-end mt-auto">
+                                                    @if (existingRequest != null)
+                                                    {
+                                                        <button class="btn btn-sm btn-light text-muted fw-bold w-100 rounded-pill" disabled><i class="fa-solid fa-check me-1"></i> Invited</button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <form asp-action="SendPharmacistRequest" method="post" class="w-100">
+                                                            <input type="hidden" name="campId" value="@Model.Camp.Id" />
+                                                            <input type="hidden" name="pharmacistId" value="@pharm.Id" />
+                                                            <button type="submit" class="btn btn-sm w-100 fw-bold text-white rounded-pill" style="background-color: #6610f2;"><i class="fa-solid fa-paper-plane me-1"></i> Send Invite</button>
+                                                        </form>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Pagination -->
+                            @if (Model.TotalPharmacistPages > 1)
+                            {
+                                <nav class="mt-4" aria-label="Pharmacist pagination">
+                                    <ul class="pagination pagination-sm justify-content-center mb-0">
+                                        <li class="page-item @(Model.CurrentPharmacistPage == 1 ? "disabled" : "")">
+                                            <a class="page-link rounded-start-pill" asp-action="ManageStaff" asp-route-id="@Model.Camp.Id" asp-route-doctorSearch="@ViewBag.DoctorSearch" asp-route-volunteerSearch="@ViewBag.VolunteerSearch" asp-route-pharmacistSearch="@ViewBag.PharmacistSearch" asp-route-doctorPage="@Model.CurrentDoctorPage" asp-route-volunteerPage="@Model.CurrentVolunteerPage" asp-route-pharmacistPage="@(Model.CurrentPharmacistPage - 1)">Previous</a>
+                                        </li>
+                                        @for (int i = 1; i <= Model.TotalPharmacistPages; i++)
+                                        {
+                                            <li class="page-item @(i == Model.CurrentPharmacistPage ? "active" : "")">
+                                                <a class="page-link" asp-action="ManageStaff" asp-route-id="@Model.Camp.Id" asp-route-doctorSearch="@ViewBag.DoctorSearch" asp-route-volunteerSearch="@ViewBag.VolunteerSearch" asp-route-pharmacistSearch="@ViewBag.PharmacistSearch" asp-route-doctorPage="@Model.CurrentDoctorPage" asp-route-volunteerPage="@Model.CurrentVolunteerPage" asp-route-pharmacistPage="@i">@i</a>
+                                            </li>
+                                        }
+                                        <li class="page-item @(Model.CurrentPharmacistPage == Model.TotalPharmacistPages ? "disabled" : "")">
+                                            <a class="page-link rounded-end-pill" asp-action="ManageStaff" asp-route-id="@Model.Camp.Id" asp-route-doctorSearch="@ViewBag.DoctorSearch" asp-route-volunteerSearch="@ViewBag.VolunteerSearch" asp-route-pharmacistSearch="@ViewBag.PharmacistSearch" asp-route-doctorPage="@Model.CurrentDoctorPage" asp-route-volunteerPage="@Model.CurrentVolunteerPage" asp-route-pharmacistPage="@(Model.CurrentPharmacistPage + 1)">Next</a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            }
+                        }
+                        else
+                        {
+                            <div class="text-center py-5">
+                                <i class="fa-solid fa-users-slash fs-1 text-muted opacity-25 mb-3"></i>
+                                <h6 class="text-muted">No pharmacists found matching your criteria.</h6>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sent Pharmacist Requests -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0 h-100 rounded-4">
+                    <div class="card-header bg-white border-bottom p-3">
+                        <h5 class="mb-0 fw-bold text-dark"><i class="fa-solid fa-clock-rotate-left text-secondary me-2"></i> Sent Invitations</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        @if (Model.CurrentPharmacistRequests.Any())
+                        {
+                            <div class="timeline">
+                                @foreach (var req in Model.CurrentPharmacistRequests.OrderByDescending(r => r.RequestedAt))
+                                {
+                                    <div class="status-timeline-item status-@req.Status">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <strong class="text-dark">@(req.Pharmacist?.FullName ?? "Unknown")</strong>
+                                            @if (req.Status == "Pending")
+                                            {
+                                                <span class="badge bg-warning text-dark rounded-pill">Pending</span>
+                                            }
+                                            else if (req.Status == "Approved")
+                                            {
+                                                <span class="badge bg-success rounded-pill">Approved</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger rounded-pill">Denied</span>
+                                            }
+                                        </div>
+                                        <div class="small text-muted">@req.RequestedAt.ToLocalTime().ToString("MMM dd, hh:mm tt")</div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-5">
+                                <i class="fa-regular fa-paper-plane fs-1 text-muted opacity-25 mb-3"></i>
+                                <p class="text-muted small mb-0">No invitations sent yet.</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
