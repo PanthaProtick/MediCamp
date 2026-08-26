@@ -10,7 +10,6 @@ A comprehensive health camp management and clinical triage system designed for N
 - [Getting Started](#getting-started)
 - [Project Structure](#project-structure)
 - [Environment Variables](#environment-variables)
-- [Team & Ownership](#team--ownership)
 - [Design System](#design-system)
 - [Known Issues](#known-issues)
 - [Roadmap](#roadmap)
@@ -95,11 +94,6 @@ Currently, there are no sensitive environment variables configured as the app ru
 
 ---
 
-## Team & Ownership
-- **Maintainer:** AkifFarhan
-- *To add additional team members, update this section.*
-
----
 
 ## Design System
 The frontend utilizes **ASP.NET Core Razor Pages** built primarily with standard HTML forms and **Bootstrap** utilities to ensure a responsive, clean, and accessible UI across desktop and mobile (essential for field volunteers).
