@@ -169,19 +169,23 @@
                                     _ => "badge-role-patient"
                                 };
 
-                                <div class="d-flex align-items-center gap-2 bg-white px-3 py-1 rounded-pill border shadow-sm">
-                                    <div class="avatar-initials" style="width: 32px; height: 32px; font-size: 0.8rem;">
-                                        @(User.Identity.Name?[0] ?? 'U')
+                                <div class="d-flex align-items-center gap-2 bg-white px-3 py-1 rounded-pill border shadow-sm" style="transition: all 0.2s ease;">
+                                    <a asp-controller="Account" asp-action="Profile" class="text-decoration-none d-flex align-items-center gap-2 text-dark" style="cursor: pointer;">
+                                        <div class="avatar-initials bg-light border border-secondary border-opacity-25 text-dark d-flex align-items-center justify-content-center rounded-circle fw-bold" style="width: 32px; height: 32px; font-size: 0.8rem;">
+                                            @(User.Identity.Name?[0] ?? 'U')
+                                        </div>
+                                        <div class="d-flex flex-column text-start">
+                                            <span class="fw-bold lh-1" style="font-size: 0.86rem;">@User.Identity.Name</span>
+                                            <span class="badge @roleClass p-0 text-start text-muted" style="font-size: 0.68rem; background: none; border: none;">@userRole</span>
+                                        </div>
+                                    </a>
+                                    <div class="border-start ms-1 ps-2">
+                                        <form asp-controller="Account" asp-action="Logout" method="post" class="m-0 p-0">
+                                            <button type="submit" class="btn btn-sm btn-link text-danger p-0" title="Sign Out">
+                                                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                                            </button>
+                                        </form>
                                     </div>
-                                    <div class="d-flex flex-column text-start">
-                                        <span class="fw-bold text-dark lh-1" style="font-size: 0.86rem;">@User.Identity.Name</span>
-                                        <span class="badge @roleClass p-0 text-start" style="font-size: 0.68rem; background: none; border: none;">@userRole</span>
-                                    </div>
-                                    <form asp-controller="Account" asp-action="Logout" method="post" class="ms-1 d-inline">
-                                        <button type="submit" class="btn btn-sm btn-link text-danger p-0 ms-1" title="Sign Out">
-                                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                                        </button>
-                                    </form>
                                 </div>
                             }
                             else

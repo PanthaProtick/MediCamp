@@ -1,0 +1,181 @@
+@model MediCamp.Models.ApplicationUser
+
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header p-4 d-flex align-items-center gap-4" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;">
+                    <div class="bg-white text-primary d-flex align-items-center justify-content-center rounded-circle fw-bold shadow-sm" style="width: 90px; height: 90px; font-size: 2.5rem; flex-shrink: 0;">
+                        @(Model.FullName?[0] ?? 'U')
+                    </div>
+                    <div>
+                        <h2 class="mb-1 fw-bold text-white">@Model.FullName</h2>
+                        <span class="badge bg-light text-dark fw-semibold px-3 py-1 rounded-pill mt-1" style="font-size: 0.85rem;">@Model.Role</span>
+                    </div>
+                </div>
+                
+                <div class="card-body p-4 p-md-5 bg-white">
+                    <h5 class="fw-bold mb-4 text-dark border-bottom border-2 border-light pb-2 d-flex align-items-center">
+                        <div class="bg-light p-2 rounded-circle me-3 d-inline-flex">
+                            <i class="fa-solid fa-address-card text-primary"></i>
+                        </div>
+                        Personal Information
+                    </h5>
+                    
+                    <div class="row g-4 mb-5">
+                        <div class="col-md-6">
+                            <label class="text-muted small fw-bold mb-1 text-uppercase" style="letter-spacing: 0.5px;">Email Address</label>
+                            <div class="fs-6 fw-medium d-flex align-items-center">
+                                <i class="fa-solid fa-envelope text-secondary opacity-50 me-2"></i>@Model.Email
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted small fw-bold mb-1 text-uppercase" style="letter-spacing: 0.5px;">Phone Number</label>
+                            <div class="fs-6 fw-medium d-flex align-items-center">
+                                <i class="fa-solid fa-phone text-secondary opacity-50 me-2"></i>@Model.PhoneNumber
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted small fw-bold mb-1 text-uppercase" style="letter-spacing: 0.5px;">National ID (NID)</label>
+                            <div class="fs-6 fw-medium d-flex align-items-center">
+                                <i class="fa-solid fa-id-card text-secondary opacity-50 me-2"></i>@(Model.NID ?? "N/A")
+                            </div>
+                        </div>
+                        @if (Model.DateOfBirth.HasValue)
+                        {
+                            <div class="col-md-6">
+                                <label class="text-muted small fw-bold mb-1 text-uppercase" style="letter-spacing: 0.5px;">Date of Birth</label>
+                                <div class="fs-6 fw-medium d-flex align-items-center">
+                                    <i class="fa-solid fa-calendar-day text-secondary opacity-50 me-2"></i>@Model.DateOfBirth.Value.ToString("dd MMM yyyy")
+                                </div>
+                            </div>
+                        }
+                        <div class="col-md-6">
+                            <label class="text-muted small fw-bold mb-1 text-uppercase" style="letter-spacing: 0.5px;">Gender</label>
+                            <div class="fs-6 fw-medium d-flex align-items-center">
+                                <i class="fa-solid fa-venus-mars text-secondary opacity-50 me-2"></i>@(Model.Gender ?? "N/A")
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted small fw-bold mb-1 text-uppercase" style="letter-spacing: 0.5px;">Blood Group</label>
+                            <div class="fs-6 fw-medium d-flex align-items-center">
+                                <i class="fa-solid fa-droplet text-danger opacity-75 me-2"></i>
+                                @if (!string.IsNullOrEmpty(Model.BloodGroup))
+                                {
+                                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1">@Model.BloodGroup</span>
+                                }
+                                else
+                                {
+                                    <span>N/A</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold mb-4 text-dark border-bottom border-2 border-light pb-2 d-flex align-items-center">
+                        <div class="bg-light p-2 rounded-circle me-3 d-inline-flex">
+                            <i class="fa-solid fa-location-dot text-primary"></i>
+                        </div>
+                        Location Details
+                    </h5>
+                    
+                    <div class="row g-4 mb-5">
+                        <div class="col-md-6">
+                            <label class="text-muted small fw-bold mb-1 text-uppercase" style="letter-spacing: 0.5px;">District</label>
+                            <div class="fs-6 fw-medium">@(Model.District ?? "N/A")</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted small fw-bold mb-1 text-uppercase" style="letter-spacing: 0.5px;">Upazila</label>
+                            <div class="fs-6 fw-medium">@(Model.Upazila ?? "N/A")</div>
+                        </div>
+                        <div class="col-12">
+                            <label class="text-muted small fw-bold mb-1 text-uppercase" style="letter-spacing: 0.5px;">Full Address</label>
+                            <div class="fs-6 fw-medium p-3 bg-light rounded-3 border border-light">@(Model.Address ?? "N/A")</div>
+                        </div>
+                    </div>
+
+                    @if (Model.Role == MediCamp.Models.SystemRoles.Doctor)
+                    {
+                        <h5 class="fw-bold mb-4 text-dark border-bottom border-2 border-light pb-2 d-flex align-items-center">
+                            <div class="bg-light p-2 rounded-circle me-3 d-inline-flex">
+                                <i class="fa-solid fa-user-doctor text-teal"></i>
+                            </div>
+                            Professional Details
+                        </h5>
+                        <div class="row g-4 mb-5">
+                            <div class="col-md-6">
+                                <label class="text-muted small fw-bold mb-1 text-uppercase" style="letter-spacing: 0.5px;">Medical Specialization</label>
+                                <div class="fs-6 fw-medium">@(Model.MedicalSpecialization ?? "N/A")</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="text-muted small fw-bold mb-1 text-uppercase" style="letter-spacing: 0.5px;">BMDC Registration No</label>
+                                <div class="fs-6 fw-medium">
+                                    <span class="badge bg-teal bg-opacity-10 text-teal border border-teal border-opacity-25 px-2 py-1 fs-6">
+                                        @(Model.BMDCRegNo ?? "N/A")
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    @if (Model.Role == MediCamp.Models.SystemRoles.Host)
+                    {
+                        <h5 class="fw-bold mb-4 text-dark border-bottom border-2 border-light pb-2 d-flex align-items-center">
+                            <div class="bg-light p-2 rounded-circle me-3 d-inline-flex">
+                                <i class="fa-solid fa-building-ngo text-success"></i>
+                            </div>
+                            Organization Details
+                        </h5>
+                        <div class="row g-4 mb-5">
+                            <div class="col-md-6">
+                                <label class="text-muted small fw-bold mb-1 text-uppercase" style="letter-spacing: 0.5px;">Organization Name</label>
+                                <div class="fs-6 fw-medium">@(Model.OrganizationName ?? "N/A")</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="text-muted small fw-bold mb-1 text-uppercase" style="letter-spacing: 0.5px;">Organization Type</label>
+                                <div class="fs-6 fw-medium">@(Model.OrganizationType ?? "N/A")</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="text-muted small fw-bold mb-1 text-uppercase" style="letter-spacing: 0.5px;">Registration / License No</label>
+                                <div class="fs-6 fw-medium">@(Model.OrganizationRegNo ?? "N/A")</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="text-muted small fw-bold mb-1 text-uppercase" style="letter-spacing: 0.5px;">Focal Person Contact</label>
+                                <div class="fs-6 fw-medium">@(Model.FocalPersonContact ?? "N/A")</div>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="text-center mt-5 pt-4 border-top border-light">
+                        <button class="btn btn-champagne rounded-pill px-5 py-2 fw-bold shadow-sm hover-lift" onclick="alert('Profile editing is not available in the demo version.')">
+                            <i class="fa-solid fa-pen-to-square me-2"></i>Edit Profile
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-lift {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .hover-lift:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+    }
+    .bg-teal {
+        background-color: #0d9488 !important;
+    }
+    .text-teal {
+        color: #0d9488 !important;
+    }
+    .border-teal {
+        border-color: #0d9488 !important;
+    }
+</style>

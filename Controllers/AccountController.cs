@@ -4,6 +4,7 @@ using MediCamp.Models.ViewModels;
 using MediCamp.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MediCamp.Controllers
@@ -56,6 +57,19 @@ namespace MediCamp.Controllers
             }
 
             return RedirectBasedOnRole(user.Role);
+        }
+
+        [HttpGet]
+        [Authorize]
+        public IActionResult Profile()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId)) return RedirectToAction("Login");
+
+            var user = _dataService.GetUserById(userId);
+            if (user == null) return NotFound();
+
+            return View(user);
         }
 
         // =========================================================================
