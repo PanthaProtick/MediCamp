@@ -1,0 +1,122 @@
+@model MediCamp.Models.ViewModels.HostMonitorCampViewModel
+
+@{
+    ViewData["Title"] = "Monitor Camp";
+    
+    // Safety calculations
+    var remainingBudget = Model.Camp.TotalBudget - Model.Camp.UtilizedBudget;
+    var budgetPercent = Model.Camp.TotalBudget > 0 ? (Model.Camp.UtilizedBudget / Model.Camp.TotalBudget) * 100 : 0;
+    
+    var servedPercent = Model.Camp.RegisteredPatientsCount > 0 ? ((decimal)Model.Camp.ServedPatientsCount / Model.Camp.RegisteredPatientsCount) * 100 : 0;
+    var capacityPercent = Model.Camp.ExpectedPatients > 0 ? ((decimal)Model.Camp.RegisteredPatientsCount / Model.Camp.ExpectedPatients) * 100 : 0;
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge badge-role-host"><i class="fa-solid fa-chart-line"></i> Dashboard</span>
+                <span class="text-muted small">@Model.Camp.Title</span>
+            </div>
+            <h2 class="fw-bold text-dark mb-0">Camp Monitoring & Financials</h2>
+        </div>
+        <a asp-action="MyCamps" class="btn btn-light shadow-sm fw-bold rounded-pill px-4">
+            <i class="fa-solid fa-arrow-left me-2"></i>Back to Camps
+        </a>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <!-- Patient Metrics -->
+        <div class="col-lg-8">
+            <div class="glass-card p-4 h-100">
+                <h5 class="fw-bold mb-4"><i class="fa-solid fa-users text-primary me-2"></i>Patient Pipeline</h5>
+                
+                <div class="row g-4">
+                    <!-- Capacity vs Registered -->
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded-4 border">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="fw-bold text-muted small text-uppercase">Registration vs Capacity</span>
+                                <span class="fw-bold text-primary">@capacityPercent.ToString("0.0")%</span>
+                            </div>
+                            <h3 class="fw-bold mb-2">@Model.Camp.RegisteredPatientsCount.ToString("N0") <span class="fs-6 text-muted fw-normal">/ @Model.Camp.ExpectedPatients.ToString("N0")</span></h3>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar @(capacityPercent > 90 ? "bg-danger" : "bg-primary")" role="progressbar" style="width: @capacityPercent%" aria-valuenow="@capacityPercent" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Registered vs Served -->
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded-4 border">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="fw-bold text-muted small text-uppercase">Served vs Registered</span>
+                                <span class="fw-bold text-success">@servedPercent.ToString("0.0")%</span>
+                            </div>
+                            <h3 class="fw-bold mb-2">@Model.Camp.ServedPatientsCount.ToString("N0") <span class="fs-6 text-muted fw-normal">/ @Model.Camp.RegisteredPatientsCount.ToString("N0")</span></h3>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: @servedPercent%" aria-valuenow="@servedPercent" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Financial Overview -->
+        <div class="col-lg-4">
+            <div class="glass-card p-4 h-100 bg-emerald-light" style="background-color: rgba(16, 185, 129, 0.05); border-color: rgba(16, 185, 129, 0.2);">
+                <h5 class="fw-bold mb-4 text-emerald"><i class="fa-solid fa-wallet me-2"></i>Financial Overview</h5>
+                
+                <div class="d-flex justify-content-between mb-1">
+                    <span class="text-muted small fw-bold">Total Budget:</span>
+                    <span class="fw-bold text-dark">৳@Model.Camp.TotalBudget.ToString("N0")</span>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="text-muted small fw-bold">Utilized:</span>
+                    <span class="fw-bold text-danger">৳@Model.Camp.UtilizedBudget.ToString("N0")</span>
+                </div>
+                
+                <div class="progress mb-3" style="height: 10px;">
+                    <div class="progress-bar @(budgetPercent > 90 ? "bg-danger" : "bg-success")" role="progressbar" style="width: @budgetPercent%" aria-valuenow="@budgetPercent" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                
+                <div class="p-3 rounded-3 mt-4" style="background-color: rgba(255,255,255,0.8); border: 1px dashed rgba(16, 185, 129, 0.5);">
+                    <div class="text-muted small text-uppercase fw-bold mb-1">Remaining Budget</div>
+                    <h3 class="fw-bold text-success mb-0">৳@remainingBudget.ToString("N0")</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Log Expense Form -->
+    <div class="glass-card p-4">
+        <h5 class="fw-bold mb-3"><i class="fa-solid fa-file-invoice-dollar text-warning me-2"></i>Log New Expense</h5>
+        <form asp-action="UpdateBudget" asp-route-campId="@Model.Camp.Id" method="post" class="row g-3 align-items-end">
+            
+            <div class="col-md-3">
+                <label class="form-label fw-bold small text-muted">Expense Amount (৳)</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light">৳</span>
+                    <input asp-for="AdditionalExpense" type="number" step="0.01" min="0.01" max="@remainingBudget" class="form-control shadow-none bg-light" required placeholder="0.00" />
+                </div>
+                <span asp-validation-for="AdditionalExpense" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold small text-muted">Description / Notes</label>
+                <input asp-for="ExpenseNotes" type="text" class="form-control shadow-none bg-light" placeholder="e.g., Volunteer transport, extra medicine purchase..." />
+            </div>
+
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-warning w-100 fw-bold shadow-sm" @(remainingBudget <= 0 ? "disabled" : "")>
+                    <i class="fa-solid fa-plus me-1"></i> Log Expense
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

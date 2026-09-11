@@ -477,5 +477,155 @@ namespace MediCamp.Controllers
 
             return RedirectToAction(nameof(ManageStaff), new { id = campId });
         }
+        // =========================================================================
+        // 7. MANAGE CAMP INVENTORY (/Host/ManageInventory/{id})
+        // =========================================================================
+        [HttpGet]
+        public IActionResult ManageInventory(int id)
+        {
+            var currentHost = GetCurrentHostUser();
+            if (currentHost == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var camp = _dbContext.Camps.FirstOrDefault(c => c.Id == id && c.HostId == currentHost.Id);
+            if (camp == null)
+            {
+                TempData["ErrorMessage"] = "Camp not found or access denied.";
+                return RedirectToAction(nameof(MyCamps));
+            }
+
+            var currentInventory = _dbContext.CampInventories
+                .Include(i => i.MasterMedicine)
+                .Where(i => i.CampId == id)
+                .OrderBy(i => i.MasterMedicine.Category)
+                .ThenBy(i => i.MasterMedicine.BrandName)
+                .ToList();
+
+            var availableMedicines = _dbContext.MasterMedicines
+                .OrderBy(m => m.Category)
+                .ThenBy(m => m.BrandName)
+                .ToList();
+
+            var model = new HostManageInventoryViewModel
+            {
+                Camp = camp,
+                CurrentInventory = currentInventory,
+                AvailableMedicines = availableMedicines
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult AllocateMedicine(int campId, HostManageInventoryViewModel inputModel)
+        {
+            var currentHost = GetCurrentHostUser();
+            if (currentHost == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var camp = _dbContext.Camps.FirstOrDefault(c => c.Id == campId && c.HostId == currentHost.Id);
+            if (camp == null)
+            {
+                TempData["ErrorMessage"] = "Camp not found or access denied.";
+                return RedirectToAction(nameof(MyCamps));
+            }
+
+            if (inputModel.SelectedMedicineId <= 0 || inputModel.QuantityToAllocate <= 0)
+            {
+                TempData["ErrorMessage"] = "Invalid medicine selection or quantity.";
+                return RedirectToAction(nameof(ManageInventory), new { id = campId });
+            }
+
+            var existingRecord = _dbContext.CampInventories
+                .FirstOrDefault(i => i.CampId == campId && i.MasterMedicineId == inputModel.SelectedMedicineId);
+
+            if (existingRecord != null)
+            {
+                existingRecord.QuantityAllocated += inputModel.QuantityToAllocate;
+            }
+            else
+            {
+                _dbContext.CampInventories.Add(new CampInventory
+                {
+                    CampId = campId,
+                    MasterMedicineId = inputModel.SelectedMedicineId,
+                    QuantityAllocated = inputModel.QuantityToAllocate,
+                    QuantityDispensed = 0
+                });
+            }
+
+            _dbContext.SaveChanges();
+            TempData["SuccessMessage"] = "Medicine successfully allocated to camp inventory.";
+            
+            return RedirectToAction(nameof(ManageInventory), new { id = campId });
+        }
+
+        // =========================================================================
+        // 8. MONITOR CAMP FINANCIALS (/Host/MonitorCamp/{id})
+        // =========================================================================
+        [HttpGet]
+        public IActionResult MonitorCamp(int id)
+        {
+            var currentHost = GetCurrentHostUser();
+            if (currentHost == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var camp = _dbContext.Camps.FirstOrDefault(c => c.Id == id && c.HostId == currentHost.Id);
+            if (camp == null)
+            {
+                TempData["ErrorMessage"] = "Camp not found or access denied.";
+                return RedirectToAction(nameof(MyCamps));
+            }
+
+            var model = new HostMonitorCampViewModel
+            {
+                Camp = camp
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult UpdateBudget(int campId, HostMonitorCampViewModel inputModel)
+        {
+            var currentHost = GetCurrentHostUser();
+            if (currentHost == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var camp = _dbContext.Camps.FirstOrDefault(c => c.Id == campId && c.HostId == currentHost.Id);
+            if (camp == null)
+            {
+                TempData["ErrorMessage"] = "Camp not found or access denied.";
+                return RedirectToAction(nameof(MyCamps));
+            }
+
+            if (inputModel.AdditionalExpense <= 0)
+            {
+                TempData["ErrorMessage"] = "Expense amount must be greater than zero.";
+                return RedirectToAction(nameof(MonitorCamp), new { id = campId });
+            }
+
+            if (camp.UtilizedBudget + inputModel.AdditionalExpense > camp.TotalBudget)
+            {
+                TempData["ErrorMessage"] = "Error: Adding this expense would exceed the Total Allocated Budget.";
+                return RedirectToAction(nameof(MonitorCamp), new { id = campId });
+            }
+
+            camp.UtilizedBudget += inputModel.AdditionalExpense;
+            _dbContext.SaveChanges();
+
+            TempData["SuccessMessage"] = $"Successfully logged expense of ৳{inputModel.AdditionalExpense:N2}.";
+            return RedirectToAction(nameof(MonitorCamp), new { id = campId });
+        }
     }
 }
