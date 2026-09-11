@@ -57,7 +57,11 @@
                         <div class="text-muted small">@Model.Patient?.PhoneNumber</div>
                     </div>
                 </div>
-                <div class="d-flex gap-2 mb-2">
+                <div class="d-flex gap-2 mb-2 flex-wrap align-items-center">
+                    @if (!string.IsNullOrWhiteSpace(Model.Patient?.PatientUniqueId))
+                    {
+                        <span class="badge bg-dark font-monospace text-warning px-2 py-1"><i class="fa-solid fa-id-card me-1"></i>ID: @Model.Patient.PatientUniqueId</span>
+                    }
                     <span class="badge bg-danger">@Model.Patient?.BloodGroup</span>
                     <span class="badge bg-light text-dark">@Model.Patient?.Gender</span>
                 </div>
@@ -117,6 +121,7 @@
                         @for (int i = 0; i < Model.Items.Count; i++)
                         {
                             var item = Model.Items[i];
+                            bool inStock = item.InCampInventory && item.AvailableStock > 0;
                             bool outOfStock = item.AvailableStock == 0;
                             double stockPct = item.QuantityPrescribed > 0
                                 ? Math.Min(100.0, (double)item.AvailableStock / item.QuantityPrescribed * 100)
@@ -128,20 +133,32 @@
 
                                 <div class="d-flex justify-content-between align-items-start mb-2 flex-wrap gap-2">
                                     <div>
-                                        <div class="fw-bold text-dark">@item.MedicineName</div>
+                                        <div class="fw-bold text-dark fs-6">@item.MedicineName</div>
                                         <div class="small text-muted">
                                             @item.Dosage &bull; @item.DurationDays day(s)
                                             @if (!string.IsNullOrWhiteSpace(item.Instructions))
                                             {
-                                                <span> &bull; @item.Instructions</span>
+                                                <span> &bull; <em>@item.Instructions</em></span>
                                             }
                                         </div>
                                     </div>
-                                    <div class="d-flex align-items-center gap-2">
-                                        @if (outOfStock)
+                                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                                        @if (!item.InCampInventory)
+                                        {
+                                            <span class="badge bg-danger text-white fw-bold" id="stock-badge-@i">
+                                                <i class="fa-solid fa-ban me-1"></i>Not in Camp Stock (External)
+                                            </span>
+                                        }
+                                        else if (outOfStock)
                                         {
                                             <span class="badge bg-warning text-dark fw-bold" id="stock-badge-@i">
-                                                <i class="fa-solid fa-triangle-exclamation me-1"></i>Out of Stock
+                                                <i class="fa-solid fa-triangle-exclamation me-1"></i>Camp Stock Exhausted
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-success text-white fw-bold" id="stock-badge-@i">
+                                                <i class="fa-solid fa-check me-1"></i>In Stock (@item.AvailableStock avail)
                                             </span>
                                         }
                                         <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill py-0 px-2"
@@ -154,24 +171,30 @@
 
                                 <!-- Stock bar -->
                                 <div class="d-flex justify-content-between small text-muted mb-1">
-                                    <span>Stock available: <strong class="text-dark" id="stock-avail-@i">@item.AvailableStock</strong></span>
-                                    <span>Prescribed: <strong class="text-dark">@item.QuantityPrescribed</strong></span>
+                                    <span>Camp stock available: <strong class="text-dark" id="stock-avail-@i">@item.AvailableStock</strong></span>
+                                    <span>Prescribed by Doctor: <strong class="text-dark">@item.QuantityPrescribed</strong></span>
                                 </div>
                                 <div class="stock-bar-bg mb-3">
                                     <div class="stock-bar-fill" id="stock-fill-@i" style="width:@stockPct.ToString("F0")%;background:@barColor;"></div>
                                 </div>
 
                                 <!-- Substitution selector (initially hidden unless out of stock or toggled) -->
-                                <div id="substitute-box-@i" class="p-2 mb-3 rounded bg-light border @(outOfStock ? "" : "d-none")">
-                                    <label class="small fw-bold text-secondary mb-1">
-                                        <i class="fa-solid fa-right-left text-primary me-1"></i> Substitute with available medicine:
-                                    </label>
+                                <div id="substitute-box-@i" class="p-3 mb-3 rounded bg-light border @(outOfStock ? "" : "d-none")">
+                                    <div class="small fw-bold text-secondary mb-1">
+                                        <i class="fa-solid fa-right-left text-primary me-1"></i> Substitute with available camp medicine:
+                                    </div>
+                                    @if (!item.InCampInventory)
+                                    {
+                                        <p class="text-muted small mb-2 fst-italic">
+                                            This medicine was prescribed by the doctor as an external item. If an equivalent is available in camp stock, select it below to dispense from dispensary:
+                                        </p>
+                                    }
                                     <select name="substituteMedicineIds"
                                             id="sub-select-@i"
                                             class="form-select form-select-sm shadow-none"
                                             onchange="onSubstituteChange(@i, @item.QuantityPrescribed)">
                                         <option value="@item.MasterMedicineId" data-stock="@item.AvailableStock" selected>
-                                            -- Original: @item.MedicineName (Avail: @item.AvailableStock) --
+                                            -- Original: @item.MedicineName (Camp Stock: @item.AvailableStock) --
                                         </option>
                                         @foreach (var inv in Model.AvailableCampInventory.Where(ci => ci.MasterMedicineId != item.MasterMedicineId))
                                         {
@@ -185,7 +208,7 @@
 
                                 <!-- Quantity input -->
                                 <div class="d-flex align-items-center gap-3">
-                                    <label class="fw-bold small text-muted flex-shrink-0">Qty to Dispense:</label>
+                                    <label class="fw-bold small text-muted flex-shrink-0">Qty to Dispense from Camp:</label>
                                     <input type="number"
                                            name="quantities"
                                            id="qty-input-@i"
@@ -198,7 +221,7 @@
                                     @if (item.QuantityToDispense < item.QuantityPrescribed)
                                     {
                                         <span class="badge bg-warning text-dark small" id="partial-badge-@i">
-                                            Partial (@item.QuantityPrescribed prescribed)
+                                            @(item.QuantityToDispense == 0 ? "Not Dispensed in Camp" : $"Partial ({item.QuantityPrescribed} prescribed)")
                                         </span>
                                     }
                                 </div>

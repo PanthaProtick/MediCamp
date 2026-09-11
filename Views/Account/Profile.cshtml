@@ -14,7 +14,15 @@
                     </div>
                     <div>
                         <h2 class="mb-1 fw-bold text-white">@Model.FullName</h2>
-                        <span class="badge bg-light text-dark fw-semibold px-3 py-1 rounded-pill mt-1" style="font-size: 0.85rem;">@Model.Role</span>
+                        <div class="d-flex align-items-center gap-2 flex-wrap mt-1">
+                            <span class="badge bg-light text-dark fw-semibold px-3 py-1 rounded-pill" style="font-size: 0.85rem;">@Model.Role</span>
+                            @if (!string.IsNullOrWhiteSpace(Model.PatientUniqueId))
+                            {
+                                <span class="badge bg-warning text-dark font-monospace fw-black px-3 py-1 rounded-pill shadow-sm" style="font-size: 0.9rem; letter-spacing: 1px;">
+                                    <i class="fa-solid fa-id-card me-1"></i> Patient ID: @Model.PatientUniqueId
+                                </span>
+                            }
+                        </div>
                     </div>
                 </div>
                 

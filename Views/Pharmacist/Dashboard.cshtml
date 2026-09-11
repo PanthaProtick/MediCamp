@@ -65,42 +65,76 @@
         </div>
     }
 
-    @if (!Model.ApprovedCamps.Any())
-    {
-        <div class="text-center py-5">
-            <div class="mb-4" style="font-size:4rem; opacity:.3;">💊</div>
-            <h4 class="fw-bold text-secondary">No Active Camp Assignments</h4>
-            <p class="text-muted">You haven't been assigned to any ongoing camps yet.</p>
-            <a asp-action="Requests" class="btn rounded-pill fw-bold px-4 text-white" style="background:#6610f2;">
-                <i class="fa-solid fa-envelope me-2"></i> View Invitations
-            </a>
+    <!-- Ongoing Camps Section -->
+    <div class="glass-card p-4 mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+            <div>
+                <h4 class="fw-bold text-dark mb-0"><i class="fa-solid fa-tent text-info me-2"></i>Ongoing Healthcare Camps</h4>
+                <p class="text-muted small mb-0">Select an active camp to enter its medicine dispensary and fulfill prescriptions.</p>
+            </div>
+            <span class="badge bg-success rounded-pill px-3 py-2 fw-bold">
+                <i class="fa-solid fa-circle-dot me-1"></i> @Model.OngoingCamps.Count Active Camp@(Model.OngoingCamps.Count != 1 ? "s" : "")
+            </span>
         </div>
-    }
-    else if (Model.ActiveCamp == null)
-    {
-        <!-- Camp Selector -->
-        <div class="ph-hero mb-5">
-            <h4 class="fw-bold mb-1"><i class="fa-solid fa-location-crosshairs me-2"></i>Select Active Camp</h4>
-            <p class="mb-4" style="opacity:.7;">You are assigned to multiple ongoing camps. Choose one to manage its pharmacy.</p>
+
+        @if (!Model.OngoingCamps.Any())
+        {
+            <div class="text-center py-4 text-muted">
+                <i class="fa-solid fa-tent-arrows-down fs-1 mb-2 opacity-50"></i>
+                <p class="mb-0">No ongoing healthcare camps active today.</p>
+            </div>
+        }
+        else
+        {
             <div class="row g-3">
-                @foreach (var camp in Model.ApprovedCamps)
+                @foreach (var camp in Model.OngoingCamps)
                 {
+                    bool isCurrent = Model.ActiveCamp?.Id == camp.Id;
                     <div class="col-md-6 col-lg-4">
-                        <a asp-action="Dashboard" asp-route-activeCampId="@camp.Id" class="camp-pick-card d-block bg-white rounded-3 p-3">
-                            <div class="fw-bold mb-1 text-dark">@camp.Title</div>
-                            <div class="small text-muted">
-                                <i class="fa-solid fa-location-dot me-1 text-danger"></i>@camp.Upazila, @camp.District
+                        <div class="card h-100 rounded-4 border-2 @(isCurrent ? "border-info bg-info-subtle shadow-sm" : "border-light-subtle shadow-none") transition-all">
+                            <div class="card-body p-3 d-flex flex-column justify-content-between">
+                                <div>
+                                    <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                                        <span class="badge bg-success rounded-pill px-2 py-1 small">
+                                            <i class="fa-solid fa-circle-play me-1"></i> Active Now
+                                        </span>
+                                        <span class="badge bg-dark-subtle text-dark rounded-pill small">
+                                            <i class="fa-solid fa-pills me-1"></i> Dispensary Open
+                                        </span>
+                                    </div>
+                                    <h6 class="fw-bold text-dark mb-1">@camp.Title</h6>
+                                    <div class="small text-muted mb-1">
+                                        <i class="fa-solid fa-location-dot text-danger me-1"></i> @camp.Venue, @camp.Upazila, @camp.District
+                                    </div>
+                                    <div class="small text-muted mb-2">
+                                        <i class="fa-solid fa-calendar-day text-primary me-1"></i> @camp.StartDate.ToString("MMM dd") – @camp.EndDate.ToString("MMM dd, yyyy")
+                                    </div>
+                                </div>
+                                <div class="mt-2 pt-2 border-top">
+                                    @if (isCurrent)
+                                    {
+                                        <a asp-action="PrescriptionQueue" asp-route-campId="@camp.Id"
+                                           class="btn btn-primary btn-sm w-100 rounded-pill fw-bold">
+                                            <i class="fa-solid fa-prescription-bottle-medical me-1"></i> Open Prescription Queue
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a asp-action="Dashboard" asp-route-activeCampId="@camp.Id"
+                                           class="btn btn-outline-primary btn-sm w-100 rounded-pill fw-bold">
+                                            <i class="fa-solid fa-right-to-bracket me-1"></i> Enter Camp Pharmacy
+                                        </a>
+                                    }
+                                </div>
                             </div>
-                            <div class="small text-muted">
-                                <i class="fa-solid fa-calendar me-1 text-primary"></i>@camp.StartDate.ToString("MMM dd") – @camp.EndDate.ToString("MMM dd, yyyy")
-                            </div>
-                        </a>
+                        </div>
                     </div>
                 }
             </div>
-        </div>
-    }
-    else
+        }
+    </div>
+
+    @if (Model.ActiveCamp != null)
     {
         <!-- Active Camp Dashboard -->
         @if (Model.ApprovedCamps.Count > 1)

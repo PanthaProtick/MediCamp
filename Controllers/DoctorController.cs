@@ -117,8 +117,12 @@ namespace MediCamp.Controllers
         }
 
         // ==========================================
-        // PATIENT QUEUE
         // ==========================================
+        // DOCTOR DASHBOARD & PATIENT QUEUE
+        // ==========================================
+
+        [HttpGet]
+        public IActionResult Dashboard(int? activeCampId) => Queue(activeCampId);
 
         [HttpGet]
         public IActionResult Queue(int? activeCampId)
@@ -127,18 +131,37 @@ namespace MediCamp.Controllers
             if (string.IsNullOrEmpty(doctorId))
                 return RedirectToAction("Login", "Account");
 
-            // All ongoing camps where this doctor has an approved request
+            var today = DateTime.UtcNow.Date;
+
+            // All ongoing camps active today or marked Ongoing
+            var ongoingCamps = _dbContext.Camps
+                .Where(c => (c.Status == "Ongoing" || (c.StartDate.Date <= today && today <= c.EndDate.Date)) &&
+                            c.Status != "Rejected" && c.Status != "Cancelled" && c.Status != "Pending Admin Approval")
+                .OrderByDescending(c => c.StartDate)
+                .ToList();
+
+            // All camps where this doctor has an approved staff request
             var approvedCamps = _dbContext.CampStaffRequests
                 .Where(r => r.DoctorId == doctorId && r.Status == "Approved")
                 .Select(r => r.Camp)
-                .Where(c => c != null && c.Status == "Ongoing")
+                .Where(c => c != null && (c.Status == "Ongoing" || (c.StartDate.Date <= today && today <= c.EndDate.Date)))
                 .ToList()!;
 
             Camp? activeCamp = null;
             if (activeCampId.HasValue)
-                activeCamp = approvedCamps.FirstOrDefault(c => c!.Id == activeCampId.Value);
-            else if (approvedCamps.Count == 1)
+            {
+                activeCamp = ongoingCamps.FirstOrDefault(c => c.Id == activeCampId.Value) 
+                             ?? approvedCamps.FirstOrDefault(c => c.Id == activeCampId.Value)
+                             ?? _dbContext.Camps.FirstOrDefault(c => c.Id == activeCampId.Value);
+            }
+            else if (ongoingCamps.Any())
+            {
+                activeCamp = ongoingCamps.First();
+            }
+            else if (approvedCamps.Any())
+            {
                 activeCamp = approvedCamps.First();
+            }
 
             var queue = new List<TriageRecord>();
             if (activeCamp != null)
@@ -154,12 +177,86 @@ namespace MediCamp.Controllers
 
             var model = new DoctorQueueViewModel
             {
+                OngoingCamps = ongoingCamps,
                 ApprovedCamps = approvedCamps!,
                 ActiveCamp = activeCamp,
                 Queue = queue
             };
 
-            return View(model);
+            return View("Queue", model);
+        }
+
+        [HttpGet]
+        public IActionResult ConsultByPatientId(int campId, string patientQuery)
+        {
+            var doctorId = GetCurrentDoctorId();
+            if (string.IsNullOrEmpty(doctorId))
+                return RedirectToAction("Login", "Account");
+
+            if (string.IsNullOrWhiteSpace(patientQuery))
+            {
+                TempData["ErrorMessage"] = "Please enter a Patient Unique ID to search.";
+                return RedirectToAction(nameof(Queue), new { activeCampId = campId });
+            }
+
+            var cleanQuery = patientQuery.Trim().ToUpperInvariant();
+            var patient = _dbContext.Users.FirstOrDefault(u => 
+                (u.PatientUniqueId != null && u.PatientUniqueId.ToUpper() == cleanQuery) ||
+                u.Id == patientQuery.Trim() ||
+                u.PhoneNumber == patientQuery.Trim() ||
+                u.NID == patientQuery.Trim() ||
+                u.Email.ToLower() == patientQuery.Trim().ToLower());
+
+            if (patient == null)
+            {
+                TempData["ErrorMessage"] = $"No patient found with Unique ID / Identifier \"{patientQuery}\". Please verify the 6-character ID.";
+                return RedirectToAction(nameof(Queue), new { activeCampId = campId });
+            }
+
+            // Find existing triage in this camp
+            var triage = _dbContext.TriageRecords
+                .Include(t => t.Patient)
+                .FirstOrDefault(t => t.CampId == campId && t.PatientId == patient.Id && !t.IsSeenByDoctor);
+
+            if (triage != null)
+            {
+                return RedirectToAction(nameof(Consult), new { triageId = triage.Id });
+            }
+
+            // If already seen in this camp
+            var alreadySeenTriage = _dbContext.TriageRecords
+                .Include(t => t.Patient)
+                .FirstOrDefault(t => t.CampId == campId && t.PatientId == patient.Id && t.IsSeenByDoctor);
+
+            if (alreadySeenTriage != null)
+            {
+                TempData["ErrorMessage"] = $"Patient {patient.FullName} ({patient.PatientUniqueId}) has already completed consultation in this camp.";
+                return RedirectToAction(nameof(Queue), new { activeCampId = campId });
+            }
+
+            // Create expedited triage intake record
+            var nextToken = _dbContext.TriageRecords.Count(t => t.CampId == campId) + 1;
+            var newTriage = new TriageRecord
+            {
+                CampId = campId,
+                PatientId = patient.Id,
+                VolunteerId = doctorId,
+                BloodPressure = "120/80",
+                TemperatureF = 98.6,
+                WeightKg = 65.0,
+                HeightCm = 165.0,
+                BMI = 23.88,
+                PresentingSymptoms = "Doctor Workspace Direct Intake",
+                UrgencyLevel = "Normal",
+                TokenNumber = nextToken,
+                IsSeenByDoctor = false,
+                RecordedAt = DateTime.UtcNow
+            };
+
+            _dbContext.TriageRecords.Add(newTriage);
+            _dbContext.SaveChanges();
+
+            return RedirectToAction(nameof(Consult), new { triageId = newTriage.Id });
         }
 
         // ==========================================
@@ -231,22 +328,45 @@ namespace MediCamp.Controllers
                 });
             }
 
-            // Camp inventory for prescription builder
+            // Camp inventory for prescription builder and stock cross-referencing
             var inventory = _dbContext.CampInventories
                 .Include(ci => ci.MasterMedicine)
                 .Where(ci => ci.CampId == triage.CampId)
                 .ToList();
+
+            var invMap = inventory.ToDictionary(ci => ci.MasterMedicineId, ci => ci.QuantityAllocated - ci.QuantityDispensed);
+
+            var allMedicines = _dbContext.MasterMedicines
+                .OrderBy(m => m.BrandName)
+                .ToList();
+
+            var medicineOptions = allMedicines.Select(m => new DoctorMedicineOption
+            {
+                MasterMedicineId = m.Id,
+                BrandName = m.BrandName,
+                GenericName = m.GenericName,
+                DosageForm = m.DosageForm,
+                Strength = m.Strength,
+                Category = m.Category,
+                InCampInventory = invMap.ContainsKey(m.Id),
+                AvailableStock = invMap.TryGetValue(m.Id, out int stock) ? Math.Max(0, stock) : 0
+            })
+            .OrderByDescending(m => m.InCampInventory && m.AvailableStock > 0)
+            .ThenByDescending(m => m.InCampInventory)
+            .ThenBy(m => m.BrandName)
+            .ToList();
 
             // Hospitals for referral dropdown
             var hospitals = _dbContext.Hospitals.OrderBy(h => h.Name).ToList();
 
             var model = new ConsultationWorkspaceViewModel
             {
-                TriageRecord      = triage,
-                Patient           = triage.Patient,
-                PastVisits        = pastVisits,
-                CampId            = triage.CampId,
-                CampInventory     = inventory,
+                TriageRecord       = triage,
+                Patient            = triage.Patient,
+                PastVisits         = pastVisits,
+                CampId             = triage.CampId,
+                CampInventory      = inventory,
+                MedicineOptions    = medicineOptions,
                 AvailableHospitals = hospitals
             };
 

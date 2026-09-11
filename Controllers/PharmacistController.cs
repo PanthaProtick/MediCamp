@@ -113,23 +113,47 @@ namespace MediCamp.Controllers
         // PHARMACIST DASHBOARD
         // ==========================================
 
+        // ==========================================
+        // PHARMACIST DASHBOARD
+        // ==========================================
+
         [HttpGet]
         public IActionResult Dashboard(int? activeCampId)
         {
             var userId = GetCurrentUserId();
             if (userId == null) return RedirectToAction("Login", "Account");
 
+            var today = DateTime.UtcNow.Date;
+
+            // All ongoing camps active today or marked Ongoing
+            var ongoingCamps = _dbContext.Camps
+                .Where(c => (c.Status == "Ongoing" || (c.StartDate.Date <= today && today <= c.EndDate.Date)) &&
+                            c.Status != "Rejected" && c.Status != "Cancelled" && c.Status != "Pending Admin Approval")
+                .OrderByDescending(c => c.StartDate)
+                .ToList();
+
+            // Camps where this pharmacist is approved
             var approvedCamps = _dbContext.CampPharmacistRequests
                 .Where(r => r.PharmacistId == userId && r.Status == "Approved")
                 .Select(r => r.Camp)
-                .Where(c => c != null && c.Status == "Ongoing")
+                .Where(c => c != null && (c.Status == "Ongoing" || (c.StartDate.Date <= today && today <= c.EndDate.Date)))
                 .ToList()!;
 
             Camp? activeCamp = null;
             if (activeCampId.HasValue)
-                activeCamp = approvedCamps.FirstOrDefault(c => c!.Id == activeCampId.Value);
-            else if (approvedCamps.Count == 1)
+            {
+                activeCamp = ongoingCamps.FirstOrDefault(c => c.Id == activeCampId.Value)
+                             ?? approvedCamps.FirstOrDefault(c => c.Id == activeCampId.Value)
+                             ?? _dbContext.Camps.FirstOrDefault(c => c.Id == activeCampId.Value);
+            }
+            else if (ongoingCamps.Any())
+            {
+                activeCamp = ongoingCamps.First();
+            }
+            else if (approvedCamps.Any())
+            {
                 activeCamp = approvedCamps.First();
+            }
 
             int pendingCount = 0, dispensedToday = 0, lowStockCount = 0;
             if (activeCamp != null)
@@ -160,6 +184,7 @@ namespace MediCamp.Controllers
 
             var model = new PharmacistDashboardViewModel
             {
+                OngoingCamps            = ongoingCamps,
                 ApprovedCamps           = approvedCamps!,
                 ActiveCamp              = activeCamp,
                 PendingPrescriptionsCount = pendingCount,
@@ -171,8 +196,70 @@ namespace MediCamp.Controllers
         }
 
         // ==========================================
-        // PRESCRIPTION QUEUE
+        // PRESCRIPTION QUEUE & LOOKUP
         // ==========================================
+
+        [HttpGet]
+        public IActionResult LookupPrescription(int campId, string patientQuery)
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null) return RedirectToAction("Login", "Account");
+
+            if (string.IsNullOrWhiteSpace(patientQuery))
+            {
+                TempData["ErrorMessage"] = "Please enter a Patient Unique ID to lookup.";
+                return RedirectToAction(nameof(PrescriptionQueue), new { campId });
+            }
+
+            var clean = patientQuery.Trim();
+            var upper = clean.ToUpperInvariant();
+
+            var patient = _dbContext.Users.FirstOrDefault(u => 
+                (u.PatientUniqueId != null && u.PatientUniqueId.ToUpper() == upper) ||
+                u.Id == clean ||
+                u.PhoneNumber == clean ||
+                (u.NID != null && u.NID == clean));
+
+            if (patient == null)
+            {
+                TempData["ErrorMessage"] = $"No patient found with Unique ID \"{patientQuery}\". Please verify the 6-character ID.";
+                return RedirectToAction(nameof(PrescriptionQueue), new { campId });
+            }
+
+            // Find pending prescription for this patient in this camp
+            var pendingRx = _dbContext.Prescriptions
+                .Include(p => p.Consultation)
+                    .ThenInclude(c => c!.TriageRecord)
+                .FirstOrDefault(p => !p.IsDispensed &&
+                                    p.Consultation != null &&
+                                    p.Consultation.TriageRecord != null &&
+                                    p.Consultation.TriageRecord.CampId == campId &&
+                                    p.Consultation.TriageRecord.PatientId == patient.Id);
+
+            if (pendingRx != null)
+            {
+                return RedirectToAction(nameof(Dispense), new { prescriptionId = pendingRx.Id });
+            }
+
+            // Check if already dispensed
+            var dispensedRx = _dbContext.Prescriptions
+                .Include(p => p.Consultation)
+                    .ThenInclude(c => c!.TriageRecord)
+                .FirstOrDefault(p => p.IsDispensed &&
+                                    p.Consultation != null &&
+                                    p.Consultation.TriageRecord != null &&
+                                    p.Consultation.TriageRecord.CampId == campId &&
+                                    p.Consultation.TriageRecord.PatientId == patient.Id);
+
+            if (dispensedRx != null)
+            {
+                TempData["ErrorMessage"] = $"Prescription for patient {patient.FullName} ({patient.PatientUniqueId}) has already been dispensed on {dispensedRx.DispensedAt:MMM dd, hh:mm tt}. Cannot dispense twice.";
+                return RedirectToAction(nameof(PrescriptionQueue), new { campId });
+            }
+
+            TempData["ErrorMessage"] = $"No active prescription found for patient {patient.FullName} ({patient.PatientUniqueId}) in this camp. The doctor may not have written a prescription yet.";
+            return RedirectToAction(nameof(PrescriptionQueue), new { campId });
+        }
 
         [HttpGet]
         public IActionResult PrescriptionQueue(int campId)
@@ -210,7 +297,7 @@ namespace MediCamp.Controllers
                     ConsultationId = p.ConsultationId,
                     TokenNumber    = p.Consultation?.TriageRecord?.TokenNumber ?? 0,
                     PatientName    = p.Consultation?.TriageRecord?.Patient?.FullName ?? "Unknown",
-                    PatientId      = p.Consultation?.TriageRecord?.PatientId ?? "",
+                    PatientId      = p.Consultation?.TriageRecord?.Patient?.PatientUniqueId ?? p.Consultation?.TriageRecord?.PatientId ?? "",
                     DoctorName     = p.Consultation?.Doctor?.FullName ?? "Unknown Doctor",
                     Diagnosis      = p.Consultation?.Diagnosis,
                     ItemCount      = itemCount,
@@ -274,8 +361,10 @@ namespace MediCamp.Controllers
                 var invEntry = _dbContext.CampInventories
                     .FirstOrDefault(ci => ci.CampId == campId && ci.MasterMedicineId == pi.MasterMedicineId);
                 int available = invEntry != null
-                    ? invEntry.QuantityAllocated - invEntry.QuantityDispensed
+                    ? Math.Max(0, invEntry.QuantityAllocated - invEntry.QuantityDispensed)
                     : 0;
+
+                bool inInventory = invEntry != null;
 
                 return new DispensingItemInput
                 {
@@ -287,6 +376,7 @@ namespace MediCamp.Controllers
                     Instructions        = pi.Instructions,
                     QuantityPrescribed  = pi.QuantityPrescribed,
                     AvailableStock      = available,
+                    InCampInventory     = inInventory,
                     QuantityToDispense  = Math.Min(pi.QuantityPrescribed, available),
                     IsDispensed         = pi.QuantityDispensed > 0
                 };
@@ -334,7 +424,35 @@ namespace MediCamp.Controllers
                 return RedirectToAction(nameof(PrescriptionQueue), new { campId });
             }
 
-            // Update each prescription item and deduct from inventory
+            // 1. Stock check: Prevent dispensing if stock is insufficient
+            for (int i = 0; i < itemIds.Length; i++)
+            {
+                int qty = (i < quantities.Length) ? quantities[i] : 0;
+                if (qty <= 0) continue;
+
+                var prescriptionItem = _dbContext.PrescriptionItems
+                    .Include(pi => pi.MasterMedicine)
+                    .FirstOrDefault(pi => pi.Id == itemIds[i] && pi.PrescriptionId == prescriptionId);
+                if (prescriptionItem == null) continue;
+
+                int effectiveMedicineId = (substituteMedicineIds != null && i < substituteMedicineIds.Length && substituteMedicineIds[i] > 0)
+                    ? substituteMedicineIds[i]
+                    : prescriptionItem.MasterMedicineId;
+
+                var invEntry = _dbContext.CampInventories
+                    .Include(ci => ci.MasterMedicine)
+                    .FirstOrDefault(ci => ci.CampId == campId && ci.MasterMedicineId == effectiveMedicineId);
+
+                int availableStock = invEntry != null ? invEntry.QuantityAllocated - invEntry.QuantityDispensed : 0;
+                if (availableStock < qty)
+                {
+                    string medName = invEntry?.MasterMedicine?.BrandName ?? prescriptionItem.MasterMedicine?.BrandName ?? "Medicine";
+                    TempData["ErrorMessage"] = $"Stock Warning: Insufficient inventory for \"{medName}\". Available stock: {availableStock} units, Requested: {qty} units. Dispensing blocked.";
+                    return RedirectToAction(nameof(Dispense), new { prescriptionId });
+                }
+            }
+
+            // 2. Update each prescription item and deduct from inventory
             for (int i = 0; i < itemIds.Length; i++)
             {
                 int qty = (i < quantities.Length) ? quantities[i] : 0;
@@ -366,10 +484,8 @@ namespace MediCamp.Controllers
                     .FirstOrDefault(ci => ci.CampId == campId && ci.MasterMedicineId == effectiveMedicineId);
                 if (invEntry != null)
                 {
-                    int maxDispense = invEntry.QuantityAllocated - invEntry.QuantityDispensed;
-                    int actualQty = Math.Min(qty, maxDispense);
-                    invEntry.QuantityDispensed += actualQty;
-                    prescriptionItem.QuantityDispensed = actualQty;
+                    invEntry.QuantityDispensed += qty;
+                    prescriptionItem.QuantityDispensed = qty;
                 }
                 else
                 {
@@ -384,7 +500,7 @@ namespace MediCamp.Controllers
 
             _dbContext.SaveChanges();
 
-            TempData["SuccessMessage"] = "Prescription dispensed successfully. Inventory updated.";
+            TempData["SuccessMessage"] = "Prescription dispensed successfully! Medicine inventory deducted from camp dispensary.";
             return RedirectToAction(nameof(PrescriptionQueue), new { campId });
         }
 

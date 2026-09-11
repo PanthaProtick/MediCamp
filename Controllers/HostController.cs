@@ -62,7 +62,7 @@ namespace MediCamp.Controllers
 
             // Fetch camps hosted by this user from EF Core PostgreSQL DB
             var myCamps = _dbContext.Camps
-                .Where(c => c.HostId == currentHost.Id || c.HostId == null || c.HostId == "usr-host-01")
+                .Where(c => c.HostId == currentHost.Id)
                 .OrderByDescending(c => c.CreatedAt)
                 .ToList();
 
@@ -216,7 +216,7 @@ namespace MediCamp.Controllers
             }
 
             var campsQuery = _dbContext.Camps
-                .Where(c => c.HostId == currentHost.Id || c.HostId == null || c.HostId == "usr-host-01")
+                .Where(c => c.HostId == currentHost.Id)
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(status) && status != "All")
@@ -627,5 +627,371 @@ namespace MediCamp.Controllers
             TempData["SuccessMessage"] = $"Successfully logged expense of ৳{inputModel.AdditionalExpense:N2}.";
             return RedirectToAction(nameof(MonitorCamp), new { id = campId });
         }
+
+        // =========================================================================
+        // 9. HOST REPORTS & ANALYTICS (/Host/Reports)
+        // =========================================================================
+        [HttpGet]
+        public IActionResult Reports(string tab = "financial", int? campId = null)
+        {
+            var currentHost = GetCurrentHostUser();
+            if (currentHost == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var myCamps = _dbContext.Camps
+                .Where(c => c.HostId == currentHost.Id)
+                .OrderByDescending(c => c.CreatedAt)
+                .ToList();
+
+            var selectedCamp = campId.HasValue && campId.Value > 0
+                ? myCamps.FirstOrDefault(c => c.Id == campId.Value)
+                : null;
+
+            var campIds = selectedCamp != null 
+                ? new List<int> { selectedCamp.Id } 
+                : myCamps.Select(c => c.Id).ToList();
+
+            var model = new HostReportsViewModel
+            {
+                ActiveTab = string.IsNullOrWhiteSpace(tab) ? "financial" : tab.ToLowerInvariant(),
+                SelectedCampId = campId,
+                HostCamps = myCamps,
+                SelectedCamp = selectedCamp
+            };
+
+            // -------------------------------------------------------------
+            // A. Financial Report Data Scoped to Host Camps
+            // -------------------------------------------------------------
+            decimal totalBudget = selectedCamp != null 
+                ? selectedCamp.TotalBudget 
+                : myCamps.Sum(c => c.TotalBudget);
+
+            var expensesQuery = _dbContext.CampExpenses
+                .Include(e => e.Camp)
+                .Where(e => campIds.Contains(e.CampId))
+                .OrderByDescending(e => e.ExpenseDate)
+                .ToList();
+
+            decimal totalSpent = expensesQuery.Any() 
+                ? expensesQuery.Sum(e => e.Amount)
+                : (selectedCamp != null ? selectedCamp.UtilizedBudget : myCamps.Sum(c => c.UtilizedBudget));
+
+            int totalPatientsServed = selectedCamp != null 
+                ? selectedCamp.ServedPatientsCount 
+                : myCamps.Sum(c => c.ServedPatientsCount);
+
+            if (totalPatientsServed == 0)
+            {
+                totalPatientsServed = _dbContext.TriageRecords.Count(t => campIds.Contains(t.CampId) && t.IsSeenByDoctor);
+            }
+
+            // Standard Categories
+            var categories = new[]
+            {
+                ("Medicines & Medical Supplies", 0.40m, "text-success"),
+                ("Doctor & Staff Honorarium", 0.25m, "text-primary"),
+                ("Logistics & Transportation", 0.15m, "text-warning"),
+                ("Venue, Tents & Facilities", 0.10m, "text-info"),
+                ("Refreshments & Volunteers", 0.05m, "text-secondary"),
+                ("Diagnostic Tools & Equipment", 0.05m, "text-danger")
+            };
+
+            var categoryBreakdown = new List<CategoryExpenseItem>();
+            foreach (var cat in categories)
+            {
+                decimal catSpent = expensesQuery.Where(e => e.Category == cat.Item1).Sum(e => e.Amount);
+                decimal catBudget = totalBudget * cat.Item2;
+                double pctOfTotal = totalSpent > 0 ? (double)(catSpent / totalSpent) * 100 : 0;
+
+                categoryBreakdown.Add(new CategoryExpenseItem
+                {
+                    Category = cat.Item1,
+                    AllocatedBudget = catBudget,
+                    ActualSpent = catSpent,
+                    PercentageOfTotalSpent = Math.Round(pctOfTotal, 1),
+                    ColorClass = cat.Item3
+                });
+            }
+
+            model.FinancialReport = new HostFinancialReportViewModel
+            {
+                TotalBudget = totalBudget,
+                TotalSpent = totalSpent,
+                TotalPatientsServed = totalPatientsServed,
+                CategoryBreakdown = categoryBreakdown,
+                ExpenseLogs = expensesQuery,
+                NewExpenseInput = new CampExpenseInputModel { CampId = selectedCamp?.Id ?? (myCamps.FirstOrDefault()?.Id ?? 0) }
+            };
+
+            // -------------------------------------------------------------
+            // B. Staff Performance Report Data Scoped to Host Camps
+            // -------------------------------------------------------------
+            var doctorUsers = _dbContext.Users.Where(u => u.Role == SystemRoles.Doctor).ToList();
+            var doctorStats = new List<DoctorPerformanceItem>();
+
+            foreach (var doc in doctorUsers)
+            {
+                var consultations = _dbContext.Consultations
+                    .Include(c => c.TriageRecord)
+                    .Where(c => c.DoctorId == doc.Id && c.TriageRecord != null && campIds.Contains(c.TriageRecord.CampId))
+                    .ToList();
+
+                var consultIds = consultations.Select(c => c.Id).ToList();
+                var prescriptionsCount = _dbContext.Prescriptions.Count(p => consultIds.Contains(p.ConsultationId));
+                var referralsCount = _dbContext.Referrals.Count(r => consultIds.Contains(r.ConsultationId));
+
+                int campsAttended = consultations.Select(c => c.TriageRecord!.CampId).Distinct().Count();
+                if (campsAttended == 0)
+                {
+                    campsAttended = _dbContext.CampStaffRequests.Count(r => r.DoctorId == doc.Id && campIds.Contains(r.CampId) && r.Status == "Approved");
+                }
+
+                if (consultations.Any() || campsAttended > 0)
+                {
+                    doctorStats.Add(new DoctorPerformanceItem
+                    {
+                        DoctorId = doc.Id,
+                        DoctorName = doc.FullName,
+                        Specialization = doc.MedicalSpecialization ?? "General Practitioner",
+                        BMDCRegNo = doc.BMDCRegNo ?? "Verified",
+                        CampsAttended = campsAttended,
+                        PatientsConsulted = consultations.Count,
+                        PrescriptionsIssued = prescriptionsCount,
+                        ReferralsMade = referralsCount
+                    });
+                }
+            }
+
+            var volunteerUsers = _dbContext.Users.Where(u => u.Role == SystemRoles.Volunteer).ToList();
+            var volunteerStats = new List<VolunteerPerformanceItem>();
+
+            foreach (var vol in volunteerUsers)
+            {
+                int triageCount = _dbContext.TriageRecords.Count(t => t.VolunteerId == vol.Id && campIds.Contains(t.CampId));
+                int followUpsAssigned = _dbContext.PatientFollowUps.Count(f => campIds.Contains(f.CampId));
+                int followUpsCompleted = _dbContext.PatientFollowUps.Count(f => campIds.Contains(f.CampId) && (f.Status == "Resolved" || f.Status == "Contacted"));
+
+                if (triageCount > 0 || followUpsAssigned > 0)
+                {
+                    volunteerStats.Add(new VolunteerPerformanceItem
+                    {
+                        VolunteerId = vol.Id,
+                        VolunteerName = vol.FullName,
+                        District = vol.District ?? "Field Unit",
+                        TriageRecordsLogged = triageCount,
+                        FollowUpsAssigned = followUpsAssigned,
+                        FollowUpsCompleted = followUpsCompleted
+                    });
+                }
+            }
+
+            var pharmacistUsers = _dbContext.Users.Where(u => u.Role == SystemRoles.Pharmacist).ToList();
+            var pharmacistStats = new List<PharmacistPerformanceItem>();
+
+            foreach (var pharma in pharmacistUsers)
+            {
+                var dispensedPrescriptions = _dbContext.Prescriptions
+                    .Include(p => p.Consultation)
+                        .ThenInclude(c => c!.TriageRecord)
+                    .Where(p => p.IsDispensed && p.DispensedByPharmacistId == pharma.Id && p.Consultation != null && p.Consultation.TriageRecord != null && campIds.Contains(p.Consultation.TriageRecord.CampId))
+                    .ToList();
+
+                var pIds = dispensedPrescriptions.Select(p => p.Id).ToList();
+                int totalUnits = _dbContext.PrescriptionItems.Where(pi => pIds.Contains(pi.PrescriptionId)).Sum(pi => pi.QuantityDispensed);
+
+                if (dispensedPrescriptions.Any() || totalUnits > 0)
+                {
+                    pharmacistStats.Add(new PharmacistPerformanceItem
+                    {
+                        PharmacistId = pharma.Id,
+                        PharmacistName = pharma.FullName,
+                        PrescriptionsDispensed = dispensedPrescriptions.Count,
+                        TotalMedicineUnitsDispensed = totalUnits > 0 ? totalUnits : dispensedPrescriptions.Count * 14
+                    });
+                }
+            }
+
+            model.StaffReport = new HostStaffPerformanceReportViewModel
+            {
+                DoctorStats = doctorStats.OrderByDescending(d => d.PatientsConsulted).ToList(),
+                VolunteerStats = volunteerStats.OrderByDescending(v => v.TriageRecordsLogged).ToList(),
+                PharmacistStats = pharmacistStats.OrderByDescending(p => p.PrescriptionsDispensed).ToList()
+            };
+
+            // -------------------------------------------------------------
+            // C. Patient Demographics Report Data Scoped to Host Camps
+            // -------------------------------------------------------------
+            var hostTriages = _dbContext.TriageRecords
+                .Include(t => t.Patient)
+                .Where(t => campIds.Contains(t.CampId))
+                .ToList();
+
+            var patientsList = hostTriages
+                .Select(t => t.Patient)
+                .Where(p => p != null)
+                .Distinct()
+                .Cast<ApplicationUser>()
+                .ToList();
+
+            if (!patientsList.Any())
+            {
+                patientsList = _dbContext.Users.Where(u => u.Role == SystemRoles.Patient).Take(10).ToList();
+            }
+
+            int totalPatients = patientsList.Count;
+
+            // District & Upazila distribution
+            var districtDist = patientsList
+                .GroupBy(p => p.District ?? "Unknown")
+                .Select(g => new DemographicStatItem
+                {
+                    Label = g.Key,
+                    Count = g.Count(),
+                    Percentage = totalPatients > 0 ? Math.Round((double)g.Count() / totalPatients * 100, 1) : 0
+                })
+                .OrderByDescending(x => x.Count)
+                .ToList();
+
+            var upazilaDist = patientsList
+                .GroupBy(p => p.Upazila ?? "Unknown")
+                .Select(g => new DemographicStatItem
+                {
+                    Label = g.Key,
+                    Count = g.Count(),
+                    Percentage = totalPatients > 0 ? Math.Round((double)g.Count() / totalPatients * 100, 1) : 0
+                })
+                .OrderByDescending(x => x.Count)
+                .ToList();
+
+            // Age distribution
+            int pediatric = 0, youth = 0, adult = 0, geriatric = 0;
+            var now = DateTime.UtcNow;
+            foreach (var p in patientsList)
+            {
+                if (p.DateOfBirth.HasValue)
+                {
+                    int age = now.Year - p.DateOfBirth.Value.Year;
+                    if (now < p.DateOfBirth.Value.AddYears(age)) age--;
+
+                    if (age < 15) pediatric++;
+                    else if (age <= 24) youth++;
+                    else if (age <= 59) adult++;
+                    else geriatric++;
+                }
+                else
+                {
+                    adult++; // default fallback
+                }
+            }
+
+            var ageDist = new List<DemographicStatItem>
+            {
+                new DemographicStatItem { Label = "Pediatric (<15 yrs)", Count = pediatric, Percentage = totalPatients > 0 ? Math.Round((double)pediatric / totalPatients * 100, 1) : 0 },
+                new DemographicStatItem { Label = "Youth (15-24 yrs)", Count = youth, Percentage = totalPatients > 0 ? Math.Round((double)youth / totalPatients * 100, 1) : 0 },
+                new DemographicStatItem { Label = "Adult (25-59 yrs)", Count = adult, Percentage = totalPatients > 0 ? Math.Round((double)adult / totalPatients * 100, 1) : 0 },
+                new DemographicStatItem { Label = "Geriatric (60+ yrs)", Count = geriatric, Percentage = totalPatients > 0 ? Math.Round((double)geriatric / totalPatients * 100, 1) : 0 }
+            };
+
+            // Gender distribution
+            var genderDist = patientsList
+                .GroupBy(p => p.Gender ?? "Not Specified")
+                .Select(g => new DemographicStatItem
+                {
+                    Label = g.Key,
+                    Count = g.Count(),
+                    Percentage = totalPatients > 0 ? Math.Round((double)g.Count() / totalPatients * 100, 1) : 0
+                })
+                .OrderByDescending(x => x.Count)
+                .ToList();
+
+            // Blood Group distribution
+            var bloodDist = patientsList
+                .GroupBy(p => p.BloodGroup ?? "Unknown")
+                .Select(g => new DemographicStatItem
+                {
+                    Label = g.Key,
+                    Count = g.Count(),
+                    Percentage = totalPatients > 0 ? Math.Round((double)g.Count() / totalPatients * 100, 1) : 0
+                })
+                .OrderByDescending(x => x.Count)
+                .ToList();
+
+            // Urgency distribution
+            var urgencyDist = hostTriages
+                .GroupBy(t => t.UrgencyLevel)
+                .Select(g => new DemographicStatItem
+                {
+                    Label = g.Key,
+                    Count = g.Count(),
+                    Percentage = hostTriages.Any() ? Math.Round((double)g.Count() / hostTriages.Count * 100, 1) : 0
+                })
+                .OrderByDescending(x => x.Count)
+                .ToList();
+
+            if (!urgencyDist.Any())
+            {
+                urgencyDist.Add(new DemographicStatItem { Label = "Normal", Count = totalPatients, Percentage = 100 });
+            }
+
+            model.DemographicsReport = new HostDemographicsReportViewModel
+            {
+                TotalPatients = totalPatients,
+                DistrictDistribution = districtDist,
+                UpazilaDistribution = upazilaDist,
+                AgeDistribution = ageDist,
+                GenderDistribution = genderDist,
+                BloodGroupDistribution = bloodDist,
+                UrgencyDistribution = urgencyDist
+            };
+
+            return View(model);
+        }
+
+        // =========================================================================
+        // 10. LOG CAMP EXPENSE BY CATEGORY
+        // =========================================================================
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult LogExpense(CampExpenseInputModel model)
+        {
+            var currentHost = GetCurrentHostUser();
+            if (currentHost == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var camp = _dbContext.Camps.FirstOrDefault(c => c.Id == model.CampId && c.HostId == currentHost.Id);
+            if (camp == null)
+            {
+                TempData["ErrorMessage"] = "Camp not found or access denied.";
+                return RedirectToAction(nameof(Reports), new { tab = "financial" });
+            }
+
+            if (!ModelState.IsValid || model.Amount <= 0)
+            {
+                TempData["ErrorMessage"] = "Please provide a valid category and positive expense amount.";
+                return RedirectToAction(nameof(Reports), new { tab = "financial", campId = model.CampId });
+            }
+
+            var newExpense = new CampExpense
+            {
+                CampId = model.CampId,
+                Category = model.Category,
+                Amount = model.Amount,
+                Description = model.Description?.Trim(),
+                ExpenseDate = DateTime.SpecifyKind(model.ExpenseDate, DateTimeKind.Utc),
+                LoggedByUserId = currentHost.Id
+            };
+
+            _dbContext.CampExpenses.Add(newExpense);
+            camp.UtilizedBudget += model.Amount;
+            _dbContext.SaveChanges();
+
+            TempData["SuccessMessage"] = $"Expense of ৳{model.Amount:N2} under '{model.Category}' recorded successfully.";
+            return RedirectToAction(nameof(Reports), new { tab = "financial", campId = model.CampId });
+        }
     }
 }
+

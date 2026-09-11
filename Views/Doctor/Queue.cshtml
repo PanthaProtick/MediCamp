@@ -71,64 +71,110 @@
         </div>
     }
 
-    <!-- Camp Selector (if multiple) -->
-    @if (Model.ApprovedCamps.Count == 0)
-    {
-        <div class="text-center py-5">
-            <div class="mb-4" style="font-size:4rem; opacity:.3;">🏥</div>
-            <h4 class="fw-bold text-secondary">No Active Camps Assigned</h4>
-            <p class="text-muted">You don't have any ongoing camp assignments. Please wait for a host to send you an invitation and approve it.</p>
-            <a asp-action="Requests" class="btn btn-primary rounded-pill px-4 fw-bold">
-                <i class="fa-solid fa-envelope me-2"></i> View Invitations
-            </a>
+    <!-- Ongoing Camps Section -->
+    <div class="glass-card p-4 mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+            <div>
+                <h4 class="fw-bold text-dark mb-0"><i class="fa-solid fa-tent text-primary me-2"></i>Ongoing Healthcare Camps</h4>
+                <p class="text-muted small mb-0">Select an active camp below to enter its consultation desk and examine patients.</p>
+            </div>
+            <span class="badge bg-success rounded-pill px-3 py-2 fw-bold">
+                <i class="fa-solid fa-circle-dot me-1"></i> @Model.OngoingCamps.Count Active Camp@(Model.OngoingCamps.Count != 1 ? "s" : "")
+            </span>
         </div>
-    }
-    else if (Model.ActiveCamp == null)
-    {
-        <!-- Multiple camps — let doctor pick one -->
-        <div class="camp-selector-card mb-5">
-            <h4 class="fw-bold mb-1"><i class="fa-solid fa-location-crosshairs me-2"></i>Select Your Active Camp</h4>
-            <p class="text-white-50 small mb-4">You are assigned to multiple ongoing camps. Choose one to view its patient queue.</p>
+
+        @if (!Model.OngoingCamps.Any())
+        {
+            <div class="text-center py-4 text-muted">
+                <i class="fa-solid fa-tent-arrows-down fs-1 mb-2 opacity-50"></i>
+                <p class="mb-0">No ongoing healthcare camps found matching today's date.</p>
+            </div>
+        }
+        else
+        {
             <div class="row g-3">
-                @foreach (var camp in Model.ApprovedCamps)
+                @foreach (var camp in Model.OngoingCamps)
                 {
+                    bool isCurrent = Model.ActiveCamp?.Id == camp.Id;
                     <div class="col-md-6 col-lg-4">
-                        <a asp-action="Queue" asp-route-activeCampId="@camp.Id"
-                           class="text-decoration-none">
-                            <div class="bg-white text-dark rounded-3 p-3 h-100 shadow-sm hover-lift">
-                                <div class="fw-bold mb-1">@camp.Title</div>
-                                <div class="small text-muted mb-2">
-                                    <i class="fa-solid fa-location-dot me-1 text-danger"></i>@camp.Upazila, @camp.District
+                        <div class="card h-100 rounded-4 border-2 @(isCurrent ? "border-primary bg-primary-subtle shadow-sm" : "border-light-subtle shadow-none") transition-all">
+                            <div class="card-body p-3 d-flex flex-column justify-content-between">
+                                <div>
+                                    <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                                        <span class="badge bg-success rounded-pill px-2 py-1 small">
+                                            <i class="fa-solid fa-circle-play me-1"></i> Active Now
+                                        </span>
+                                        <span class="badge bg-dark-subtle text-dark rounded-pill small">
+                                            <i class="fa-solid fa-users me-1"></i> @camp.ServedPatientsCount Served
+                                        </span>
+                                    </div>
+                                    <h6 class="fw-bold text-dark mb-1">@camp.Title</h6>
+                                    <div class="small text-muted mb-1">
+                                        <i class="fa-solid fa-location-dot text-danger me-1"></i> @camp.Venue, @camp.Upazila, @camp.District
+                                    </div>
+                                    <div class="small text-muted mb-2">
+                                        <i class="fa-solid fa-calendar-day text-primary me-1"></i> @camp.StartDate.ToString("MMM dd") – @camp.EndDate.ToString("MMM dd, yyyy")
+                                    </div>
                                 </div>
-                                <div class="small text-muted">
-                                    <i class="fa-solid fa-calendar me-1 text-primary"></i>@camp.StartDate.ToString("MMM dd") – @camp.EndDate.ToString("MMM dd, yyyy")
-                                </div>
-                                <div class="mt-2">
-                                    <span class="badge bg-success">Ongoing</span>
+                                <div class="mt-2 pt-2 border-top">
+                                    @if (isCurrent)
+                                    {
+                                        <button class="btn btn-primary btn-sm w-100 rounded-pill fw-bold" disabled>
+                                            <i class="fa-solid fa-stethoscope me-1"></i> Active Camp Desk
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <a asp-action="Queue" asp-route-activeCampId="@camp.Id"
+                                           class="btn btn-outline-primary btn-sm w-100 rounded-pill fw-bold">
+                                            <i class="fa-solid fa-right-to-bracket me-1"></i> Enter Camp Desk
+                                        </a>
+                                    }
                                 </div>
                             </div>
-                        </a>
+                        </div>
                     </div>
                 }
             </div>
-        </div>
-    }
-    else
-    {
-        <!-- Active camp chosen — show queue -->
-        @if (Model.ApprovedCamps.Count > 1)
-        {
-            <div class="mb-3">
-                <span class="text-muted small me-2">Switch camp:</span>
-                @foreach (var c in Model.ApprovedCamps)
-                {
-                    <a asp-action="Queue" asp-route-activeCampId="@c.Id"
-                       class="btn btn-sm @(c.Id == Model.ActiveCamp.Id ? "btn-primary" : "btn-outline-secondary") rounded-pill me-1 fw-bold">
-                        @c.Title
-                    </a>
-                }
-            </div>
         }
+    </div>
+
+    @if (Model.ActiveCamp != null)
+    {
+        <!-- Patient Unique ID Direct Lookup -->
+        <div class="glass-card p-4 mb-4 border border-primary border-opacity-25 bg-light-subtle">
+            <div class="row align-items-center g-3">
+                <div class="col-lg-6">
+                    <h5 class="fw-bold text-dark mb-1">
+                        <i class="fa-solid fa-id-card-clip text-primary me-2"></i>Patient Intake by Unique ID
+                    </h5>
+                    <p class="text-muted small mb-0">Enter the patient's 6-character Unique ID (e.g., <code>A3K9P2</code>) to open their consultation record directly.</p>
+                </div>
+                <div class="col-lg-6">
+                    <form asp-action="ConsultByPatientId" method="get" class="d-flex gap-2">
+                        <input type="hidden" name="campId" value="@Model.ActiveCamp.Id" />
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0 font-monospace text-muted fw-bold">ID:</span>
+                            <input type="text" name="patientQuery" class="form-control font-monospace fw-bold text-uppercase border-start-0" 
+                                   placeholder="e.g. A3K9P2" maxlength="15" required style="letter-spacing: 0.1em;" />
+                            <button type="submit" class="btn btn-primary px-3 fw-bold">
+                                <i class="fa-solid fa-user-doctor me-1"></i> Open Consultation
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Camp Queue Desk -->
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+            <div>
+                <h4 class="fw-bold text-dark mb-0">
+                    <i class="fa-solid fa-users-line text-primary me-2"></i>Triage Waiting Queue
+                </h4>
+                <div class="text-muted small">Showing patients checked in for <strong>@Model.ActiveCamp.Title</strong></div>
+            </div>
+        </div>
 
         <!-- Queue Stats -->
         <div class="row g-3 mb-4">
@@ -206,8 +252,16 @@
                                         <span class="fw-black fs-5 text-primary">#@t.TokenNumber</span>
                                     </td>
                                     <td>
-                                        <div class="fw-bold text-dark">@t.Patient?.FullName</div>
-                                        <div class="small text-muted">@t.Patient?.Gender &bull; @(t.Patient?.DateOfBirth.HasValue == true ? (DateTime.Today.Year - t.Patient.DateOfBirth!.Value.Year) + " yrs" : "Age N/A")</div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="fw-bold text-dark">@t.Patient?.FullName</span>
+                                            @if (!string.IsNullOrEmpty(t.Patient?.PatientUniqueId))
+                                            {
+                                                <span class="badge bg-dark-subtle text-dark font-monospace px-2 py-0 border" style="font-size: 0.75rem;">
+                                                    @t.Patient.PatientUniqueId
+                                                </span>
+                                            }
+                                        </div>
+                                        <div class="small text-muted">@t.Patient?.Gender &bull; @(t.Patient?.DateOfBirth.HasValue == true ? (DateTime.Today.Year - t.Patient.DateOfBirth!.Value.Year) + " yrs" : "Age N/A") &bull; @(t.Patient?.PhoneNumber ?? "No Phone")</div>
                                     </td>
                                     <td>
                                         <span class="badge @badgeClass fw-bold">

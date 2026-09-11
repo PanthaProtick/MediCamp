@@ -33,6 +33,38 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Patient Unique ID Lookup Form -->
+    <div class="glass-card p-4 mb-4 border border-info border-opacity-50 bg-light-subtle">
+        <div class="row align-items-center g-3">
+            <div class="col-lg-6">
+                <h5 class="fw-bold text-dark mb-1">
+                    <i class="fa-solid fa-id-card-clip text-info me-2"></i>Dispense by Patient Unique ID
+                </h5>
+                <p class="text-muted small mb-0">Enter the patient's 6-character Unique ID (e.g., <code>A3K9P2</code>) to load their prescription for immediate dispensing.</p>
+            </div>
+            <div class="col-lg-6">
+                <form asp-action="LookupPrescription" method="get" class="d-flex gap-2">
+                    <input type="hidden" name="campId" value="@Model.Camp.Id" />
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 font-monospace text-muted fw-bold">ID:</span>
+                        <input type="text" name="patientQuery" class="form-control font-monospace fw-bold text-uppercase border-start-0" 
+                               placeholder="e.g. A3K9P2" maxlength="15" required style="letter-spacing: 0.1em;" />
+                        <button type="submit" class="btn btn-primary px-4 fw-bold">
+                            <i class="fa-solid fa-pills me-1"></i> Open Prescription
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <!-- Tab navigation -->
     <ul class="nav nav-pills mb-4" id="rxTab" role="tablist">

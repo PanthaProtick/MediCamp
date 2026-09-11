@@ -467,6 +467,7 @@ namespace MediCamp.Models.ViewModels
 
     public class VolunteerDashboardViewModel
     {
+        public List<MediCamp.Models.Domain.Camp> OngoingCamps { get; set; } = new();
         public List<MediCamp.Models.Domain.Camp> ApprovedCamps { get; set; } = new();
         public MediCamp.Models.Domain.Camp? ActiveCamp { get; set; }
         public List<ApplicationUser> SearchResults { get; set; } = new();
@@ -482,6 +483,15 @@ namespace MediCamp.Models.ViewModels
         public string PatientId { get; set; } = string.Empty;
         
         public ApplicationUser? Patient { get; set; }
+
+        [Range(0, 150, ErrorMessage = "Please enter a valid age (0-150).")]
+        public int? Age { get; set; }
+
+        [MaxLength(10)]
+        public string? BloodGroup { get; set; }
+
+        [MaxLength(15)]
+        public string? Gender { get; set; }
         
         [MaxLength(20)]
         public string? BloodPressure { get; set; }
@@ -514,8 +524,23 @@ namespace MediCamp.Models.ViewModels
     // PHASE 6 — DOCTOR
     // ==========================================
 
+    public class DoctorMedicineOption
+    {
+        public int MasterMedicineId { get; set; }
+        public string BrandName { get; set; } = string.Empty;
+        public string GenericName { get; set; } = string.Empty;
+        public string DosageForm { get; set; } = string.Empty;
+        public string Strength { get; set; } = string.Empty;
+        public string Category { get; set; } = string.Empty;
+        public bool InCampInventory { get; set; }
+        public int AvailableStock { get; set; }
+    }
+
     public class DoctorQueueViewModel
     {
+        /// <summary>All active camps currently ongoing in the system.</summary>
+        public List<MediCamp.Models.Domain.Camp> OngoingCamps { get; set; } = new();
+
         /// <summary>All camps the Doctor has been approved for that are currently Ongoing.</summary>
         public List<MediCamp.Models.Domain.Camp> ApprovedCamps { get; set; } = new();
 
@@ -561,6 +586,7 @@ namespace MediCamp.Models.ViewModels
         // Camp context for medicine selection
         public int CampId { get; set; }
         public List<MediCamp.Models.Domain.CampInventory> CampInventory { get; set; } = new();
+        public List<DoctorMedicineOption> MedicineOptions { get; set; } = new();
 
         // Fields the doctor fills in
         [System.ComponentModel.DataAnnotations.MaxLength(250)]
@@ -588,11 +614,16 @@ namespace MediCamp.Models.ViewModels
 
     public class PharmacistDashboardViewModel
     {
+        /// <summary>All active camps currently ongoing in the system.</summary>
+        public List<MediCamp.Models.Domain.Camp> OngoingCamps { get; set; } = new();
         public List<MediCamp.Models.Domain.Camp> ApprovedCamps { get; set; } = new();
         public MediCamp.Models.Domain.Camp? ActiveCamp { get; set; }
+        public List<PrescriptionQueueItem> PendingPrescriptions { get; set; } = new();
         public int PendingPrescriptionsCount { get; set; }
         public int DispensedTodayCount { get; set; }
         public int LowStockItemsCount { get; set; }
+        public int OutOfStockItemsCount { get; set; }
+        public List<PharmacistInventoryItem> LowStockAlerts { get; set; } = new();
     }
 
     public class PrescriptionQueueViewModel
@@ -600,6 +631,10 @@ namespace MediCamp.Models.ViewModels
         public MediCamp.Models.Domain.Camp Camp { get; set; } = new();
         public List<PrescriptionQueueItem> PendingPrescriptions { get; set; } = new();
         public List<PrescriptionQueueItem> DispensedPrescriptions { get; set; } = new();
+        public string Filter { get; set; } = "Pending"; // "Pending" | "Dispensed" | "All"
+        public string? PatientIdSearch { get; set; }
+        public int PendingCount => PendingPrescriptions.Count;
+        public int DispensedCount => DispensedPrescriptions.Count;
     }
 
     public class PrescriptionQueueItem
@@ -629,6 +664,7 @@ namespace MediCamp.Models.ViewModels
         public int AvailableStock { get; set; }
         public int QuantityToDispense { get; set; }
         public int? SubstituteMedicineId { get; set; }
+        public bool InCampInventory { get; set; } = true;
         public bool IsDispensed { get; set; }
     }
 
@@ -857,4 +893,256 @@ namespace MediCamp.Models.ViewModels
         public ApplicationUser Patient { get; set; } = new();
         public bool AlreadyRegistered { get; set; }
     }
+
+    // ==========================================
+    // PHASE 8 — HOST REPORTS & FINANCIALS
+    // ==========================================
+
+    public class CampExpenseInputModel
+    {
+        [Required]
+        public int CampId { get; set; }
+
+        [Required(ErrorMessage = "Please select an expense category.")]
+        public string Category { get; set; } = "Medicines & Medical Supplies";
+
+        [Required(ErrorMessage = "Amount is required.")]
+        [Range(1, 10000000, ErrorMessage = "Expense amount must be greater than 0.")]
+        public decimal Amount { get; set; }
+
+        [MaxLength(500)]
+        public string? Description { get; set; }
+
+        public DateTime ExpenseDate { get; set; } = DateTime.UtcNow;
+    }
+
+    public class CategoryExpenseItem
+    {
+        public string Category { get; set; } = string.Empty;
+        public decimal AllocatedBudget { get; set; }
+        public decimal ActualSpent { get; set; }
+        public decimal Variance => AllocatedBudget - ActualSpent;
+        public double PercentageOfTotalSpent { get; set; }
+        public string ColorClass { get; set; } = "text-primary";
+    }
+
+    public class HostFinancialReportViewModel
+    {
+        public decimal TotalBudget { get; set; }
+        public decimal TotalSpent { get; set; }
+        public decimal RemainingBudget => TotalBudget - TotalSpent;
+        public double UtilizationPercentage => TotalBudget > 0 ? (double)(TotalSpent / TotalBudget) * 100 : 0;
+        public int TotalPatientsServed { get; set; }
+        public decimal CostPerPatient => TotalPatientsServed > 0 ? TotalSpent / TotalPatientsServed : 0;
+        
+        public List<CategoryExpenseItem> CategoryBreakdown { get; set; } = new();
+        public List<CampExpense> ExpenseLogs { get; set; } = new();
+        public CampExpenseInputModel NewExpenseInput { get; set; } = new();
+    }
+
+    public class DoctorPerformanceItem
+    {
+        public string DoctorId { get; set; } = string.Empty;
+        public string DoctorName { get; set; } = string.Empty;
+        public string Specialization { get; set; } = string.Empty;
+        public string BMDCRegNo { get; set; } = string.Empty;
+        public int CampsAttended { get; set; }
+        public int PatientsConsulted { get; set; }
+        public int PrescriptionsIssued { get; set; }
+        public int ReferralsMade { get; set; }
+        public double ReferralRate => PatientsConsulted > 0 ? (double)ReferralsMade / PatientsConsulted * 100 : 0;
+    }
+
+    public class VolunteerPerformanceItem
+    {
+        public string VolunteerId { get; set; } = string.Empty;
+        public string VolunteerName { get; set; } = string.Empty;
+        public string District { get; set; } = string.Empty;
+        public int TriageRecordsLogged { get; set; }
+        public int FollowUpsAssigned { get; set; }
+        public int FollowUpsCompleted { get; set; }
+        public double FollowUpCompletionRate => FollowUpsAssigned > 0 ? (double)FollowUpsCompleted / FollowUpsAssigned * 100 : 0;
+    }
+
+    public class PharmacistPerformanceItem
+    {
+        public string PharmacistId { get; set; } = string.Empty;
+        public string PharmacistName { get; set; } = string.Empty;
+        public int PrescriptionsDispensed { get; set; }
+        public int TotalMedicineUnitsDispensed { get; set; }
+    }
+
+    public class HostStaffPerformanceReportViewModel
+    {
+        public List<DoctorPerformanceItem> DoctorStats { get; set; } = new();
+        public List<VolunteerPerformanceItem> VolunteerStats { get; set; } = new();
+        public List<PharmacistPerformanceItem> PharmacistStats { get; set; } = new();
+    }
+
+    public class DemographicStatItem
+    {
+        public string Label { get; set; } = string.Empty;
+        public int Count { get; set; }
+        public double Percentage { get; set; }
+    }
+
+    public class HostDemographicsReportViewModel
+    {
+        public int TotalPatients { get; set; }
+        public List<DemographicStatItem> DistrictDistribution { get; set; } = new();
+        public List<DemographicStatItem> UpazilaDistribution { get; set; } = new();
+        public List<DemographicStatItem> AgeDistribution { get; set; } = new();
+        public List<DemographicStatItem> GenderDistribution { get; set; } = new();
+        public List<DemographicStatItem> BloodGroupDistribution { get; set; } = new();
+        public List<DemographicStatItem> UrgencyDistribution { get; set; } = new();
+    }
+
+    public class HostReportsViewModel
+    {
+        public string ActiveTab { get; set; } = "financial"; // financial, staff, demographics
+        public int? SelectedCampId { get; set; }
+        public List<Camp> HostCamps { get; set; } = new();
+        public Camp? SelectedCamp { get; set; }
+
+        public HostFinancialReportViewModel FinancialReport { get; set; } = new();
+        public HostStaffPerformanceReportViewModel StaffReport { get; set; } = new();
+        public HostDemographicsReportViewModel DemographicsReport { get; set; } = new();
+    }
+
+    // ==========================================
+    // PHASE 8 — ADMIN GLOBAL REPORTS & DASHBOARD
+    // ==========================================
+
+    public class AdminDashboardViewModel
+    {
+        // High-level Metrics
+        public int TotalCampsCount { get; set; }
+        public int ActiveCampsCount { get; set; }
+        public int ScheduledCampsCount { get; set; }
+        public int CompletedCampsCount { get; set; }
+        public int PendingCampApprovalsCount { get; set; }
+        public int RejectedCampsCount { get; set; }
+
+        public int TotalPatientsRegistered { get; set; }
+        public int TotalPatientsServed { get; set; }
+
+        // User Metrics by Role
+        public int TotalUsersCount { get; set; }
+        public int TotalAdminsCount { get; set; }
+        public int TotalHostsCount { get; set; }
+        public int TotalDoctorsCount { get; set; }
+        public int TotalVolunteersCount { get; set; }
+        public int TotalPharmacistsCount { get; set; }
+        public int TotalPatientsCount { get; set; }
+
+        public int PendingHostApprovalsCount { get; set; }
+
+        // Operational Telemetry
+        public int TotalConsultationsCount { get; set; }
+        public int TotalPrescriptionsDispensed { get; set; }
+        public int TotalMedicineUnitsDispensed { get; set; }
+        public decimal TotalSystemBudget { get; set; }
+        public decimal TotalSystemExpenses { get; set; }
+
+        // Quick Lists
+        public List<Camp> ActiveAndUpcomingCamps { get; set; } = new();
+        public List<ApplicationUser> RecentPendingHosts { get; set; } = new();
+        public List<Consultation> RecentConsultations { get; set; } = new();
+    }
+
+    public class DiseaseStatItem
+    {
+        public string DiseaseName { get; set; } = string.Empty;
+        public int CaseCount { get; set; }
+        public double Percentage { get; set; }
+        public string TopAffectedDistrict { get; set; } = string.Empty;
+        public string CommonAgeGroup { get; set; } = string.Empty;
+        public string RiskLevel { get; set; } = "Moderate"; // Low, Moderate, High
+    }
+
+    public class SeasonalDiseaseItem
+    {
+        public string Season { get; set; } = string.Empty; // Summer, Monsoon, Winter
+        public string PrimaryDisease { get; set; } = string.Empty;
+        public int ReportedCases { get; set; }
+        public string ClinicalNote { get; set; } = string.Empty;
+    }
+
+    public class AdminDiseaseReportViewModel
+    {
+        public int TotalDiagnosesLogged { get; set; }
+        public List<DiseaseStatItem> TopDiseases { get; set; } = new();
+        public List<SeasonalDiseaseItem> SeasonalTrends { get; set; } = new();
+        public List<DemographicStatItem> DistrictDiseaseBreakdown { get; set; } = new();
+    }
+
+    public class MedicineStockStatItem
+    {
+        public int MasterMedicineId { get; set; }
+        public string BrandName { get; set; } = string.Empty;
+        public string GenericName { get; set; } = string.Empty;
+        public string Category { get; set; } = string.Empty;
+        public string Strength { get; set; } = string.Empty;
+        public int TotalAllocated { get; set; }
+        public int TotalDispensed { get; set; }
+        public int RemainingStock => TotalAllocated - TotalDispensed;
+        public double UtilizationRate => TotalAllocated > 0 ? (double)TotalDispensed / TotalAllocated * 100 : 0;
+        public bool IsOutOfStock => RemainingStock <= 0;
+        public bool IsLowStock => RemainingStock > 0 && UtilizationRate >= 80;
+    }
+
+    public class CategoryMedicineUsageItem
+    {
+        public string Category { get; set; } = string.Empty;
+        public int TotalAllocated { get; set; }
+        public int TotalDispensed { get; set; }
+        public int RemainingStock => TotalAllocated - TotalDispensed;
+        public double UtilizationRate => TotalAllocated > 0 ? (double)TotalDispensed / TotalAllocated * 100 : 0;
+    }
+
+    public class AdminMedicineUsageReportViewModel
+    {
+        public int TotalMedicinesAllocated { get; set; }
+        public int TotalMedicinesDispensed { get; set; }
+        public int TotalRemainingStock => TotalMedicinesAllocated - TotalMedicinesDispensed;
+        public int OutOfStockCount { get; set; }
+        public int LowStockCount { get; set; }
+        public List<MedicineStockStatItem> MedicineStockList { get; set; } = new();
+        public List<CategoryMedicineUsageItem> CategoryUsageList { get; set; } = new();
+    }
+
+    public class AreaHierarchyItem
+    {
+        public string Division { get; set; } = string.Empty;
+        public string District { get; set; } = string.Empty;
+        public string Upazila { get; set; } = string.Empty;
+        public string Union { get; set; } = string.Empty;
+        public string Village { get; set; } = string.Empty;
+        public int CampsCount { get; set; }
+        public int PatientsServed { get; set; }
+        public string TopDisease { get; set; } = string.Empty;
+        public int DoctorsDeployed { get; set; }
+        public int MedicinesDispensed { get; set; }
+    }
+
+    public class AdminAreaReportViewModel
+    {
+        public string? SelectedDivision { get; set; }
+        public string? SelectedDistrict { get; set; }
+        public List<string> AvailableDivisions { get; set; } = new();
+        public List<string> AvailableDistricts { get; set; } = new();
+        public List<AreaHierarchyItem> AreaHierarchyData { get; set; } = new();
+        public int TotalDivisionsCovered => AreaHierarchyData.Select(a => a.Division).Distinct().Count();
+        public int TotalDistrictsCovered => AreaHierarchyData.Select(a => a.District).Distinct().Count();
+        public int TotalUpazilasCovered => AreaHierarchyData.Select(a => a.Upazila).Distinct().Count();
+    }
+
+    public class AdminGlobalReportsViewModel
+    {
+        public string ActiveTab { get; set; } = "disease"; // disease, medicine, area
+        public AdminDiseaseReportViewModel DiseaseReport { get; set; } = new();
+        public AdminMedicineUsageReportViewModel MedicineReport { get; set; } = new();
+        public AdminAreaReportViewModel AreaReport { get; set; } = new();
+    }
 }
+

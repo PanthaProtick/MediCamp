@@ -1,0 +1,324 @@
+@model AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Executive Dashboard - MediCamp";
+}
+
+<div class="container py-4">
+
+    <!-- Header Section -->
+    <div class="glass-card mb-4 p-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <span class="badge badge-role-admin"><i class="fa-solid fa-crown me-1"></i> System Administration</span>
+                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1">
+                        <i class="fa-solid fa-signal me-1"></i> Global Real-time Monitoring
+                    </span>
+                </div>
+                <h2 class="fw-bold text-dark mb-1">MediCamp Executive Control Center</h2>
+                <p class="text-secondary small mb-0">
+                    High-level operational metrics across all 64 districts, medical camps, field clinicians, and rural patients.
+                </p>
+            </div>
+
+            <!-- Quick Action Links -->
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <a asp-controller="Admin" asp-action="Reports" class="btn btn-sapphire btn-sm rounded-pill px-3 shadow-sm">
+                    <i class="fa-solid fa-chart-line me-1"></i> Global Analytics
+                </a>
+                <a asp-controller="Admin" asp-action="HostApprovals" class="btn btn-outline-warning btn-sm rounded-pill px-3 shadow-sm">
+                    <i class="fa-solid fa-building-circle-check me-1"></i> Host Approvals (@Model.PendingHostApprovalsCount)
+                </a>
+                <a asp-controller="Admin" asp-action="CampApprovals" class="btn btn-outline-danger btn-sm rounded-pill px-3 shadow-sm">
+                    <i class="fa-solid fa-tent-arrow-turn-left me-1"></i> Camp Approvals (@Model.PendingCampApprovalsCount)
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1. Top High-level Metric KPI Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="p-3.5 bg-white rounded-4 border shadow-sm h-100">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-secondary small fw-bold text-uppercase">Total Field Camps</span>
+                    <span class="badge bg-primary-subtle text-primary rounded-pill px-2.5 py-1">@Model.ActiveCampsCount Active</span>
+                </div>
+                <div class="d-flex align-items-baseline gap-2">
+                    <h2 class="fw-bold text-dark mb-0">@Model.TotalCampsCount</h2>
+                    <span class="text-muted small">(@Model.ScheduledCampsCount Scheduled)</span>
+                </div>
+                <div class="d-flex justify-content-between small text-secondary mt-2 pt-2 border-top">
+                    <span><i class="fa-solid fa-check text-success me-1"></i>@Model.CompletedCampsCount Completed</span>
+                    <span><i class="fa-solid fa-hourglass text-warning me-1"></i>@Model.PendingCampApprovalsCount Pending</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="p-3.5 bg-white rounded-4 border shadow-sm h-100">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-secondary small fw-bold text-uppercase">Patients Reached</span>
+                    <span class="badge bg-success-subtle text-success rounded-pill px-2.5 py-1"><i class="fa-solid fa-heart-pulse me-1"></i>Impact</span>
+                </div>
+                <div class="d-flex align-items-baseline gap-2">
+                    <h2 class="fw-bold text-teal mb-0">@Model.TotalPatientsServed.ToString("N0")</h2>
+                    <span class="text-muted small">Consulted</span>
+                </div>
+                <div class="d-flex justify-content-between small text-secondary mt-2 pt-2 border-top">
+                    <span><i class="fa-solid fa-id-card text-info me-1"></i>@Model.TotalPatientsRegistered Registered</span>
+                    <span><i class="fa-solid fa-stethoscope text-primary me-1"></i>@Model.TotalConsultationsCount Clinical Logs</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="p-3.5 bg-white rounded-4 border shadow-sm h-100">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-secondary small fw-bold text-uppercase">System User Base</span>
+                    <span class="badge bg-info-subtle text-info rounded-pill px-2.5 py-1">6 System Roles</span>
+                </div>
+                <div class="d-flex align-items-baseline gap-2">
+                    <h2 class="fw-bold text-primary mb-0">@Model.TotalUsersCount</h2>
+                    <span class="text-muted small">Registered Users</span>
+                </div>
+                <div class="d-flex justify-content-between small text-secondary mt-2 pt-2 border-top">
+                    <span><i class="fa-solid fa-user-doctor text-primary me-1"></i>@Model.TotalDoctorsCount Doctors</span>
+                    <span><i class="fa-solid fa-building text-warning me-1"></i>@Model.TotalHostsCount NGO Hosts</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="p-3.5 bg-white rounded-4 border shadow-sm h-100">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-secondary small fw-bold text-uppercase">Medicines Dispensed</span>
+                    <span class="badge bg-danger-subtle text-danger rounded-pill px-2.5 py-1"><i class="fa-solid fa-pills me-1"></i>Free Aid</span>
+                </div>
+                <div class="d-flex align-items-baseline gap-2">
+                    <h2 class="fw-bold text-success mb-0">@Model.TotalMedicineUnitsDispensed.ToString("N0")</h2>
+                    <span class="text-muted small">Units</span>
+                </div>
+                <div class="d-flex justify-content-between small text-secondary mt-2 pt-2 border-top">
+                    <span><i class="fa-solid fa-prescription text-info me-1"></i>@Model.TotalPrescriptionsDispensed Prescriptions</span>
+                    <span><i class="fa-solid fa-wallet text-secondary me-1"></i>৳@Model.TotalSystemExpenses.ToString("N0") Spent</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Users by Role & Operational Telemetry -->
+    <div class="row g-4 mb-4">
+        <!-- Users by Role breakdown -->
+        <div class="col-lg-5">
+            <div class="glass-card p-4 h-100 d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-dark mb-0"><i class="fa-solid fa-users-gear me-2 text-teal"></i> User Base by Role</h5>
+                    <a asp-controller="Admin" asp-action="UserManagement" class="btn btn-sm btn-link text-decoration-none p-0">Manage Users &rarr;</a>
+                </div>
+
+                <div class="flex-grow-1 d-flex align-items-center justify-content-center" style="min-height: 200px;">
+                    <canvas id="userRoleDonutChart" style="max-height: 200px;"></canvas>
+                </div>
+
+                <div class="row g-2 mt-3 text-center small">
+                    <div class="col-4 p-2 bg-light rounded-3">
+                        <span class="text-muted d-block">Patients</span>
+                        <strong class="text-danger fs-6">@Model.TotalPatientsCount</strong>
+                    </div>
+                    <div class="col-4 p-2 bg-light rounded-3">
+                        <span class="text-muted d-block">Doctors</span>
+                        <strong class="text-primary fs-6">@Model.TotalDoctorsCount</strong>
+                    </div>
+                    <div class="col-4 p-2 bg-light rounded-3">
+                        <span class="text-muted d-block">Volunteers</span>
+                        <strong class="text-warning fs-6">@Model.TotalVolunteersCount</strong>
+                    </div>
+                    <div class="col-4 p-2 bg-light rounded-3">
+                        <span class="text-muted d-block">Pharmacists</span>
+                        <strong class="text-info fs-6">@Model.TotalPharmacistsCount</strong>
+                    </div>
+                    <div class="col-4 p-2 bg-light rounded-3">
+                        <span class="text-muted d-block">NGO Hosts</span>
+                        <strong class="text-success fs-6">@Model.TotalHostsCount</strong>
+                    </div>
+                    <div class="col-4 p-2 bg-light rounded-3">
+                        <span class="text-muted d-block">Admins</span>
+                        <strong class="text-dark fs-6">@Model.TotalAdminsCount</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active & Upcoming Camps Live Feed -->
+        <div class="col-lg-7">
+            <div class="glass-card p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-dark mb-0"><i class="fa-solid fa-tent me-2 text-teal"></i> Active & Upcoming Medical Camps</h5>
+                    <a asp-controller="Admin" asp-action="CampApprovals" class="btn btn-sm btn-link text-decoration-none p-0">All Camps &rarr;</a>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr class="small text-uppercase text-secondary">
+                                <th>Camp Title / Host</th>
+                                <th>Location</th>
+                                <th>Dates</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-end">Budget</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var camp in Model.ActiveAndUpcomingCamps)
+                            {
+                                <tr>
+                                    <td>
+                                        <span class="fw-bold text-dark d-block">@camp.Title</span>
+                                        <span class="text-muted small"><i class="fa-solid fa-building me-1"></i>@(camp.Host?.OrganizationName ?? camp.Host?.FullName ?? "Unknown NGO")</span>
+                                    </td>
+                                    <td class="small">
+                                        <i class="fa-solid fa-location-dot me-1 text-teal"></i>@camp.Upazila, @camp.District
+                                    </td>
+                                    <td class="small text-secondary">
+                                        @camp.StartDate.ToString("dd MMM") - @camp.EndDate.ToString("dd MMM yyyy")
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge @(camp.Status == "Ongoing" ? "bg-success" : "bg-primary") px-2.5 py-1">
+                                            @camp.Status
+                                        </span>
+                                    </td>
+                                    <td class="text-end fw-bold text-dark">৳@camp.TotalBudget.ToString("N0")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Operational Telemetry & Pending Actions -->
+    <div class="row g-4">
+        <!-- Pending Approvals Action Card -->
+        <div class="col-lg-5">
+            <div class="glass-card p-4 h-100">
+                <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-clock-rotate-left me-2 text-warning"></i> Pending Admin Action Items</h5>
+                
+                @if (Model.PendingHostApprovalsCount > 0 || Model.PendingCampApprovalsCount > 0)
+                {
+                    <div class="d-flex flex-column gap-3">
+                        @if (Model.PendingHostApprovalsCount > 0)
+                        {
+                            <div class="p-3 rounded-3 bg-warning-subtle border border-warning-subtle d-flex align-items-center justify-content-between">
+                                <div>
+                                    <strong class="text-warning-emphasis d-block"><i class="fa-solid fa-building-circle-check me-1"></i> @Model.PendingHostApprovalsCount NGO Registration(s) Pending</strong>
+                                    <span class="small text-secondary">Awaiting verification of organization credentials.</span>
+                                </div>
+                                <a asp-controller="Admin" asp-action="HostApprovals" class="btn btn-warning btn-sm rounded-pill px-3 fw-semibold">Review</a>
+                            </div>
+                        }
+                        @if (Model.PendingCampApprovalsCount > 0)
+                        {
+                            <div class="p-3 rounded-3 bg-danger-subtle border border-danger-subtle d-flex align-items-center justify-content-between">
+                                <div>
+                                    <strong class="text-danger-emphasis d-block"><i class="fa-solid fa-tent-arrow-turn-left me-1"></i> @Model.PendingCampApprovalsCount Medical Camp(s) Pending</strong>
+                                    <span class="small text-secondary">Awaiting conflict analysis and date verification.</span>
+                                </div>
+                                <a asp-controller="Admin" asp-action="CampApprovals" class="btn btn-danger btn-sm rounded-pill px-3 fw-semibold">Review</a>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-4 text-muted">
+                        <i class="fa-solid fa-circle-check fs-2 mb-2 text-success"></i>
+                        <p class="mb-0">All pending approvals are up to date. No action required.</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Recent Clinical Diagnoses Stream -->
+        <div class="col-lg-7">
+            <div class="glass-card p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-dark mb-0"><i class="fa-solid fa-heart-pulse me-2 text-teal"></i> Real-time Clinical Consultations Feed</h5>
+                    <a asp-controller="Admin" asp-action="Reports" asp-route-tab="disease" class="btn btn-sm btn-link text-decoration-none p-0">Disease Analytics &rarr;</a>
+                </div>
+
+                @if (Model.RecentConsultations.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr class="small text-uppercase text-secondary">
+                                    <th>Patient</th>
+                                    <th>Attending Clinician</th>
+                                    <th>Primary Diagnosis</th>
+                                    <th class="text-end">Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var consult in Model.RecentConsultations)
+                                {
+                                    <tr>
+                                        <td>
+                                            <span class="fw-bold text-dark d-block">@(consult.TriageRecord?.Patient?.FullName ?? "Rural Patient")</span>
+                                            <span class="text-muted small">@(consult.TriageRecord?.Patient?.District ?? "Field Camp")</span>
+                                        </td>
+                                        <td class="small text-dark">
+                                            <i class="fa-solid fa-user-doctor me-1 text-teal"></i>@(consult.Doctor?.FullName ?? "Volunteer Doctor")
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-light text-primary border">@(consult.Diagnosis ?? "General Checkup")</span>
+                                        </td>
+                                        <td class="text-end small text-muted">
+                                            @consult.ConsultedAt.ToString("hh:mm tt, dd MMM")
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-4 text-muted">No clinical logs recorded recently.</div>
+                }
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const userCtx = document.getElementById('userRoleDonutChart');
+            if (userCtx) {
+                new Chart(userCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Patients', 'Doctors', 'Volunteers', 'Pharmacists', 'Hosts', 'Admins'],
+                        datasets: [{
+                            data: [@Model.TotalPatientsCount, @Model.TotalDoctorsCount, @Model.TotalVolunteersCount, @Model.TotalPharmacistsCount, @Model.TotalHostsCount, @Model.TotalAdminsCount],
+                            backgroundColor: ['#ef4444', '#3b82f6', '#f59e0b', '#06b6d4', '#10b981', '#1e293b'],
+                            borderWidth: 2,
+                            borderColor: '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'right', labels: { boxWidth: 10, font: { size: 11 } } }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+}

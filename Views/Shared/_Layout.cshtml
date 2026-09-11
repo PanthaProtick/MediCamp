@@ -77,6 +77,11 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
+                                    <a class="nav-link nav-link-custom @(ViewContext.RouteData.Values["Action"]?.ToString() == "Reports" && ViewContext.RouteData.Values["Controller"]?.ToString() == "Host" ? "active" : "")" asp-controller="Host" asp-action="Reports">
+                                        <i class="fa-solid fa-chart-pie me-1 text-champagne"></i> Host Reports
+                                    </a>
+                                </li>
+                                <li class="nav-item">
                                     <a class="nav-link nav-link-custom @(ViewContext.RouteData.Values["Action"]?.ToString() == "CreateCamp" && ViewContext.RouteData.Values["Controller"]?.ToString() == "Host" ? "active" : "")" asp-controller="Host" asp-action="CreateCamp">
                                         <i class="fa-solid fa-plus-circle me-1 text-champagne"></i> Create New Camp
                                     </a>
@@ -154,6 +159,16 @@
                             }
                             @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin"))
                             {
+                                <li class="nav-item">
+                                    <a class="nav-link nav-link-custom @(ViewContext.RouteData.Values["Action"]?.ToString() == "Dashboard" && ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" ? "active" : "")" asp-controller="Admin" asp-action="Dashboard">
+                                        <i class="fa-solid fa-gauge me-1 text-champagne"></i> Dashboard
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link nav-link-custom @(ViewContext.RouteData.Values["Action"]?.ToString() == "Reports" && ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" ? "active" : "")" asp-controller="Admin" asp-action="Reports">
+                                        <i class="fa-solid fa-chart-line me-1 text-champagne"></i> Global Reports
+                                    </a>
+                                </li>
                                 <li class="nav-item">
                                     <a class="nav-link nav-link-custom @(ViewContext.RouteData.Values["Action"]?.ToString() == "UserManagement" && ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" ? "active" : "")" asp-controller="Admin" asp-action="UserManagement">
                                         <i class="fa-solid fa-users-gear me-1 text-champagne"></i> User Management
