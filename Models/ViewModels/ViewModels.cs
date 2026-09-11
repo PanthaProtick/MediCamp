@@ -97,6 +97,59 @@ namespace MediCamp.Models.ViewModels
         public string ConfirmPassword { get; set; } = string.Empty;
     }
 
+    public class EditProfileViewModel
+    {
+        [Required]
+        [Display(Name = "Full Name")]
+        public string FullName { get; set; } = string.Empty;
+
+        [Required]
+        [Phone]
+        [Display(Name = "Phone Number")]
+        public string PhoneNumber { get; set; } = string.Empty;
+
+        [Display(Name = "National ID (NID)")]
+        public string? NID { get; set; }
+
+        [DataType(DataType.Date)]
+        [Display(Name = "Date of Birth")]
+        public DateTime? DateOfBirth { get; set; }
+
+        [Display(Name = "Gender")]
+        public string? Gender { get; set; }
+
+        [Display(Name = "Blood Group")]
+        public string? BloodGroup { get; set; }
+
+        [Display(Name = "District")]
+        public string? District { get; set; }
+
+        [Display(Name = "Upazila")]
+        public string? Upazila { get; set; }
+
+        [Display(Name = "Address")]
+        public string? Address { get; set; }
+
+        // Specific fields
+        [Display(Name = "Medical Specialization / Degrees")]
+        public string? MedicalSpecialization { get; set; }
+
+        [Display(Name = "BMDC Registration Number")]
+        public string? BMDCRegNo { get; set; }
+
+        [Display(Name = "Organization Name")]
+        public string? OrganizationName { get; set; }
+
+        [Display(Name = "Organization Type")]
+        public string? OrganizationType { get; set; }
+
+        [Display(Name = "Registration / License No")]
+        public string? OrganizationRegNo { get; set; }
+
+        [Display(Name = "Focal Person Contact")]
+        public string? FocalPersonContact { get; set; }
+    }
+
     public class RegisterPatientViewModel : RegisterViewModel
     {
         public RegisterPatientViewModel()

@@ -171,6 +171,42 @@ namespace MediCamp.Services
             return (true, "User registration successful.", newUser);
         }
 
+        public (bool Success, string Message) UpdateUserProfile(string userId, EditProfileViewModel model)
+        {
+            var user = _dbContext.Users.FirstOrDefault(u => u.Id == userId);
+            if (user == null)
+            {
+                return (false, "User not found.");
+            }
+
+            user.FullName = model.FullName;
+            user.PhoneNumber = model.PhoneNumber;
+            user.NID = model.NID;
+            user.DateOfBirth = model.DateOfBirth;
+            user.Gender = model.Gender;
+            user.BloodGroup = model.BloodGroup;
+            user.District = model.District;
+            user.Upazila = model.Upazila;
+            user.Address = model.Address;
+
+            if (user.Role == SystemRoles.Doctor)
+            {
+                user.MedicalSpecialization = model.MedicalSpecialization;
+                user.BMDCRegNo = model.BMDCRegNo;
+            }
+
+            if (user.Role == SystemRoles.Host)
+            {
+                user.OrganizationName = model.OrganizationName;
+                user.OrganizationType = model.OrganizationType;
+                user.OrganizationRegNo = model.OrganizationRegNo;
+                user.FocalPersonContact = model.FocalPersonContact;
+            }
+
+            _dbContext.SaveChanges();
+            return (true, "Profile updated successfully.");
+        }
+
         public (bool Success, string Message) CreateUser(CreateUserViewModel model)
         {
             if (_dbContext.Users.Any(u => u.Email.ToLower() == model.Email.ToLower()))

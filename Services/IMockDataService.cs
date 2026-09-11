@@ -15,6 +15,7 @@ namespace MediCamp.Services
         (bool Success, string Message, ApplicationUser? User) RegisterPatient(RegisterPatientViewModel model);
         (bool Success, string Message, ApplicationUser? User) RegisterHost(RegisterHostViewModel model);
         (bool Success, string Message, ApplicationUser? User) RegisterUser(RegisterViewModel model);
+        (bool Success, string Message) UpdateUserProfile(string userId, EditProfileViewModel model);
         (bool Success, string Message) CreateUser(CreateUserViewModel model);
         (bool Success, string Message) UpdateUserRole(string userId, string newRole);
         (bool Success, string Message) ToggleUserStatus(string userId);
