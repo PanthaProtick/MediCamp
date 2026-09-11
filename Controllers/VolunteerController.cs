@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MediCamp.Models;
 using MediCamp.Models.Domain;
 using MediCamp.Models.ViewModels;
@@ -12,10 +13,12 @@ namespace MediCamp.Controllers
     public class VolunteerController : Controller
     {
         private readonly IMockDataService _mockDataService;
+        private readonly MediCamp.Data.ApplicationDbContext _dbContext;
 
-        public VolunteerController(IMockDataService mockDataService)
+        public VolunteerController(IMockDataService mockDataService, MediCamp.Data.ApplicationDbContext dbContext)
         {
             _mockDataService = mockDataService;
+            _dbContext = dbContext;
         }
 
         private string? GetCurrentUserId()
@@ -24,19 +27,48 @@ namespace MediCamp.Controllers
         }
 
         [HttpGet]
-        public IActionResult Dashboard(string searchQuery)
+        public IActionResult Dashboard(int? activeCampId, string? searchQuery)
         {
             var userId = GetCurrentUserId();
             if (userId == null) return RedirectToAction("Login", "Account");
 
-            var patients = new List<ApplicationUser>();
-            if (!string.IsNullOrWhiteSpace(searchQuery))
+            var approvedCamps = _dbContext.CampVolunteerRequests
+                .Where(r => r.VolunteerId == userId && r.Status == "Approved")
+                .Select(r => r.Camp)
+                .Where(c => c != null && c.Status == "Ongoing")
+                .ToList();
+
+            Camp? activeCamp = null;
+            if (activeCampId.HasValue)
             {
-                patients = _mockDataService.GetFilteredUsers(searchQuery, SystemRoles.Patient, "All");
+                activeCamp = approvedCamps.FirstOrDefault(c => c.Id == activeCampId.Value);
+            }
+            else if (approvedCamps.Count == 1)
+            {
+                activeCamp = approvedCamps.First();
             }
 
-            ViewData["SearchQuery"] = searchQuery;
-            return View(patients);
+            var searchResults = new List<ApplicationUser>();
+            if (activeCamp != null && !string.IsNullOrWhiteSpace(searchQuery))
+            {
+                var lowerQuery = searchQuery.ToLower();
+                searchResults = _dbContext.Users
+                    .Where(u => u.Role == SystemRoles.Patient && u.IsActive && 
+                           (u.FullName.ToLower().Contains(lowerQuery) || 
+                            u.PhoneNumber.Contains(lowerQuery)))
+                    .Take(10)
+                    .ToList();
+            }
+
+            var model = new VolunteerDashboardViewModel
+            {
+                ApprovedCamps = approvedCamps!,
+                ActiveCamp = activeCamp,
+                SearchResults = searchResults,
+                SearchQuery = searchQuery
+            };
+
+            return View(model);
         }
 
         [HttpGet]
@@ -120,6 +152,133 @@ namespace MediCamp.Controllers
             
             ModelState.AddModelError(string.Empty, result.Message);
             return View(model);
+        }
+
+        // ==========================================
+        // TRIAGE
+        // ==========================================
+        [HttpGet]
+        public IActionResult Triage(int campId, string patientId)
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null) return RedirectToAction("Login", "Account");
+
+            var patient = _dbContext.Users.FirstOrDefault(u => u.Id == patientId && u.Role == SystemRoles.Patient);
+            if (patient == null)
+            {
+                TempData["ErrorMessage"] = "Patient not found.";
+                return RedirectToAction(nameof(Dashboard));
+            }
+
+            var model = new TriageFormViewModel
+            {
+                CampId = campId,
+                PatientId = patientId,
+                Patient = patient
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult SubmitTriage(TriageFormViewModel model)
+        {
+            var volunteerId = GetCurrentUserId();
+            if (volunteerId == null) return RedirectToAction("Login", "Account");
+
+            if (!ModelState.IsValid)
+            {
+                model.Patient = _dbContext.Users.FirstOrDefault(u => u.Id == model.PatientId);
+                return View("Triage", model);
+            }
+
+            var camp = _dbContext.Camps.FirstOrDefault(c => c.Id == model.CampId);
+            if (camp == null)
+            {
+                TempData["ErrorMessage"] = "Camp not found.";
+                return RedirectToAction(nameof(Dashboard));
+            }
+
+            var tokenNumber = _dbContext.TriageRecords.Count(t => t.CampId == model.CampId) + 1;
+
+            var record = new TriageRecord
+            {
+                CampId = model.CampId,
+                PatientId = model.PatientId,
+                VolunteerId = volunteerId,
+                BloodPressure = model.BloodPressure,
+                TemperatureF = model.TemperatureF,
+                WeightKg = model.WeightKg,
+                HeightCm = model.HeightCm,
+                BMI = model.BMI,
+                PresentingSymptoms = model.PresentingSymptoms,
+                UrgencyLevel = model.UrgencyLevel,
+                TokenNumber = tokenNumber,
+                IsSeenByDoctor = false
+            };
+
+            _dbContext.TriageRecords.Add(record);
+            
+            // Increment RegisteredPatientsCount
+            camp.RegisteredPatientsCount += 1;
+
+            _dbContext.SaveChanges();
+
+            TempData["SuccessMessage"] = $"Triage complete. Patient added to doctor queue with Token #{tokenNumber}.";
+            return RedirectToAction(nameof(Dashboard), new { activeCampId = model.CampId });
+        }
+
+        // ==========================================
+        // FOLLOW-UPS
+        // ==========================================
+        [HttpGet]
+        public IActionResult FollowUps(int campId)
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null) return RedirectToAction("Login", "Account");
+
+            var camp = _dbContext.Camps.FirstOrDefault(c => c.Id == campId);
+            if (camp == null)
+            {
+                return RedirectToAction(nameof(Dashboard));
+            }
+
+            // Get follow-ups for this camp
+            var followUps = _dbContext.PatientFollowUps
+                .Include(f => f.Patient)
+                .Where(f => f.CampId == campId)
+                .OrderBy(f => f.Status == "Pending" ? 0 : 1)
+                .ThenBy(f => f.ScheduledDate)
+                .ToList();
+
+            var model = new VolunteerFollowUpViewModel
+            {
+                Camp = camp,
+                FollowUps = followUps
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult UpdateFollowUpStatus(int followUpId, string status, string? notes, int campId)
+        {
+            var followUp = _dbContext.PatientFollowUps.FirstOrDefault(f => f.Id == followUpId);
+            if (followUp != null)
+            {
+                followUp.Status = status;
+                if (!string.IsNullOrWhiteSpace(notes))
+                {
+                    followUp.VolunteerNotes = notes;
+                }
+                followUp.LastContactedAt = DateTime.UtcNow;
+                _dbContext.SaveChanges();
+                TempData["SuccessMessage"] = "Follow-up status updated.";
+            }
+
+            return RedirectToAction(nameof(FollowUps), new { campId = campId });
         }
     }
 }

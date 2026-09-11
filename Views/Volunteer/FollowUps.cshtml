@@ -1,0 +1,106 @@
+@model MediCamp.Models.ViewModels.VolunteerFollowUpViewModel
+
+@{
+    ViewData["Title"] = "Follow-ups Management";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge badge-role-volunteer"><i class="fa-solid fa-phone-volume"></i> Field Operations</span>
+                <span class="text-muted small">Camp: @Model.Camp?.Title</span>
+            </div>
+            <h2 class="fw-bold text-dark mb-0">Follow-up Management</h2>
+        </div>
+        <a asp-action="Dashboard" asp-route-activeCampId="@Model.Camp?.Id" class="btn btn-light shadow-sm fw-bold rounded-pill px-4">
+            <i class="fa-solid fa-arrow-left me-2"></i>Back to Dashboard
+        </a>
+    </div>
+
+    @if (!Model.FollowUps.Any())
+    {
+        <div class="glass-card p-5 text-center my-4">
+            <i class="fa-solid fa-check-circle fs-1 text-success mb-3 opacity-50"></i>
+            <h4 class="fw-bold text-dark">All Caught Up!</h4>
+            <p class="text-muted">There are currently no patients requiring follow-up calls for this camp.</p>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var followup in Model.FollowUps)
+            {
+                var cardBorder = followup.Status == "Pending" ? "border-start border-4 border-warning" : (followup.Status == "Contacted" ? "border-start border-4 border-info" : "border-start border-4 border-success opacity-75");
+                var badgeClass = followup.Status == "Pending" ? "bg-warning text-dark" : (followup.Status == "Contacted" ? "bg-info text-white" : "bg-success text-white");
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="glass-card p-4 h-100 @cardBorder">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h5 class="fw-bold text-dark mb-0">@followup.Patient?.FullName</h5>
+                            <span class="badge @badgeClass rounded-pill">@followup.Status</span>
+                        </div>
+                        
+                        <p class="text-muted small mb-2"><i class="fa-solid fa-phone me-1 text-secondary"></i> <strong>@followup.Patient?.PhoneNumber</strong></p>
+                        
+                        <div class="bg-light p-2 rounded small text-muted mb-3">
+                            <strong>Reason for follow-up:</strong><br />
+                            @followup.Reason
+                        </div>
+
+                        <div class="small mb-3">
+                            <i class="fa-solid fa-calendar-day me-1 text-primary"></i> Scheduled: <strong>@followup.ScheduledDate.ToString("MMM dd, yyyy")</strong>
+                            @if (followup.LastContactedAt.HasValue)
+                            {
+                                <br />
+                                <text><i class="fa-solid fa-clock-rotate-left me-1 text-secondary mt-1"></i> Last called: <strong>@followup.LastContactedAt.Value.ToString("MMM dd - HH:mm")</strong></text>
+                            }
+                        </div>
+
+                        @if (followup.Status != "Resolved")
+                        {
+                            <button type="button" class="btn btn-sm btn-outline-teal w-100 fw-bold rounded-pill" data-bs-toggle="modal" data-bs-target="#followupModal-@followup.Id">
+                                <i class="fa-solid fa-phone me-1"></i> Log Contact
+                            </button>
+                        }
+                    </div>
+                </div>
+
+                <!-- Modal for Logging Contact -->
+                <div class="modal fade" id="followupModal-@followup.Id" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                            <div class="modal-header bg-light border-0 pt-4 px-4">
+                                <h5 class="modal-title fw-bold text-dark"><i class="fa-solid fa-headset text-teal me-2"></i>Log Contact Update</h5>
+                                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form asp-action="UpdateFollowUpStatus" method="post">
+                                <div class="modal-body px-4 py-3">
+                                    <input type="hidden" name="followUpId" value="@followup.Id" />
+                                    <input type="hidden" name="campId" value="@Model.Camp?.Id" />
+
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold small text-muted">Update Status</label>
+                                        <select name="status" class="form-select shadow-none bg-light" required>
+                                            <option value="Pending" selected="@(followup.Status == "Pending")">Pending</option>
+                                            <option value="Contacted" selected="@(followup.Status == "Contacted")">Contacted (Left Msg/In Progress)</option>
+                                            <option value="Resolved" selected="@(followup.Status == "Resolved")">Resolved (Completed/Recovered)</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold small text-muted">Call Notes</label>
+                                        <textarea name="notes" class="form-control shadow-none bg-light" rows="3" placeholder="Describe the outcome of the call...">@followup.VolunteerNotes</textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer border-0 pb-4 px-4">
+                                    <button type="button" class="btn btn-light rounded-pill fw-bold px-4" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-teal rounded-pill fw-bold px-4"><i class="fa-solid fa-save me-1"></i>Save Update</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

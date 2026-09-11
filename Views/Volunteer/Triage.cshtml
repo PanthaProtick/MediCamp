@@ -1,0 +1,146 @@
+@model MediCamp.Models.ViewModels.TriageFormViewModel
+
+@{
+    ViewData["Title"] = "Patient Triage";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge badge-role-volunteer"><i class="fa-solid fa-clipboard-list"></i> Triage Desk</span>
+                <span class="text-muted small">Camp ID: @Model.CampId</span>
+            </div>
+            <h2 class="fw-bold text-dark mb-0">Initial Assessment</h2>
+        </div>
+        <a asp-action="Dashboard" asp-route-activeCampId="@Model.CampId" class="btn btn-light shadow-sm fw-bold rounded-pill px-4">
+            <i class="fa-solid fa-arrow-left me-2"></i>Cancel
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-3">
+            <div class="glass-card p-4 sticky-top" style="top: 2rem;">
+                <h5 class="fw-bold mb-3">Patient Info</h5>
+                <div class="text-center mb-3">
+                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px; font-size: 2rem;">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                </div>
+                <h6 class="fw-bold text-center mb-0">@Model.Patient?.FullName</h6>
+                <p class="text-center text-muted small mb-3">@Model.Patient?.PhoneNumber</p>
+                <hr />
+                <div class="small mb-2"><strong>Blood Group:</strong> <span class="badge bg-danger float-end">@(Model.Patient?.BloodGroup ?? "Unknown")</span></div>
+                <div class="small mb-2"><strong>Gender:</strong> <span class="float-end">@(Model.Patient?.Gender ?? "N/A")</span></div>
+                <div class="small"><strong>DOB:</strong> <span class="float-end">@(Model.Patient?.DateOfBirth?.ToString("MMM dd, yyyy") ?? "N/A")</span></div>
+            </div>
+        </div>
+
+        <div class="col-lg-9">
+            <div class="glass-card p-4">
+                <form asp-action="SubmitTriage" method="post">
+                    <input type="hidden" asp-for="CampId" />
+                    <input type="hidden" asp-for="PatientId" />
+                    
+                    <h5 class="fw-bold text-dark border-bottom pb-2 mb-4"><i class="fa-solid fa-heart-pulse text-danger me-2"></i>Vital Signs</h5>
+                    
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small text-muted">Blood Pressure</label>
+                            <div class="input-group">
+                                <input asp-for="BloodPressure" type="text" class="form-control shadow-none bg-light" placeholder="120/80" />
+                                <span class="input-group-text bg-light">mmHg</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small text-muted">Temperature</label>
+                            <div class="input-group">
+                                <input asp-for="TemperatureF" type="number" step="0.1" class="form-control shadow-none bg-light" placeholder="98.6" />
+                                <span class="input-group-text bg-light">°F</span>
+                            </div>
+                            <span asp-validation-for="TemperatureF" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small text-muted">Weight</label>
+                            <div class="input-group">
+                                <input asp-for="WeightKg" id="WeightKg" type="number" step="0.1" class="form-control shadow-none bg-light" placeholder="70" />
+                                <span class="input-group-text bg-light">kg</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small text-muted">Height</label>
+                            <div class="input-group">
+                                <input asp-for="HeightCm" id="HeightCm" type="number" step="0.1" class="form-control shadow-none bg-light" placeholder="170" />
+                                <span class="input-group-text bg-light">cm</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small text-muted">BMI (Auto-calculated)</label>
+                            <div class="input-group">
+                                <input asp-for="BMI" id="BMI" type="number" step="0.01" class="form-control shadow-none bg-light fw-bold text-primary" readonly placeholder="-" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold text-dark border-bottom pb-2 mb-4 mt-5"><i class="fa-solid fa-stethoscope text-primary me-2"></i>Clinical Assessment</h5>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-muted">Presenting Symptoms</label>
+                        <textarea asp-for="PresentingSymptoms" class="form-control shadow-none bg-light" rows="3" placeholder="Describe the patient's primary complaints..."></textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-muted">Urgency Level</label>
+                        <div class="d-flex gap-3">
+                            <div class="form-check p-0">
+                                <input type="radio" class="btn-check" name="UrgencyLevel" id="urgencyNormal" value="Normal" checked>
+                                <label class="btn btn-outline-success fw-bold px-4" for="urgencyNormal">Normal</label>
+                            </div>
+                            <div class="form-check p-0">
+                                <input type="radio" class="btn-check" name="UrgencyLevel" id="urgencyUrgent" value="Urgent">
+                                <label class="btn btn-outline-warning fw-bold px-4" for="urgencyUrgent">Urgent</label>
+                            </div>
+                            <div class="form-check p-0">
+                                <input type="radio" class="btn-check" name="UrgencyLevel" id="urgencyEmergency" value="Emergency">
+                                <label class="btn btn-outline-danger fw-bold px-4" for="urgencyEmergency">Emergency</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end pt-3">
+                        <button type="submit" class="btn btn-warning btn-lg fw-bold px-5 shadow-sm rounded-pill text-dark">
+                            Generate Queue Token <i class="fa-solid fa-ticket ms-2"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const weightInput = document.getElementById('WeightKg');
+            const heightInput = document.getElementById('HeightCm');
+            const bmiInput = document.getElementById('BMI');
+
+            function calculateBMI() {
+                const weight = parseFloat(weightInput.value);
+                const height = parseFloat(heightInput.value);
+
+                if (!isNaN(weight) && !isNaN(height) && height > 0) {
+                    const heightMeters = height / 100;
+                    const bmi = weight / (heightMeters * heightMeters);
+                    bmiInput.value = bmi.toFixed(2);
+                } else {
+                    bmiInput.value = '';
+                }
+            }
+
+            weightInput.addEventListener('input', calculateBMI);
+            heightInput.addEventListener('input', calculateBMI);
+        });
+    </script>
+}

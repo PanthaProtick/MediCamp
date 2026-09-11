@@ -372,4 +372,38 @@ namespace MediCamp.Models.Domain
         public DateTime RequestedAt { get; set; } = DateTime.UtcNow;
         public DateTime? RespondedAt { get; set; }
     }
+    public class PatientFollowUp
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        public string PatientId { get; set; } = string.Empty;
+        [ForeignKey("PatientId")]
+        public ApplicationUser? Patient { get; set; }
+
+        [Required]
+        public int CampId { get; set; }
+        [ForeignKey("CampId")]
+        public Camp? Camp { get; set; }
+
+        public int? ConsultationId { get; set; }
+        [ForeignKey("ConsultationId")]
+        public Consultation? Consultation { get; set; }
+
+        [Required]
+        [MaxLength(500)]
+        public string Reason { get; set; } = string.Empty;
+
+        public DateTime ScheduledDate { get; set; }
+
+        [MaxLength(50)]
+        public string Status { get; set; } = "Pending"; // Pending, Contacted, Resolved
+
+        [MaxLength(1000)]
+        public string? VolunteerNotes { get; set; }
+        
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? LastContactedAt { get; set; }
+    }
 }

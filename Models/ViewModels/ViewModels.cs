@@ -464,4 +464,49 @@ namespace MediCamp.Models.ViewModels
         
         public string? ExpenseNotes { get; set; }
     }
+
+    public class VolunteerDashboardViewModel
+    {
+        public List<MediCamp.Models.Domain.Camp> ApprovedCamps { get; set; } = new();
+        public MediCamp.Models.Domain.Camp? ActiveCamp { get; set; }
+        public List<ApplicationUser> SearchResults { get; set; } = new();
+        public string? SearchQuery { get; set; }
+    }
+
+    public class TriageFormViewModel
+    {
+        [Required]
+        public int CampId { get; set; }
+        
+        [Required]
+        public string PatientId { get; set; } = string.Empty;
+        
+        public ApplicationUser? Patient { get; set; }
+        
+        [MaxLength(20)]
+        public string? BloodPressure { get; set; }
+        
+        [Range(90, 110, ErrorMessage = "Invalid Temperature")]
+        public double? TemperatureF { get; set; }
+        
+        [Range(2, 300, ErrorMessage = "Invalid Weight")]
+        public double? WeightKg { get; set; }
+        
+        [Range(30, 250, ErrorMessage = "Invalid Height")]
+        public double? HeightCm { get; set; }
+        
+        public double? BMI { get; set; }
+        
+        [MaxLength(500)]
+        public string? PresentingSymptoms { get; set; }
+        
+        [Required]
+        public string UrgencyLevel { get; set; } = "Normal";
+    }
+
+    public class VolunteerFollowUpViewModel
+    {
+        public MediCamp.Models.Domain.Camp? Camp { get; set; }
+        public List<MediCamp.Models.Domain.PatientFollowUp> FollowUps { get; set; } = new();
+    }
 }
