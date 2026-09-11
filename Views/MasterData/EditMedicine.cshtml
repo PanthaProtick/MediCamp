@@ -1,0 +1,47 @@
+@model MediCamp.Models.Domain.MasterMedicine
+@{ ViewData["Title"] = "Edit Medicine"; }
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header bg-primary text-white p-4">
+                    <h4 class="mb-0 fw-bold"><i class="fa-solid fa-pen me-2"></i>Edit Medicine</h4>
+                </div>
+                <div class="card-body p-4 p-md-5 bg-white">
+                    <form asp-action="EditMedicine" method="post">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="mb-3">
+                            <label asp-for="BrandName" class="form-label fw-bold"></label>
+                            <input asp-for="BrandName" class="form-control" required />
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="GenericName" class="form-label fw-bold"></label>
+                            <input asp-for="GenericName" class="form-control" required />
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="DosageForm" class="form-label fw-bold"></label>
+                            <input asp-for="DosageForm" class="form-control" required />
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Strength" class="form-label fw-bold"></label>
+                            <input asp-for="Strength" class="form-control" required />
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Category" class="form-label fw-bold"></label>
+                            <input asp-for="Category" class="form-control" required />
+                        </div>
+                        <div class="mb-4 form-check">
+                            <input asp-for="IsEssential" class="form-check-input" />
+                            <label asp-for="IsEssential" class="form-check-label fw-bold"></label>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Medicines" class="btn btn-light rounded-pill px-4">Cancel</a>
+                            <button type="submit" class="btn btn-champagne rounded-pill px-4 fw-bold">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

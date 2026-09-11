@@ -99,6 +99,8 @@ namespace MediCamp.Models.ViewModels
 
     public class EditProfileViewModel
     {
+        public string Id { get; set; } = string.Empty;
+
         [Required]
         [Display(Name = "Full Name")]
         public string FullName { get; set; } = string.Empty;
@@ -429,5 +431,12 @@ namespace MediCamp.Models.ViewModels
     {
         public List<CampPharmacistRequest> PendingRequests { get; set; } = new();
         public List<CampPharmacistRequest> RespondedRequests { get; set; } = new();
+    }
+
+    public class PatientHistoryViewModel
+    {
+        public MediCamp.Models.Domain.TriageRecord TriageRecord { get; set; } = new();
+        public MediCamp.Models.Domain.Consultation? Consultation { get; set; }
+        public List<MediCamp.Models.Domain.PrescriptionItem> PrescriptionItems { get; set; } = new();
     }
 }

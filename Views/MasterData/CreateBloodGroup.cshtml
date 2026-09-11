@@ -1,0 +1,30 @@
+@model MediCamp.Models.Domain.BloodGroupMaster
+@{ ViewData["Title"] = "Add Blood Group"; }
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header bg-danger text-white p-4">
+                    <h4 class="mb-0 fw-bold"><i class="fa-solid fa-droplet me-2"></i>Add Blood Group</h4>
+                </div>
+                <div class="card-body p-4 p-md-5 bg-white">
+                    <form asp-action="CreateBloodGroup" method="post">
+                        <div class="mb-3">
+                            <label asp-for="GroupName" class="form-label fw-bold"></label>
+                            <input asp-for="GroupName" class="form-control" required />
+                        </div>
+                        <div class="mb-4 form-check">
+                            <input asp-for="IsActive" class="form-check-input" />
+                            <label asp-for="IsActive" class="form-check-label fw-bold"></label>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="BloodGroups" class="btn btn-light rounded-pill px-4">Cancel</a>
+                            <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
