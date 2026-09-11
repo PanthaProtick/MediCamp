@@ -1,0 +1,248 @@
+@model MediCamp.Models.ViewModels.DoctorQueueViewModel
+
+@{
+    ViewData["Title"] = "Patient Queue — Doctor";
+}
+
+<style>
+    .urgency-emergency { border-left: 5px solid #dc3545 !important; }
+    .urgency-urgent    { border-left: 5px solid #ffc107 !important; }
+    .urgency-normal    { border-left: 5px solid #198754 !important; }
+
+    .queue-row:hover { background-color: #f8f9ff; transition: background .15s; }
+
+    .stat-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        padding: .35rem .85rem;
+        border-radius: 50px;
+        font-size: .82rem;
+        font-weight: 700;
+    }
+
+    .camp-selector-card {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        border-radius: 16px;
+        padding: 2rem;
+        color: #fff;
+    }
+</style>
+
+<div class="container py-4">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-2">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge badge-role-doctor"><i class="fa-solid fa-stethoscope"></i> Doctor Portal</span>
+                @if (Model.ActiveCamp != null)
+                {
+                    <span class="text-muted small">@Model.ActiveCamp.Title</span>
+                }
+            </div>
+            <h2 class="fw-bold text-dark mb-0">Patient Queue</h2>
+        </div>
+        <div class="d-flex gap-2 align-items-center flex-wrap">
+            <a asp-action="Requests" class="btn btn-outline-secondary btn-sm rounded-pill fw-bold">
+                <i class="fa-solid fa-envelope me-1"></i> Camp Invitations
+            </a>
+            @if (Model.ActiveCamp != null)
+            {
+                <a asp-action="Queue" asp-route-activeCampId="@Model.ActiveCamp.Id" class="btn btn-outline-primary btn-sm rounded-pill fw-bold">
+                    <i class="fa-solid fa-arrows-rotate me-1"></i> Refresh
+                </a>
+            }
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Camp Selector (if multiple) -->
+    @if (Model.ApprovedCamps.Count == 0)
+    {
+        <div class="text-center py-5">
+            <div class="mb-4" style="font-size:4rem; opacity:.3;">🏥</div>
+            <h4 class="fw-bold text-secondary">No Active Camps Assigned</h4>
+            <p class="text-muted">You don't have any ongoing camp assignments. Please wait for a host to send you an invitation and approve it.</p>
+            <a asp-action="Requests" class="btn btn-primary rounded-pill px-4 fw-bold">
+                <i class="fa-solid fa-envelope me-2"></i> View Invitations
+            </a>
+        </div>
+    }
+    else if (Model.ActiveCamp == null)
+    {
+        <!-- Multiple camps — let doctor pick one -->
+        <div class="camp-selector-card mb-5">
+            <h4 class="fw-bold mb-1"><i class="fa-solid fa-location-crosshairs me-2"></i>Select Your Active Camp</h4>
+            <p class="text-white-50 small mb-4">You are assigned to multiple ongoing camps. Choose one to view its patient queue.</p>
+            <div class="row g-3">
+                @foreach (var camp in Model.ApprovedCamps)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <a asp-action="Queue" asp-route-activeCampId="@camp.Id"
+                           class="text-decoration-none">
+                            <div class="bg-white text-dark rounded-3 p-3 h-100 shadow-sm hover-lift">
+                                <div class="fw-bold mb-1">@camp.Title</div>
+                                <div class="small text-muted mb-2">
+                                    <i class="fa-solid fa-location-dot me-1 text-danger"></i>@camp.Upazila, @camp.District
+                                </div>
+                                <div class="small text-muted">
+                                    <i class="fa-solid fa-calendar me-1 text-primary"></i>@camp.StartDate.ToString("MMM dd") – @camp.EndDate.ToString("MMM dd, yyyy")
+                                </div>
+                                <div class="mt-2">
+                                    <span class="badge bg-success">Ongoing</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Active camp chosen — show queue -->
+        @if (Model.ApprovedCamps.Count > 1)
+        {
+            <div class="mb-3">
+                <span class="text-muted small me-2">Switch camp:</span>
+                @foreach (var c in Model.ApprovedCamps)
+                {
+                    <a asp-action="Queue" asp-route-activeCampId="@c.Id"
+                       class="btn btn-sm @(c.Id == Model.ActiveCamp.Id ? "btn-primary" : "btn-outline-secondary") rounded-pill me-1 fw-bold">
+                        @c.Title
+                    </a>
+                }
+            </div>
+        }
+
+        <!-- Queue Stats -->
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-md-3">
+                <div class="glass-card p-3 text-center">
+                    <div class="fw-black fs-2 text-dark">@Model.Queue.Count</div>
+                    <div class="text-muted small fw-bold">Waiting</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="glass-card p-3 text-center">
+                    <div class="fw-black fs-2 text-danger">@Model.EmergencyCount</div>
+                    <div class="text-muted small fw-bold">Emergency</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="glass-card p-3 text-center">
+                    <div class="fw-black fs-2 text-warning">@Model.UrgentCount</div>
+                    <div class="text-muted small fw-bold">Urgent</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="glass-card p-3 text-center">
+                    <div class="fw-black fs-2 text-success">@Model.NormalCount</div>
+                    <div class="text-muted small fw-bold">Normal</div>
+                </div>
+            </div>
+        </div>
+
+        @if (!Model.Queue.Any())
+        {
+            <div class="glass-card text-center py-5">
+                <div class="mb-3" style="font-size:3.5rem;">✅</div>
+                <h4 class="fw-bold text-success">Queue is Clear!</h4>
+                <p class="text-muted">All triaged patients have been seen. Great work!</p>
+                <a asp-action="Queue" asp-route-activeCampId="@Model.ActiveCamp.Id"
+                   class="btn btn-outline-primary rounded-pill px-4 fw-bold">
+                    <i class="fa-solid fa-arrows-rotate me-2"></i> Refresh
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="glass-card p-0 overflow-hidden">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th class="ps-4" style="width:80px">Token</th>
+                                <th>Patient</th>
+                                <th>Urgency</th>
+                                <th>Presenting Symptoms</th>
+                                <th>Vitals</th>
+                                <th>Triaged At</th>
+                                <th class="pe-4 text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var t in Model.Queue)
+                            {
+                                var urgencyClass = t.UrgencyLevel switch
+                                {
+                                    "Emergency" => "urgency-emergency",
+                                    "Urgent"    => "urgency-urgent",
+                                    _           => "urgency-normal"
+                                };
+                                var badgeClass = t.UrgencyLevel switch
+                                {
+                                    "Emergency" => "bg-danger",
+                                    "Urgent"    => "bg-warning text-dark",
+                                    _           => "bg-success"
+                                };
+                                <tr class="queue-row @urgencyClass">
+                                    <td class="ps-4">
+                                        <span class="fw-black fs-5 text-primary">#@t.TokenNumber</span>
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold text-dark">@t.Patient?.FullName</div>
+                                        <div class="small text-muted">@t.Patient?.Gender &bull; @(t.Patient?.DateOfBirth.HasValue == true ? (DateTime.Today.Year - t.Patient.DateOfBirth!.Value.Year) + " yrs" : "Age N/A")</div>
+                                    </td>
+                                    <td>
+                                        <span class="badge @badgeClass fw-bold">
+                                            @if (t.UrgencyLevel == "Emergency") { <i class="fa-solid fa-triangle-exclamation me-1"></i> }
+                                            else if (t.UrgencyLevel == "Urgent") { <i class="fa-solid fa-circle-exclamation me-1"></i> }
+                                            @t.UrgencyLevel
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="small" style="max-width:220px;">
+                                            @(string.IsNullOrWhiteSpace(t.PresentingSymptoms) ? "—" : t.PresentingSymptoms)
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="small text-muted">
+                                            @if (t.BloodPressure != null) { <span><i class="fa-solid fa-heart-pulse me-1 text-danger"></i>@t.BloodPressure mmHg<br /></span> }
+                                            @if (t.TemperatureF.HasValue) { <span><i class="fa-solid fa-thermometer me-1 text-warning"></i>@t.TemperatureF.Value.ToString("F1")°F<br /></span> }
+                                            @if (t.BMI.HasValue) { <span><i class="fa-solid fa-weight-scale me-1 text-info"></i>BMI @t.BMI.Value.ToString("F1")</span> }
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="small text-muted">@t.RecordedAt.ToLocalTime().ToString("hh:mm tt")</div>
+                                    </td>
+                                    <td class="pe-4 text-end">
+                                        <a asp-action="Consult" asp-route-triageId="@t.Id"
+                                           class="btn btn-sm btn-primary rounded-pill fw-bold px-3">
+                                            <i class="fa-solid fa-stethoscope me-1"></i> Consult
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+    }
+</div>

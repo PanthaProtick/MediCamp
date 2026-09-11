@@ -1,0 +1,265 @@
+@model MediCamp.Models.ViewModels.DispensingViewModel
+
+@{
+    ViewData["Title"] = $"Dispense — Token #{Model.TriageRecord?.TokenNumber}";
+}
+
+<style>
+    .dispense-item {
+        background: #fff;
+        border: 1.5px solid #e9ecef;
+        border-radius: 14px;
+        padding: 1.2rem 1.5rem;
+        margin-bottom: .75rem;
+        transition: border-color .2s;
+    }
+    .dispense-item:hover { border-color: #6610f2; }
+    .dispense-item.out-of-stock { border-color: #ffc107; background: #fffbf0; }
+    .stock-bar-bg {
+        height: 6px;
+        background: #e9ecef;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    .stock-bar-fill { height: 100%; border-radius: 10px; transition: width .4s; }
+</style>
+
+<div class="container py-4">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-2">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge" style="background:#6610f2;"><i class="fa-solid fa-pills"></i> Pharmacist</span>
+                <span class="text-muted small">Dispensing</span>
+            </div>
+            <h2 class="fw-bold text-dark mb-0">Dispense Prescription — Token #@Model.TriageRecord?.TokenNumber</h2>
+        </div>
+        <a asp-action="PrescriptionQueue" asp-route-campId="@Model.CampId"
+           class="btn btn-light shadow-sm fw-bold rounded-pill px-4">
+            <i class="fa-solid fa-arrow-left me-2"></i> Back to Queue
+        </a>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- Patient & Consultation Summary -->
+        <div class="col-lg-4">
+            <div class="glass-card p-4 mb-3">
+                <h6 class="fw-bold mb-3"><i class="fa-solid fa-user-injured text-primary me-2"></i>Patient</h6>
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                         style="width:48px;height:48px;font-size:1.2rem;">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold text-dark">@Model.Patient?.FullName</div>
+                        <div class="text-muted small">@Model.Patient?.PhoneNumber</div>
+                    </div>
+                </div>
+                <div class="d-flex gap-2 mb-2">
+                    <span class="badge bg-danger">@Model.Patient?.BloodGroup</span>
+                    <span class="badge bg-light text-dark">@Model.Patient?.Gender</span>
+                </div>
+            </div>
+
+            <div class="glass-card p-4">
+                <h6 class="fw-bold mb-3"><i class="fa-solid fa-stethoscope text-success me-2"></i>Consultation</h6>
+                <div class="mb-2">
+                    <div class="small text-muted fw-bold">Doctor</div>
+                    <div class="fw-bold">Dr. @Model.Doctor?.FullName</div>
+                </div>
+                @if (!string.IsNullOrWhiteSpace(Model.Consultation?.Diagnosis))
+                {
+                    <div class="mb-2">
+                        <div class="small text-muted fw-bold">Diagnosis</div>
+                        <div class="fw-bold text-dark">@Model.Consultation!.Diagnosis</div>
+                    </div>
+                }
+                @if (!string.IsNullOrWhiteSpace(Model.Consultation?.Advice))
+                {
+                    <div class="mb-2">
+                        <div class="small text-muted fw-bold">Patient Advice</div>
+                        <div class="small text-dark">@Model.Consultation!.Advice</div>
+                    </div>
+                }
+                <div class="small text-muted mt-3">
+                    <i class="fa-solid fa-clock me-1"></i>
+                    Consulted @Model.Consultation?.ConsultedAt.ToLocalTime().ToString("MMM dd, hh:mm tt")
+                </div>
+            </div>
+        </div>
+
+        <!-- Dispensing Form -->
+        <div class="col-lg-8">
+            @if (!Model.Items.Any())
+            {
+                <div class="glass-card text-center py-5">
+                    <i class="fa-solid fa-prescription text-muted fs-1 mb-3 opacity-50"></i>
+                    <h5 class="fw-bold text-secondary">No Medicine Items</h5>
+                    <p class="text-muted small">This prescription has no medicine items to dispense.</p>
+                </div>
+            }
+            else
+            {
+                <form asp-action="DispenseItems" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="prescriptionId" value="@Model.Prescription.Id" />
+                    <input type="hidden" name="campId" value="@Model.CampId" />
+
+                    <div class="glass-card p-4 mb-4">
+                        <h5 class="fw-bold border-bottom pb-2 mb-4">
+                            <i class="fa-solid fa-capsules text-primary me-2"></i>
+                            Medicines to Dispense
+                            <span class="badge bg-light text-dark fw-normal ms-2">@Model.Items.Count item@(Model.Items.Count != 1 ? "s" : "")</span>
+                        </h5>
+
+                        @for (int i = 0; i < Model.Items.Count; i++)
+                        {
+                            var item = Model.Items[i];
+                            bool outOfStock = item.AvailableStock == 0;
+                            double stockPct = item.QuantityPrescribed > 0
+                                ? Math.Min(100.0, (double)item.AvailableStock / item.QuantityPrescribed * 100)
+                                : 0;
+                            string barColor = stockPct > 50 ? "#198754" : (stockPct > 20 ? "#ffc107" : "#dc3545");
+
+                            <div class="dispense-item @(outOfStock ? "out-of-stock" : "")" id="item-row-@i">
+                                <input type="hidden" name="itemIds" value="@item.PrescriptionItemId" />
+
+                                <div class="d-flex justify-content-between align-items-start mb-2 flex-wrap gap-2">
+                                    <div>
+                                        <div class="fw-bold text-dark">@item.MedicineName</div>
+                                        <div class="small text-muted">
+                                            @item.Dosage &bull; @item.DurationDays day(s)
+                                            @if (!string.IsNullOrWhiteSpace(item.Instructions))
+                                            {
+                                                <span> &bull; @item.Instructions</span>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        @if (outOfStock)
+                                        {
+                                            <span class="badge bg-warning text-dark fw-bold" id="stock-badge-@i">
+                                                <i class="fa-solid fa-triangle-exclamation me-1"></i>Out of Stock
+                                            </span>
+                                        }
+                                        <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill py-0 px-2"
+                                                style="font-size:0.75rem;"
+                                                onclick="toggleSubstitute(@i)">
+                                            <i class="fa-solid fa-arrows-rotate me-1"></i>Substitute
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Stock bar -->
+                                <div class="d-flex justify-content-between small text-muted mb-1">
+                                    <span>Stock available: <strong class="text-dark" id="stock-avail-@i">@item.AvailableStock</strong></span>
+                                    <span>Prescribed: <strong class="text-dark">@item.QuantityPrescribed</strong></span>
+                                </div>
+                                <div class="stock-bar-bg mb-3">
+                                    <div class="stock-bar-fill" id="stock-fill-@i" style="width:@stockPct.ToString("F0")%;background:@barColor;"></div>
+                                </div>
+
+                                <!-- Substitution selector (initially hidden unless out of stock or toggled) -->
+                                <div id="substitute-box-@i" class="p-2 mb-3 rounded bg-light border @(outOfStock ? "" : "d-none")">
+                                    <label class="small fw-bold text-secondary mb-1">
+                                        <i class="fa-solid fa-right-left text-primary me-1"></i> Substitute with available medicine:
+                                    </label>
+                                    <select name="substituteMedicineIds"
+                                            id="sub-select-@i"
+                                            class="form-select form-select-sm shadow-none"
+                                            onchange="onSubstituteChange(@i, @item.QuantityPrescribed)">
+                                        <option value="@item.MasterMedicineId" data-stock="@item.AvailableStock" selected>
+                                            -- Original: @item.MedicineName (Avail: @item.AvailableStock) --
+                                        </option>
+                                        @foreach (var inv in Model.AvailableCampInventory.Where(ci => ci.MasterMedicineId != item.MasterMedicineId))
+                                        {
+                                            int rem = inv.QuantityAllocated - inv.QuantityDispensed;
+                                            <option value="@inv.MasterMedicineId" data-stock="@rem">
+                                                @inv.MasterMedicine?.BrandName (@inv.MasterMedicine?.GenericName) — @inv.MasterMedicine?.Strength [Stock: @rem]
+                                            </option>
+                                        }
+                                    </select>
+                                </div>
+
+                                <!-- Quantity input -->
+                                <div class="d-flex align-items-center gap-3">
+                                    <label class="fw-bold small text-muted flex-shrink-0">Qty to Dispense:</label>
+                                    <input type="number"
+                                           name="quantities"
+                                           id="qty-input-@i"
+                                           value="@item.QuantityToDispense"
+                                           min="0"
+                                           max="@item.AvailableStock"
+                                           class="form-control form-control-sm shadow-none bg-light fw-bold text-primary"
+                                           style="width:90px;"
+                                           @(outOfStock ? "disabled" : "") />
+                                    @if (item.QuantityToDispense < item.QuantityPrescribed)
+                                    {
+                                        <span class="badge bg-warning text-dark small" id="partial-badge-@i">
+                                            Partial (@item.QuantityPrescribed prescribed)
+                                        </span>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-3">
+                        <a asp-action="PrescriptionQueue" asp-route-campId="@Model.CampId"
+                           class="btn btn-light fw-bold rounded-pill px-4">Cancel</a>
+                        <button type="submit" class="btn btn-lg fw-bold rounded-pill px-5 shadow text-white"
+                                style="background:#6610f2;"
+                                onclick="return confirm('Mark this prescription as dispensed and deduct inventory?')">
+                            <i class="fa-solid fa-check me-2"></i> Confirm & Dispense
+                        </button>
+                    </div>
+                </form>
+            }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function toggleSubstitute(index) {
+            const box = document.getElementById(`substitute-box-${index}`);
+            if (box) {
+                box.classList.toggle('d-none');
+            }
+        }
+
+        function onSubstituteChange(index, qtyPrescribed) {
+            const select = document.getElementById(`sub-select-${index}`);
+            const selectedOpt = select.options[select.selectedIndex];
+            const stock = parseInt(selectedOpt.dataset.stock || "0", 10);
+            const input = document.getElementById(`qty-input-${index}`);
+            const availDisplay = document.getElementById(`stock-avail-${index}`);
+            const fill = document.getElementById(`stock-fill-${index}`);
+            const row = document.getElementById(`item-row-${index}`);
+            const badge = document.getElementById(`stock-badge-${index}`);
+
+            if (availDisplay) availDisplay.textContent = stock;
+            if (input) {
+                input.max = stock;
+                if (stock > 0) {
+                    input.removeAttribute('disabled');
+                    input.value = Math.min(qtyPrescribed, stock);
+                    if (row) row.classList.remove('out-of-stock');
+                    if (badge) badge.classList.add('d-none');
+                } else {
+                    input.setAttribute('disabled', 'disabled');
+                    input.value = 0;
+                    if (row) row.classList.add('out-of-stock');
+                    if (badge) badge.classList.remove('d-none');
+                }
+            }
+
+            if (fill) {
+                const pct = qtyPrescribed > 0 ? Math.min(100, Math.round((stock / qtyPrescribed) * 100)) : 0;
+                fill.style.width = pct + '%';
+                fill.style.background = pct > 50 ? '#198754' : (pct > 20 ? '#ffc107' : '#dc3545');
+            }
+        }
+    </script>
+}

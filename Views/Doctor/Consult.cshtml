@@ -1,0 +1,497 @@
+@model MediCamp.Models.ViewModels.ConsultationWorkspaceViewModel
+
+@{
+    ViewData["Title"] = $"Consult — {Model.Patient?.FullName}";
+}
+
+<style>
+    .history-timeline { border-left: 3px solid #dee2e6; padding-left: 1.2rem; }
+    .history-node {
+        position: relative;
+        padding-bottom: 1.5rem;
+    }
+    .history-node::before {
+        content: '';
+        position: absolute;
+        left: -1.55rem;
+        top: .35rem;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #0d6efd;
+        border: 2px solid #fff;
+        box-shadow: 0 0 0 3px #0d6efd33;
+    }
+    .rx-row { background: #f8f9ff; border-radius: 10px; padding: .75rem 1rem; margin-bottom: .5rem; border: 1px solid #e2e8ff; }
+    .rx-row .remove-btn { cursor: pointer; color: #dc3545; }
+    .vital-chip {
+        background: #f1f3ff;
+        border-radius: 8px;
+        padding: .4rem .8rem;
+        font-size: .8rem;
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        font-weight: 600;
+    }
+    .panel-left  { position: sticky; top: 1rem; max-height: calc(100vh - 80px); overflow-y: auto; }
+    .workspace-label { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #6c757d; margin-bottom: .3rem; }
+</style>
+
+<div class="container-fluid py-3 px-4">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge badge-role-doctor"><i class="fa-solid fa-stethoscope"></i> Consultation</span>
+                <span class="text-muted small">Token #@Model.TriageRecord.TokenNumber</span>
+                @{
+                    var urgBadge = Model.TriageRecord.UrgencyLevel switch {
+                        "Emergency" => "bg-danger",
+                        "Urgent"    => "bg-warning text-dark",
+                        _           => "bg-success"
+                    };
+                }
+                <span class="badge @urgBadge fw-bold">@Model.TriageRecord.UrgencyLevel</span>
+            </div>
+            <h2 class="fw-bold text-dark mb-0">Consultation Workspace</h2>
+        </div>
+        <a asp-action="Queue" asp-route-activeCampId="@Model.CampId"
+           class="btn btn-light shadow-sm fw-bold rounded-pill px-4">
+            <i class="fa-solid fa-arrow-left me-2"></i> Back to Queue
+        </a>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- ============================================================
+             LEFT PANEL: Patient Info + History
+             ============================================================ -->
+        <div class="col-xl-4 col-lg-5">
+            <div class="panel-left">
+
+                <!-- Patient Card -->
+                <div class="glass-card p-4 mb-3">
+                    <div class="d-flex gap-3 align-items-center mb-3">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                             style="width:56px;height:56px;font-size:1.4rem;">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold fs-5 text-dark">@Model.Patient?.FullName</div>
+                            <div class="text-muted small">@Model.Patient?.PhoneNumber</div>
+                        </div>
+                    </div>
+                    <div class="row g-2 text-center mb-3">
+                        <div class="col-4">
+                            <div class="bg-light rounded p-2">
+                                <div class="fw-bold text-dark">@(Model.Patient?.Gender ?? "N/A")</div>
+                                <div class="text-muted" style="font-size:.7rem;">Gender</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="bg-light rounded p-2">
+                                <div class="fw-bold text-dark">
+                                    @(Model.Patient?.DateOfBirth.HasValue == true
+                                        ? (DateTime.Today.Year - Model.Patient.DateOfBirth!.Value.Year).ToString()
+                                        : "N/A")
+                                </div>
+                                <div class="text-muted" style="font-size:.7rem;">Age</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="bg-danger text-white rounded p-2">
+                                <div class="fw-bold">@(Model.Patient?.BloodGroup ?? "?")</div>
+                                <div style="font-size:.7rem;">Blood</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="small text-muted">@Model.Patient?.District, @Model.Patient?.Upazila</div>
+                </div>
+
+                <!-- Current Vitals (from triage) -->
+                <div class="glass-card p-4 mb-3">
+                    <h6 class="fw-bold mb-3"><i class="fa-solid fa-heart-pulse text-danger me-2"></i>Current Vitals (Triage)</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        @if (Model.TriageRecord.BloodPressure != null)
+                        {
+                            <span class="vital-chip"><i class="fa-solid fa-droplet text-danger"></i> @Model.TriageRecord.BloodPressure mmHg</span>
+                        }
+                        @if (Model.TriageRecord.TemperatureF.HasValue)
+                        {
+                            <span class="vital-chip"><i class="fa-solid fa-thermometer text-warning"></i> @Model.TriageRecord.TemperatureF.Value.ToString("F1")°F</span>
+                        }
+                        @if (Model.TriageRecord.WeightKg.HasValue)
+                        {
+                            <span class="vital-chip"><i class="fa-solid fa-weight-scale text-info"></i> @Model.TriageRecord.WeightKg.Value.ToString("F1") kg</span>
+                        }
+                        @if (Model.TriageRecord.HeightCm.HasValue)
+                        {
+                            <span class="vital-chip"><i class="fa-solid fa-ruler-vertical text-secondary"></i> @Model.TriageRecord.HeightCm.Value.ToString("F0") cm</span>
+                        }
+                        @if (Model.TriageRecord.BMI.HasValue)
+                        {
+                            <span class="vital-chip"><i class="fa-solid fa-calculator text-primary"></i> BMI @Model.TriageRecord.BMI.Value.ToString("F1")</span>
+                        }
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(Model.TriageRecord.PresentingSymptoms))
+                    {
+                        <hr class="my-3">
+                        <div class="workspace-label">Presenting Symptoms</div>
+                        <div class="small text-dark">@Model.TriageRecord.PresentingSymptoms</div>
+                    }
+                </div>
+
+                <!-- Longitudinal History -->
+                <div class="glass-card p-4">
+                    <h6 class="fw-bold mb-3">
+                        <i class="fa-solid fa-clock-rotate-left text-secondary me-2"></i>
+                        Patient History
+                        <span class="badge bg-light text-dark ms-1 fw-normal">@Model.PastVisits.Count visits</span>
+                    </h6>
+
+                    @if (!Model.PastVisits.Any())
+                    {
+                        <div class="text-center py-3 text-muted small">
+                            <i class="fa-solid fa-user-plus me-1"></i> First visit — no prior history.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="history-timeline">
+                            @foreach (var visit in Model.PastVisits)
+                            {
+                                <div class="history-node">
+                                    <div class="d-flex justify-content-between align-items-start mb-1">
+                                        <div class="fw-bold small text-dark">@visit.CampTitle</div>
+                                        <div class="text-muted" style="font-size:.7rem;">@visit.Triage.RecordedAt.ToString("MMM dd, yyyy")</div>
+                                    </div>
+                                    @if (visit.Consultation != null)
+                                    {
+                                        @if (!string.IsNullOrWhiteSpace(visit.Consultation.Diagnosis))
+                                        {
+                                            <div class="small"><strong>Dx:</strong> @visit.Consultation.Diagnosis</div>
+                                        }
+                                        @if (!string.IsNullOrWhiteSpace(visit.Consultation.ClinicalNotes))
+                                        {
+                                            <div class="small text-muted">@visit.Consultation.ClinicalNotes</div>
+                                        }
+                                        @if (visit.PrescriptionItems.Any())
+                                        {
+                                            <div class="mt-2">
+                                                @foreach (var pi in visit.PrescriptionItems)
+                                                {
+                                                    <span class="badge bg-light text-dark border me-1 mb-1" style="font-size:.72rem;">
+                                                        @pi.MasterMedicine?.BrandName @pi.Dosage
+                                                    </span>
+                                                }
+                                            </div>
+                                        }
+                                        @if (visit.Referral != null)
+                                        {
+                                            <div class="small text-danger mt-1">
+                                                <i class="fa-solid fa-arrow-right-from-bracket me-1"></i>
+                                                Referred to @visit.Referral.ReferredHospital
+                                                <span class="badge @(visit.Referral.Urgency == "Urgent" ? "bg-danger" : "bg-secondary") ms-1" style="font-size:.68rem;">@visit.Referral.Urgency</span>
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div class="small text-muted fst-italic">No consultation recorded</div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ============================================================
+             RIGHT PANEL: Consultation Form
+             ============================================================ -->
+        <div class="col-xl-8 col-lg-7">
+            <form id="consultForm" asp-action="SubmitConsultation" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="triageRecordId" value="@Model.TriageRecord.Id" />
+                <input type="hidden" name="campId" value="@Model.CampId" />
+
+                <!-- Clinical Notes -->
+                <div class="glass-card p-4 mb-4">
+                    <h5 class="fw-bold border-bottom pb-2 mb-4">
+                        <i class="fa-solid fa-notes-medical text-primary me-2"></i>Clinical Assessment
+                    </h5>
+
+                    <div class="mb-3">
+                        <label class="workspace-label">Diagnosis</label>
+                        <input type="text" name="diagnosis" class="form-control bg-light shadow-none"
+                               placeholder="Primary diagnosis..." maxlength="250" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="workspace-label">Clinical Notes</label>
+                        <textarea name="clinicalNotes" class="form-control bg-light shadow-none" rows="3"
+                                  placeholder="Examination findings, observations..." maxlength="500"></textarea>
+                    </div>
+                    <div class="mb-0">
+                        <label class="workspace-label">Advice to Patient</label>
+                        <textarea name="advice" class="form-control bg-light shadow-none" rows="2"
+                                  placeholder="Diet, lifestyle advice, follow-up instructions..." maxlength="500"></textarea>
+                    </div>
+                </div>
+
+                <!-- Prescription Builder -->
+                <div class="glass-card p-4 mb-4">
+                    <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-4">
+                        <h5 class="fw-bold mb-0">
+                            <i class="fa-solid fa-prescription-bottle-medical text-success me-2"></i>Prescription Builder
+                        </h5>
+                        <button type="button" id="addMedicineBtn" class="btn btn-success btn-sm rounded-pill fw-bold px-3">
+                            <i class="fa-solid fa-plus me-1"></i> Add Medicine
+                        </button>
+                    </div>
+
+                    <!-- Medicine selector row (hidden until button clicked) -->
+                    <div id="medicineSelectorRow" class="bg-light rounded-3 p-3 mb-3 d-none">
+                        <div class="row g-2 align-items-end">
+                            <div class="col-md-5">
+                                <label class="workspace-label">Medicine (from camp stock)</label>
+                                <select id="medicineSelect" class="form-select shadow-none">
+                                    <option value="">— Select medicine —</option>
+                                     @foreach (var inv in Model.CampInventory)
+                                    {
+                                        int remaining = inv.QuantityAllocated - inv.QuantityDispensed;
+                                        if (remaining == 0)
+                                        {
+                                            <option value="@inv.MasterMedicineId"
+                                                    data-name="@inv.MasterMedicine?.BrandName (@inv.MasterMedicine?.GenericName)"
+                                                    data-form="@inv.MasterMedicine?.DosageForm"
+                                                    data-strength="@inv.MasterMedicine?.Strength"
+                                                    data-stock="@remaining"
+                                                    disabled="disabled">
+                                                @inv.MasterMedicine?.BrandName (@inv.MasterMedicine?.GenericName) — @inv.MasterMedicine?.Strength [Out of Stock]
+                                            </option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@inv.MasterMedicineId"
+                                                    data-name="@inv.MasterMedicine?.BrandName (@inv.MasterMedicine?.GenericName)"
+                                                    data-form="@inv.MasterMedicine?.DosageForm"
+                                                    data-strength="@inv.MasterMedicine?.Strength"
+                                                    data-stock="@remaining">
+                                                @inv.MasterMedicine?.BrandName (@inv.MasterMedicine?.GenericName) — @inv.MasterMedicine?.Strength [@remaining left]
+                                            </option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="workspace-label">Dosage</label>
+                                <input type="text" id="dosageInput" class="form-control shadow-none bg-white" placeholder="1+0+1" />
+                            </div>
+                            <div class="col-md-2">
+                                <label class="workspace-label">Duration (days)</label>
+                                <input type="number" id="durationInput" class="form-control shadow-none bg-white" value="5" min="1" max="365" />
+                            </div>
+                            <div class="col-md-2">
+                                <label class="workspace-label">Qty</label>
+                                <input type="number" id="qtyInput" class="form-control shadow-none bg-white" value="10" min="1" />
+                            </div>
+                            <div class="col-md-1">
+                                <button type="button" id="confirmAddBtn" class="btn btn-primary w-100 shadow-none">
+                                    <i class="fa-solid fa-check"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <label class="workspace-label">Special Instructions (optional)</label>
+                            <input type="text" id="instructionsInput" class="form-control shadow-none bg-white" placeholder="e.g. After meal, with water" />
+                        </div>
+                    </div>
+
+                    <!-- Prescription Items List -->
+                    <div id="prescriptionItems">
+                        <div id="emptyRxMsg" class="text-center py-3 text-muted small">
+                            <i class="fa-solid fa-prescription me-1"></i> No medicines added yet. Click "Add Medicine" to start.
+                        </div>
+                    </div>
+
+                    <!-- Hidden inputs for submission -->
+                    <div id="rxHiddenInputs"></div>
+                </div>
+
+                <!-- Referral Section -->
+                <div class="glass-card p-4 mb-4">
+                    <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-4">
+                        <h5 class="fw-bold mb-0">
+                            <i class="fa-solid fa-arrow-right-from-bracket text-warning me-2"></i>Hospital Referral
+                            <span class="badge bg-light text-muted fw-normal ms-2 small">Optional</span>
+                        </h5>
+                        <div class="form-check form-switch mb-0">
+                            <input class="form-check-input" type="checkbox" id="addReferralToggle" name="addReferral" value="true" />
+                            <label class="form-check-label fw-bold small" for="addReferralToggle">Add Referral</label>
+                        </div>
+                    </div>
+
+                    <div id="referralFields" class="d-none">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="workspace-label">Referred Hospital</label>
+                                <select name="referredHospital" class="form-select shadow-none bg-light">
+                                    <option value="">— Select hospital —</option>
+                                    @foreach (var h in Model.AvailableHospitals)
+                                    {
+                                        <option value="@h.Name">@h.Name @(string.IsNullOrEmpty(h.District) ? "" : $"— {h.District}")</option>
+                                    }
+                                    <option value="Other">Other / Not Listed</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="workspace-label">Referral Urgency</label>
+                                <div class="d-flex gap-2 mt-1">
+                                    <div class="form-check p-0">
+                                        <input type="radio" class="btn-check" name="referralUrgency" id="urgRoutine" value="Routine" checked />
+                                        <label class="btn btn-outline-secondary fw-bold px-4" for="urgRoutine">Routine</label>
+                                    </div>
+                                    <div class="form-check p-0">
+                                        <input type="radio" class="btn-check" name="referralUrgency" id="urgUrgent" value="Urgent" />
+                                        <label class="btn btn-outline-danger fw-bold px-4" for="urgUrgent">Urgent</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label class="workspace-label">Referral Reason</label>
+                                <textarea name="referralReason" class="form-control shadow-none bg-light" rows="2"
+                                          placeholder="Reason for referral, additional notes for receiving hospital..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="referralPlaceholder" class="text-center py-3 text-muted small">
+                        Toggle the switch above if this patient needs to be referred to a hospital.
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <div class="d-flex justify-content-end gap-3 pb-4">
+                    <a asp-action="Queue" asp-route-activeCampId="@Model.CampId"
+                       class="btn btn-light fw-bold rounded-pill px-4">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary btn-lg fw-bold rounded-pill px-5 shadow">
+                        <i class="fa-solid fa-floppy-disk me-2"></i> Save Consultation
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // ── Referral toggle ──────────────────────────────────────────────
+        document.getElementById('addReferralToggle').addEventListener('change', function() {
+            document.getElementById('referralFields').classList.toggle('d-none', !this.checked);
+            document.getElementById('referralPlaceholder').classList.toggle('d-none', this.checked);
+        });
+
+        // ── Prescription builder ─────────────────────────────────────────
+        let rxItems = [];
+
+        document.getElementById('addMedicineBtn').addEventListener('click', function () {
+            document.getElementById('medicineSelectorRow').classList.remove('d-none');
+            this.classList.add('d-none');
+        });
+
+        document.getElementById('confirmAddBtn').addEventListener('click', function () {
+            const sel = document.getElementById('medicineSelect');
+            const medId = sel.value;
+            const medName = sel.options[sel.selectedIndex]?.dataset.name;
+            const dosage = document.getElementById('dosageInput').value.trim() || '1+0+1';
+            const duration = parseInt(document.getElementById('durationInput').value) || 5;
+            const qty = parseInt(document.getElementById('qtyInput').value) || 1;
+            const instructions = document.getElementById('instructionsInput').value.trim();
+            const stock = parseInt(sel.options[sel.selectedIndex]?.dataset.stock) || 0;
+
+            if (!medId || !medName) {
+                alert('Please select a medicine.');
+                return;
+            }
+
+            // Prevent duplicates
+            if (rxItems.find(i => i.medId === medId)) {
+                alert('This medicine is already in the prescription.');
+                return;
+            }
+
+            rxItems.push({ medId, medName, dosage, duration, qty, instructions, stock });
+            renderPrescription();
+            resetSelectorRow();
+        });
+
+        function renderPrescription() {
+            const container = document.getElementById('prescriptionItems');
+            const emptyMsg  = document.getElementById('emptyRxMsg');
+            const inputs    = document.getElementById('rxHiddenInputs');
+
+            container.innerHTML = '';
+            inputs.innerHTML    = '';
+
+            if (rxItems.length === 0) {
+                container.appendChild(emptyMsg);
+                emptyMsg.classList.remove('d-none');
+                return;
+            }
+            emptyMsg.classList.add('d-none');
+
+            rxItems.forEach((item, idx) => {
+                // Visible row
+                const row = document.createElement('div');
+                row.className = 'rx-row d-flex align-items-center gap-3';
+                row.innerHTML = `
+                    <div class="flex-grow-1">
+                        <div class="fw-bold small text-dark">${item.medName}</div>
+                        <div class="text-muted" style="font-size:.75rem;">
+                            ${item.dosage} &bull; ${item.duration} day(s) &bull; Qty: ${item.qty}
+                            ${item.instructions ? ' &bull; ' + item.instructions : ''}
+                            <span class="ms-2 text-info">[Stock: ${item.stock}]</span>
+                        </div>
+                    </div>
+                    <span class="remove-btn" data-idx="${idx}" title="Remove">
+                        <i class="fa-solid fa-xmark"></i>
+                    </span>`;
+                container.appendChild(row);
+
+                // Hidden inputs
+                inputs.innerHTML += `
+                    <input type="hidden" name="rxMedicineIds" value="${item.medId}" />
+                    <input type="hidden" name="rxDosages"     value="${item.dosage}" />
+                    <input type="hidden" name="rxDurations"   value="${item.duration}" />
+                    <input type="hidden" name="rxInstructions" value="${item.instructions}" />
+                    <input type="hidden" name="rxQuantities"  value="${item.qty}" />
+                `;
+            });
+
+            // Remove buttons
+            container.querySelectorAll('.remove-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    rxItems.splice(parseInt(this.dataset.idx), 1);
+                    renderPrescription();
+                });
+            });
+        }
+
+        function resetSelectorRow() {
+            document.getElementById('medicineSelect').value = '';
+            document.getElementById('dosageInput').value = '';
+            document.getElementById('durationInput').value = '5';
+            document.getElementById('qtyInput').value = '10';
+            document.getElementById('instructionsInput').value = '';
+            document.getElementById('medicineSelectorRow').classList.add('d-none');
+            document.getElementById('addMedicineBtn').classList.remove('d-none');
+        }
+    </script>
+}

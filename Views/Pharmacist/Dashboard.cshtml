@@ -1,0 +1,209 @@
+@model MediCamp.Models.ViewModels.PharmacistDashboardViewModel
+
+@{
+    ViewData["Title"] = "Pharmacist Dashboard";
+}
+
+<style>
+    .ph-hero {
+        background: linear-gradient(135deg, #3a0ca3 0%, #4cc9f0 100%);
+        border-radius: 20px;
+        padding: 2.5rem;
+        color: #fff;
+    }
+    .stat-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,.07);
+        border: 1px solid #f0f0f8;
+        transition: transform .2s;
+    }
+    .stat-card:hover { transform: translateY(-3px); }
+    .camp-pick-card {
+        border-radius: 14px;
+        border: 2px solid transparent;
+        transition: border-color .2s, box-shadow .2s;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+    }
+    .camp-pick-card:hover {
+        border-color: #6610f2;
+        box-shadow: 0 4px 20px rgba(102,16,242,.15);
+        color: inherit;
+    }
+</style>
+
+<div class="container py-4">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-2">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge" style="background:#6610f2;"><i class="fa-solid fa-pills"></i> Pharmacist Portal</span>
+            </div>
+            <h2 class="fw-bold text-dark mb-0">Pharmacy Dashboard</h2>
+        </div>
+        <a asp-action="Requests" class="btn btn-outline-secondary rounded-pill fw-bold btn-sm">
+            <i class="fa-solid fa-envelope me-1"></i> Camp Invitations
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (!Model.ApprovedCamps.Any())
+    {
+        <div class="text-center py-5">
+            <div class="mb-4" style="font-size:4rem; opacity:.3;">💊</div>
+            <h4 class="fw-bold text-secondary">No Active Camp Assignments</h4>
+            <p class="text-muted">You haven't been assigned to any ongoing camps yet.</p>
+            <a asp-action="Requests" class="btn rounded-pill fw-bold px-4 text-white" style="background:#6610f2;">
+                <i class="fa-solid fa-envelope me-2"></i> View Invitations
+            </a>
+        </div>
+    }
+    else if (Model.ActiveCamp == null)
+    {
+        <!-- Camp Selector -->
+        <div class="ph-hero mb-5">
+            <h4 class="fw-bold mb-1"><i class="fa-solid fa-location-crosshairs me-2"></i>Select Active Camp</h4>
+            <p class="mb-4" style="opacity:.7;">You are assigned to multiple ongoing camps. Choose one to manage its pharmacy.</p>
+            <div class="row g-3">
+                @foreach (var camp in Model.ApprovedCamps)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <a asp-action="Dashboard" asp-route-activeCampId="@camp.Id" class="camp-pick-card d-block bg-white rounded-3 p-3">
+                            <div class="fw-bold mb-1 text-dark">@camp.Title</div>
+                            <div class="small text-muted">
+                                <i class="fa-solid fa-location-dot me-1 text-danger"></i>@camp.Upazila, @camp.District
+                            </div>
+                            <div class="small text-muted">
+                                <i class="fa-solid fa-calendar me-1 text-primary"></i>@camp.StartDate.ToString("MMM dd") – @camp.EndDate.ToString("MMM dd, yyyy")
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Active Camp Dashboard -->
+        @if (Model.ApprovedCamps.Count > 1)
+        {
+            <div class="mb-3">
+                <span class="text-muted small me-2">Switch camp:</span>
+                @foreach (var c in Model.ApprovedCamps)
+                {
+                    <a asp-action="Dashboard" asp-route-activeCampId="@c.Id"
+                       class="btn btn-sm @(c.Id == Model.ActiveCamp.Id ? "text-white" : "btn-outline-secondary") rounded-pill me-1 fw-bold"
+                       style="@(c.Id == Model.ActiveCamp.Id ? "background:#6610f2;" : "")">
+                        @c.Title
+                    </a>
+                }
+            </div>
+        }
+
+        <!-- Hero Banner -->
+        <div class="ph-hero mb-4">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <h4 class="fw-bold mb-1">@Model.ActiveCamp.Title</h4>
+                    <div class="mb-1" style="opacity:.8;"><i class="fa-solid fa-location-dot me-1"></i>@Model.ActiveCamp.Venue, @Model.ActiveCamp.Upazila, @Model.ActiveCamp.District</div>
+                    <div style="opacity:.7; font-size:.88rem;"><i class="fa-solid fa-calendar me-1"></i>@Model.ActiveCamp.StartDate.ToString("MMM dd") – @Model.ActiveCamp.EndDate.ToString("MMM dd, yyyy")</div>
+                </div>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a asp-action="PrescriptionQueue" asp-route-campId="@Model.ActiveCamp.Id"
+                       class="btn btn-light fw-bold rounded-pill px-4">
+                        <i class="fa-solid fa-list-check me-2"></i> Prescription Queue
+                    </a>
+                    <a asp-action="Inventory" asp-route-campId="@Model.ActiveCamp.Id"
+                       class="btn btn-outline-light fw-bold rounded-pill px-4">
+                        <i class="fa-solid fa-boxes-stacked me-2"></i> Inventory
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="stat-card text-center">
+                    <div class="fw-black text-warning" style="font-size:2.5rem;">@Model.PendingPrescriptionsCount</div>
+                    <div class="text-muted fw-bold">Pending Prescriptions</div>
+                    <a asp-action="PrescriptionQueue" asp-route-campId="@Model.ActiveCamp.Id"
+                       class="btn btn-sm fw-bold mt-2 text-white rounded-pill" style="background:#6610f2;">
+                        View Queue
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card text-center">
+                    <div class="fw-black text-success" style="font-size:2.5rem;">@Model.DispensedTodayCount</div>
+                    <div class="text-muted fw-bold">Dispensed Today</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card text-center">
+                    <div class="fw-black @(Model.LowStockItemsCount > 0 ? "text-danger" : "text-success")" style="font-size:2.5rem;">
+                        @Model.LowStockItemsCount
+                    </div>
+                    <div class="text-muted fw-bold">Low-Stock Alerts</div>
+                    @if (Model.LowStockItemsCount > 0)
+                    {
+                        <a asp-action="Inventory" asp-route-campId="@Model.ActiveCamp.Id"
+                           class="btn btn-sm btn-outline-danger fw-bold mt-2 rounded-pill">
+                            <i class="fa-solid fa-triangle-exclamation me-1"></i> View
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick actions -->
+        <div class="row g-3">
+            <div class="col-md-6">
+                <a asp-action="PrescriptionQueue" asp-route-campId="@Model.ActiveCamp.Id"
+                   class="d-flex align-items-center gap-3 glass-card p-4 text-decoration-none text-dark">
+                    <div class="rounded-3 d-flex align-items-center justify-content-center text-white flex-shrink-0"
+                         style="width:52px;height:52px;background:#6610f2;font-size:1.4rem;">
+                        <i class="fa-solid fa-receipt"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold">Prescription Queue</div>
+                        <div class="small text-muted">Dispense medicines to patients</div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right ms-auto text-muted"></i>
+                </a>
+            </div>
+            <div class="col-md-6">
+                <a asp-action="Inventory" asp-route-campId="@Model.ActiveCamp.Id"
+                   class="d-flex align-items-center gap-3 glass-card p-4 text-decoration-none text-dark">
+                    <div class="rounded-3 d-flex align-items-center justify-content-center text-white flex-shrink-0"
+                         style="width:52px;height:52px;background:#0dcaf0;font-size:1.4rem;">
+                        <i class="fa-solid fa-boxes-stacked"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold">Inventory & Restock</div>
+                        <div class="small text-muted">Monitor stock levels, request restock</div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right ms-auto text-muted"></i>
+                </a>
+            </div>
+        </div>
+    }
+</div>

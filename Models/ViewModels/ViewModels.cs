@@ -509,4 +509,168 @@ namespace MediCamp.Models.ViewModels
         public MediCamp.Models.Domain.Camp? Camp { get; set; }
         public List<MediCamp.Models.Domain.PatientFollowUp> FollowUps { get; set; } = new();
     }
+
+    // ==========================================
+    // PHASE 6 — DOCTOR
+    // ==========================================
+
+    public class DoctorQueueViewModel
+    {
+        /// <summary>All camps the Doctor has been approved for that are currently Ongoing.</summary>
+        public List<MediCamp.Models.Domain.Camp> ApprovedCamps { get; set; } = new();
+
+        /// <summary>The camp the doctor selected for this session.</summary>
+        public MediCamp.Models.Domain.Camp? ActiveCamp { get; set; }
+
+        /// <summary>Triage records not yet seen by a doctor, sorted by urgency then token.</summary>
+        public List<MediCamp.Models.Domain.TriageRecord> Queue { get; set; } = new();
+
+        public int EmergencyCount => Queue.Count(t => t.UrgencyLevel == "Emergency");
+        public int UrgentCount    => Queue.Count(t => t.UrgencyLevel == "Urgent");
+        public int NormalCount    => Queue.Count(t => t.UrgencyLevel == "Normal");
+    }
+
+    public class ConsultationPrescriptionItemInput
+    {
+        public int MasterMedicineId { get; set; }
+        public string MedicineName { get; set; } = string.Empty;
+        public string Dosage { get; set; } = string.Empty;        // e.g. "1+0+1"
+        public int DurationDays { get; set; }
+        public string? Instructions { get; set; }
+        public int QuantityPrescribed { get; set; }
+    }
+
+    public class PatientVisitHistoryItem
+    {
+        public MediCamp.Models.Domain.TriageRecord Triage { get; set; } = new();
+        public MediCamp.Models.Domain.Consultation? Consultation { get; set; }
+        public List<MediCamp.Models.Domain.PrescriptionItem> PrescriptionItems { get; set; } = new();
+        public MediCamp.Models.Domain.Referral? Referral { get; set; }
+        public string CampTitle { get; set; } = string.Empty;
+    }
+
+    public class ConsultationWorkspaceViewModel
+    {
+        // Current triage being consulted
+        public MediCamp.Models.Domain.TriageRecord TriageRecord { get; set; } = new();
+        public ApplicationUser? Patient { get; set; }
+
+        // Patient's full longitudinal history (all past visits, excluding current)
+        public List<PatientVisitHistoryItem> PastVisits { get; set; } = new();
+
+        // Camp context for medicine selection
+        public int CampId { get; set; }
+        public List<MediCamp.Models.Domain.CampInventory> CampInventory { get; set; } = new();
+
+        // Fields the doctor fills in
+        [System.ComponentModel.DataAnnotations.MaxLength(250)]
+        public string? Diagnosis { get; set; }
+
+        [System.ComponentModel.DataAnnotations.MaxLength(500)]
+        public string? ClinicalNotes { get; set; }
+
+        [System.ComponentModel.DataAnnotations.MaxLength(500)]
+        public string? Advice { get; set; }
+
+        // Referral (optional)
+        public bool AddReferral { get; set; } = false;
+        public string? ReferredHospital { get; set; }
+        public string? ReferralReason { get; set; }
+        public string ReferralUrgency { get; set; } = "Routine";
+
+        // Available hospitals for referral dropdown
+        public List<MediCamp.Models.Domain.Hospital> AvailableHospitals { get; set; } = new();
+    }
+
+    // ==========================================
+    // PHASE 6 — PHARMACIST
+    // ==========================================
+
+    public class PharmacistDashboardViewModel
+    {
+        public List<MediCamp.Models.Domain.Camp> ApprovedCamps { get; set; } = new();
+        public MediCamp.Models.Domain.Camp? ActiveCamp { get; set; }
+        public int PendingPrescriptionsCount { get; set; }
+        public int DispensedTodayCount { get; set; }
+        public int LowStockItemsCount { get; set; }
+    }
+
+    public class PrescriptionQueueViewModel
+    {
+        public MediCamp.Models.Domain.Camp Camp { get; set; } = new();
+        public List<PrescriptionQueueItem> PendingPrescriptions { get; set; } = new();
+        public List<PrescriptionQueueItem> DispensedPrescriptions { get; set; } = new();
+    }
+
+    public class PrescriptionQueueItem
+    {
+        public int PrescriptionId { get; set; }
+        public int ConsultationId { get; set; }
+        public int TokenNumber { get; set; }
+        public string PatientName { get; set; } = string.Empty;
+        public string PatientId { get; set; } = string.Empty;
+        public string DoctorName { get; set; } = string.Empty;
+        public string? Diagnosis { get; set; }
+        public int ItemCount { get; set; }
+        public DateTime ConsultedAt { get; set; }
+        public bool IsDispensed { get; set; }
+        public DateTime? DispensedAt { get; set; }
+    }
+
+    public class DispensingItemInput
+    {
+        public int PrescriptionItemId { get; set; }
+        public int MasterMedicineId { get; set; }
+        public string MedicineName { get; set; } = string.Empty;
+        public string Dosage { get; set; } = string.Empty;
+        public int DurationDays { get; set; }
+        public string? Instructions { get; set; }
+        public int QuantityPrescribed { get; set; }
+        public int AvailableStock { get; set; }
+        public int QuantityToDispense { get; set; }
+        public int? SubstituteMedicineId { get; set; }
+        public bool IsDispensed { get; set; }
+    }
+
+    public class DispensingViewModel
+    {
+        public MediCamp.Models.Domain.Prescription Prescription { get; set; } = new();
+        public MediCamp.Models.Domain.Consultation? Consultation { get; set; }
+        public MediCamp.Models.Domain.TriageRecord? TriageRecord { get; set; }
+        public ApplicationUser? Patient { get; set; }
+        public ApplicationUser? Doctor { get; set; }
+        public int CampId { get; set; }
+        public List<DispensingItemInput> Items { get; set; } = new();
+        public List<MediCamp.Models.Domain.CampInventory> AvailableCampInventory { get; set; } = new();
+    }
+
+    public class PharmacistInventoryItem
+    {
+        public int InventoryId { get; set; }
+        public int MasterMedicineId { get; set; }
+        public string BrandName { get; set; } = string.Empty;
+        public string GenericName { get; set; } = string.Empty;
+        public string DosageForm { get; set; } = string.Empty;
+        public string Strength { get; set; } = string.Empty;
+        public string Category { get; set; } = string.Empty;
+        public int Allocated { get; set; }
+        public int Dispensed { get; set; }
+        public int Remaining => Allocated - Dispensed;
+        public double StockPercentage => Allocated > 0 ? (double)Remaining / Allocated * 100 : 0;
+        public bool IsLowStock => Remaining > 0 && StockPercentage < 15;
+        public bool IsOutOfStock => Remaining <= 0;
+    }
+
+    public class PharmacistInventoryViewModel
+    {
+        public MediCamp.Models.Domain.Camp Camp { get; set; } = new();
+        public List<PharmacistInventoryItem> Inventory { get; set; } = new();
+        public int LowStockCount => Inventory.Count(i => i.IsLowStock);
+        public int OutOfStockCount => Inventory.Count(i => i.IsOutOfStock);
+        public int TotalItems => Inventory.Count;
+
+        // For restock form
+        public int RestockMedicineId { get; set; }
+        public int RestockQuantity { get; set; }
+    }
 }

@@ -1,0 +1,177 @@
+@model MediCamp.Models.ViewModels.PrescriptionQueueViewModel
+
+@{
+    ViewData["Title"] = "Prescription Queue";
+}
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-2">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge" style="background:#6610f2;"><i class="fa-solid fa-pills"></i> Pharmacist</span>
+                <span class="text-muted small">@Model.Camp.Title</span>
+            </div>
+            <h2 class="fw-bold text-dark mb-0">Prescription Queue</h2>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-action="Dashboard" asp-route-activeCampId="@Model.Camp.Id"
+               class="btn btn-light shadow-sm fw-bold rounded-pill px-4">
+                <i class="fa-solid fa-arrow-left me-2"></i> Dashboard
+            </a>
+            <a asp-action="PrescriptionQueue" asp-route-campId="@Model.Camp.Id"
+               class="btn btn-outline-primary rounded-pill fw-bold px-3">
+                <i class="fa-solid fa-arrows-rotate me-1"></i> Refresh
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Tab navigation -->
+    <ul class="nav nav-pills mb-4" id="rxTab" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link active fw-bold" id="pending-tab" data-bs-toggle="tab"
+                    data-bs-target="#pendingTab" type="button">
+                Pending <span class="badge bg-warning text-dark ms-1">@Model.PendingPrescriptions.Count</span>
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link fw-bold text-secondary" id="done-tab" data-bs-toggle="tab"
+                    data-bs-target="#doneTab" type="button">
+                Dispensed <span class="badge bg-success ms-1">@Model.DispensedPrescriptions.Count</span>
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+
+        <!-- Pending Prescriptions -->
+        <div class="tab-pane fade show active" id="pendingTab">
+            @if (!Model.PendingPrescriptions.Any())
+            {
+                <div class="glass-card text-center py-5">
+                    <div class="mb-3" style="font-size:3rem;">✅</div>
+                    <h5 class="fw-bold text-success">All Caught Up!</h5>
+                    <p class="text-muted">No pending prescriptions in the queue right now.</p>
+                </div>
+            }
+            else
+            {
+                <div class="glass-card p-0 overflow-hidden">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th class="ps-4">Token</th>
+                                    <th>Patient</th>
+                                    <th>Doctor</th>
+                                    <th>Diagnosis</th>
+                                    <th>Items</th>
+                                    <th>Consulted</th>
+                                    <th class="pe-4 text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var rx in Model.PendingPrescriptions)
+                                {
+                                    <tr>
+                                        <td class="ps-4">
+                                            <span class="fw-black fs-5 text-primary">#@rx.TokenNumber</span>
+                                        </td>
+                                        <td>
+                                            <div class="fw-bold text-dark">@rx.PatientName</div>
+                                        </td>
+                                        <td>
+                                            <div class="small">Dr. @rx.DoctorName</div>
+                                        </td>
+                                        <td>
+                                            <div class="small text-muted" style="max-width:180px;">
+                                                @(string.IsNullOrWhiteSpace(rx.Diagnosis) ? "—" : rx.Diagnosis)
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-primary rounded-pill">@rx.ItemCount item@(rx.ItemCount != 1 ? "s" : "")</span>
+                                        </td>
+                                        <td>
+                                            <div class="small text-muted">@rx.ConsultedAt.ToLocalTime().ToString("hh:mm tt")</div>
+                                        </td>
+                                        <td class="pe-4 text-end">
+                                            <a asp-action="Dispense" asp-route-prescriptionId="@rx.PrescriptionId"
+                                               class="btn btn-sm fw-bold rounded-pill px-3 text-white"
+                                               style="background:#6610f2;">
+                                                <i class="fa-solid fa-pills me-1"></i> Dispense
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Dispensed Prescriptions -->
+        <div class="tab-pane fade" id="doneTab">
+            @if (!Model.DispensedPrescriptions.Any())
+            {
+                <div class="glass-card text-center py-5">
+                    <i class="fa-solid fa-clock-rotate-left text-muted fs-1 mb-3 opacity-50"></i>
+                    <h5 class="fw-bold text-secondary">No History Yet</h5>
+                    <p class="text-muted small">Dispensed prescriptions will appear here.</p>
+                </div>
+            }
+            else
+            {
+                <div class="glass-card p-0 overflow-hidden">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4">Token</th>
+                                    <th>Patient</th>
+                                    <th>Doctor</th>
+                                    <th>Items</th>
+                                    <th>Dispensed At</th>
+                                    <th class="pe-4 text-end">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var rx in Model.DispensedPrescriptions)
+                                {
+                                    <tr class="table-success-subtle">
+                                        <td class="ps-4">
+                                            <span class="fw-bold text-muted">#@rx.TokenNumber</span>
+                                        </td>
+                                        <td><div class="fw-bold">@rx.PatientName</div></td>
+                                        <td><div class="small">Dr. @rx.DoctorName</div></td>
+                                        <td><span class="badge bg-secondary rounded-pill">@rx.ItemCount</span></td>
+                                        <td>
+                                            <div class="small text-muted">
+                                                @rx.DispensedAt?.ToLocalTime().ToString("MMM dd, hh:mm tt")
+                                            </div>
+                                        </td>
+                                        <td class="pe-4 text-end">
+                                            <span class="badge bg-success"><i class="fa-solid fa-check me-1"></i>Dispensed</span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .nav-pills .nav-link.active { background-color: #6610f2; }
+</style>

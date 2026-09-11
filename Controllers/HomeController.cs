@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using System.Security.Claims;
+using MediCamp.Data;
 using MediCamp.Models;
 using MediCamp.Models.ViewModels;
 using MediCamp.Services;
@@ -10,11 +12,13 @@ namespace MediCamp.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IMockDataService _dataService;
+        private readonly ApplicationDbContext _dbContext;
 
-        public HomeController(ILogger<HomeController> logger, IMockDataService dataService)
+        public HomeController(ILogger<HomeController> logger, IMockDataService dataService, ApplicationDbContext dbContext)
         {
             _logger = logger;
             _dataService = dataService;
+            _dbContext = dbContext;
         }
 
         public IActionResult Index()
@@ -66,6 +70,30 @@ namespace MediCamp.Controllers
                 upazilasQuery = upazilasQuery.Where(c => c.District.Equals(district, StringComparison.OrdinalIgnoreCase));
             }
             ViewBag.Upazilas = upazilasQuery.Select(c => c.Upazila).Distinct().OrderBy(u => u).ToList();
+
+            // Populate user's status for camps if logged in
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!string.IsNullOrEmpty(userId))
+            {
+                if (User.IsInRole(SystemRoles.Pharmacist))
+                {
+                    ViewBag.UserCampStatus = _dbContext.CampPharmacistRequests
+                        .Where(r => r.PharmacistId == userId)
+                        .ToDictionary(r => r.CampId, r => r.Status);
+                }
+                else if (User.IsInRole(SystemRoles.Doctor))
+                {
+                    ViewBag.UserCampStatus = _dbContext.CampStaffRequests
+                        .Where(r => r.DoctorId == userId)
+                        .ToDictionary(r => r.CampId, r => r.Status);
+                }
+                else if (User.IsInRole(SystemRoles.Volunteer))
+                {
+                    ViewBag.UserCampStatus = _dbContext.CampVolunteerRequests
+                        .Where(r => r.VolunteerId == userId)
+                        .ToDictionary(r => r.CampId, r => r.Status);
+                }
+            }
 
             return View(camps);
         }
