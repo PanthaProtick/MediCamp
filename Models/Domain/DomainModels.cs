@@ -491,4 +491,33 @@ namespace MediCamp.Models.Domain
         [MaxLength(500)]
         public string? Notes { get; set; }
     }
+
+    public class CampExpense
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        public int CampId { get; set; }
+        [ForeignKey("CampId")]
+        public Camp? Camp { get; set; }
+
+        [Required]
+        [MaxLength(100)]
+        public string Category { get; set; } = "Medicines & Medical Supplies"; // Medicines & Medical Supplies, Doctor & Staff Honorarium, Logistics & Transportation, Venue, Tents & Facilities, Refreshments & Volunteers, Diagnostic Tools & Equipment, Miscellaneous
+
+        [Required]
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal Amount { get; set; }
+
+        [MaxLength(500)]
+        public string? Description { get; set; }
+
+        public DateTime ExpenseDate { get; set; } = DateTime.UtcNow;
+
+        public string? LoggedByUserId { get; set; }
+        [ForeignKey("LoggedByUserId")]
+        public ApplicationUser? LoggedByUser { get; set; }
+    }
 }
+

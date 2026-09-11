@@ -79,7 +79,15 @@
                             <i class="fa-solid fa-user"></i>
                         </div>
                         <div>
-                            <div class="fw-bold fs-5 text-dark">@Model.Patient?.FullName</div>
+                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                <span class="fw-bold fs-5 text-dark">@Model.Patient?.FullName</span>
+                                @if (!string.IsNullOrEmpty(Model.Patient?.PatientUniqueId))
+                                {
+                                    <span class="badge bg-primary rounded-pill font-monospace px-2 py-1">
+                                        <i class="fa-solid fa-id-badge me-1"></i>@Model.Patient.PatientUniqueId
+                                    </span>
+                                }
+                            </div>
                             <div class="text-muted small">@Model.Patient?.PhoneNumber</div>
                         </div>
                     </div>
@@ -107,7 +115,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="small text-muted">@Model.Patient?.District, @Model.Patient?.Upazila</div>
+                    <div class="small text-muted"><i class="fa-solid fa-location-dot text-danger me-1"></i>@Model.Patient?.District, @Model.Patient?.Upazila</div>
                 </div>
 
                 <!-- Current Vitals (from triage) -->
@@ -132,7 +140,12 @@
                         }
                         @if (Model.TriageRecord.BMI.HasValue)
                         {
-                            <span class="vital-chip"><i class="fa-solid fa-calculator text-primary"></i> BMI @Model.TriageRecord.BMI.Value.ToString("F1")</span>
+                            var bmiVal = Model.TriageRecord.BMI.Value;
+                            var (bmiCat, bmiClass) = bmiVal < 18.5 ? ("Underweight", "bg-warning text-dark") :
+                                                     bmiVal < 25.0 ? ("Normal", "bg-success text-white") :
+                                                     bmiVal < 30.0 ? ("Overweight", "bg-warning text-dark") :
+                                                                     ("Obese", "bg-danger text-white");
+                            <span class="vital-chip"><i class="fa-solid fa-calculator text-primary"></i> BMI @bmiVal.ToString("F1") <span class="badge @bmiClass ms-1 rounded-pill" style="font-size:0.68rem;">@bmiCat</span></span>
                         }
                     </div>
                     @if (!string.IsNullOrWhiteSpace(Model.TriageRecord.PresentingSymptoms))
@@ -254,36 +267,43 @@
                     </div>
 
                     <!-- Medicine selector row (hidden until button clicked) -->
-                    <div id="medicineSelectorRow" class="bg-light rounded-3 p-3 mb-3 d-none">
+                    <div id="medicineSelectorRow" class="bg-light rounded-3 p-3 mb-3 d-none border border-primary-subtle">
                         <div class="row g-2 align-items-end">
                             <div class="col-md-5">
-                                <label class="workspace-label">Medicine (from camp stock)</label>
+                                <label class="workspace-label">Medicine (Prescribe Any Master Medicine)</label>
                                 <select id="medicineSelect" class="form-select shadow-none">
-                                    <option value="">— Select medicine —</option>
-                                     @foreach (var inv in Model.CampInventory)
+                                    <option value="">— Select any medicine to prescribe —</option>
+                                    @if (Model.MedicineOptions.Any(m => m.InCampInventory && m.AvailableStock > 0))
                                     {
-                                        int remaining = inv.QuantityAllocated - inv.QuantityDispensed;
-                                        if (remaining == 0)
-                                        {
-                                            <option value="@inv.MasterMedicineId"
-                                                    data-name="@inv.MasterMedicine?.BrandName (@inv.MasterMedicine?.GenericName)"
-                                                    data-form="@inv.MasterMedicine?.DosageForm"
-                                                    data-strength="@inv.MasterMedicine?.Strength"
-                                                    data-stock="@remaining"
-                                                    disabled="disabled">
-                                                @inv.MasterMedicine?.BrandName (@inv.MasterMedicine?.GenericName) — @inv.MasterMedicine?.Strength [Out of Stock]
-                                            </option>
-                                        }
-                                        else
-                                        {
-                                            <option value="@inv.MasterMedicineId"
-                                                    data-name="@inv.MasterMedicine?.BrandName (@inv.MasterMedicine?.GenericName)"
-                                                    data-form="@inv.MasterMedicine?.DosageForm"
-                                                    data-strength="@inv.MasterMedicine?.Strength"
-                                                    data-stock="@remaining">
-                                                @inv.MasterMedicine?.BrandName (@inv.MasterMedicine?.GenericName) — @inv.MasterMedicine?.Strength [@remaining left]
-                                            </option>
-                                        }
+                                        <optgroup label="🟢 Available in Camp Dispensary Inventory">
+                                            @foreach (var med in Model.MedicineOptions.Where(m => m.InCampInventory && m.AvailableStock > 0))
+                                            {
+                                                <option value="@med.MasterMedicineId"
+                                                        data-name="@med.BrandName (@med.GenericName)"
+                                                        data-form="@med.DosageForm"
+                                                        data-strength="@med.Strength"
+                                                        data-in-camp="true"
+                                                        data-stock="@med.AvailableStock">
+                                                    @med.BrandName (@med.GenericName) — @med.Strength [Camp Stock: @med.AvailableStock]
+                                                </option>
+                                            }
+                                        </optgroup>
+                                    }
+                                    @if (Model.MedicineOptions.Any(m => !m.InCampInventory || m.AvailableStock == 0))
+                                    {
+                                        <optgroup label="⚪ Not in Camp Inventory / Out of Stock (External Purchase)">
+                                            @foreach (var med in Model.MedicineOptions.Where(m => !m.InCampInventory || m.AvailableStock == 0))
+                                            {
+                                                <option value="@med.MasterMedicineId"
+                                                        data-name="@med.BrandName (@med.GenericName)"
+                                                        data-form="@med.DosageForm"
+                                                        data-strength="@med.Strength"
+                                                        data-in-camp="false"
+                                                        data-stock="@med.AvailableStock">
+                                                    @med.BrandName (@med.GenericName) — @med.Strength [@(med.InCampInventory ? "Camp Stock: 0" : "External Pharmacy")]
+                                                </option>
+                                            }
+                                        </optgroup>
                                     }
                                 </select>
                             </div>
@@ -409,12 +429,14 @@
         document.getElementById('confirmAddBtn').addEventListener('click', function () {
             const sel = document.getElementById('medicineSelect');
             const medId = sel.value;
-            const medName = sel.options[sel.selectedIndex]?.dataset.name;
+            const selectedOpt = sel.options[sel.selectedIndex];
+            const medName = selectedOpt?.dataset.name;
             const dosage = document.getElementById('dosageInput').value.trim() || '1+0+1';
             const duration = parseInt(document.getElementById('durationInput').value) || 5;
             const qty = parseInt(document.getElementById('qtyInput').value) || 1;
             const instructions = document.getElementById('instructionsInput').value.trim();
-            const stock = parseInt(sel.options[sel.selectedIndex]?.dataset.stock) || 0;
+            const stock = parseInt(selectedOpt?.dataset.stock) || 0;
+            const inCamp = selectedOpt?.dataset.inCamp === 'true';
 
             if (!medId || !medName) {
                 alert('Please select a medicine.');
@@ -427,7 +449,7 @@
                 return;
             }
 
-            rxItems.push({ medId, medName, dosage, duration, qty, instructions, stock });
+            rxItems.push({ medId, medName, dosage, duration, qty, instructions, stock, inCamp });
             renderPrescription();
             resetSelectorRow();
         });
@@ -448,19 +470,26 @@
             emptyMsg.classList.add('d-none');
 
             rxItems.forEach((item, idx) => {
+                const isAvail = item.inCamp && item.stock > 0;
+                const badgeHtml = isAvail
+                    ? `<span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="fa-solid fa-circle-check me-1"></i>In Camp Stock (${item.stock} avail)</span>`
+                    : `<span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2 py-1"><i class="fa-solid fa-triangle-exclamation me-1"></i>External Purchase (Not in Camp Stock)</span>`;
+
                 // Visible row
                 const row = document.createElement('div');
-                row.className = 'rx-row d-flex align-items-center gap-3';
+                row.className = 'rx-row d-flex align-items-center gap-3 p-3 mb-2 rounded-3 border bg-white';
                 row.innerHTML = `
                     <div class="flex-grow-1">
-                        <div class="fw-bold small text-dark">${item.medName}</div>
-                        <div class="text-muted" style="font-size:.75rem;">
-                            ${item.dosage} &bull; ${item.duration} day(s) &bull; Qty: ${item.qty}
-                            ${item.instructions ? ' &bull; ' + item.instructions : ''}
-                            <span class="ms-2 text-info">[Stock: ${item.stock}]</span>
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-1">
+                            <span class="fw-bold text-dark fs-6">${item.medName}</span>
+                            ${badgeHtml}
+                        </div>
+                        <div class="text-secondary small">
+                            <strong>${item.dosage}</strong> &bull; ${item.duration} day(s) &bull; Qty to dispense: <strong>${item.qty}</strong>
+                            ${item.instructions ? ' &bull; <em>' + item.instructions + '</em>' : ''}
                         </div>
                     </div>
-                    <span class="remove-btn" data-idx="${idx}" title="Remove">
+                    <span class="remove-btn btn btn-sm btn-outline-danger rounded-circle" data-idx="${idx}" title="Remove">
                         <i class="fa-solid fa-xmark"></i>
                     </span>`;
                 container.appendChild(row);

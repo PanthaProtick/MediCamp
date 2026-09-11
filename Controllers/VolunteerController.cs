@@ -32,18 +32,34 @@ namespace MediCamp.Controllers
             var userId = GetCurrentUserId();
             if (userId == null) return RedirectToAction("Login", "Account");
 
+            var today = DateTime.UtcNow.Date;
+
+            // All ongoing camps active today or marked Ongoing
+            var ongoingCamps = _dbContext.Camps
+                .Where(c => (c.Status == "Ongoing" || (c.StartDate.Date <= today && today <= c.EndDate.Date)) &&
+                            c.Status != "Rejected" && c.Status != "Cancelled" && c.Status != "Pending Admin Approval")
+                .OrderByDescending(c => c.StartDate)
+                .ToList();
+
+            // Camps where this volunteer is approved
             var approvedCamps = _dbContext.CampVolunteerRequests
                 .Where(r => r.VolunteerId == userId && r.Status == "Approved")
                 .Select(r => r.Camp)
-                .Where(c => c != null && c.Status == "Ongoing")
-                .ToList();
+                .Where(c => c != null && (c.Status == "Ongoing" || (c.StartDate.Date <= today && today <= c.EndDate.Date)))
+                .ToList()!;
 
             Camp? activeCamp = null;
             if (activeCampId.HasValue)
             {
-                activeCamp = approvedCamps.FirstOrDefault(c => c.Id == activeCampId.Value);
+                activeCamp = ongoingCamps.FirstOrDefault(c => c.Id == activeCampId.Value)
+                             ?? approvedCamps.FirstOrDefault(c => c.Id == activeCampId.Value)
+                             ?? _dbContext.Camps.FirstOrDefault(c => c.Id == activeCampId.Value);
             }
-            else if (approvedCamps.Count == 1)
+            else if (ongoingCamps.Any())
+            {
+                activeCamp = ongoingCamps.First();
+            }
+            else if (approvedCamps.Any())
             {
                 activeCamp = approvedCamps.First();
             }
@@ -51,17 +67,23 @@ namespace MediCamp.Controllers
             var searchResults = new List<ApplicationUser>();
             if (activeCamp != null && !string.IsNullOrWhiteSpace(searchQuery))
             {
-                var lowerQuery = searchQuery.ToLower();
+                var clean = searchQuery.Trim();
+                var upper = clean.ToUpperInvariant();
+                var lower = clean.ToLowerInvariant();
+
                 searchResults = _dbContext.Users
                     .Where(u => u.Role == SystemRoles.Patient && u.IsActive && 
-                           (u.FullName.ToLower().Contains(lowerQuery) || 
-                            u.PhoneNumber.Contains(lowerQuery)))
-                    .Take(10)
+                           ((u.PatientUniqueId != null && u.PatientUniqueId.ToUpper() == upper) ||
+                            u.FullName.ToLower().Contains(lower) || 
+                            u.PhoneNumber.Contains(clean) ||
+                            (u.NID != null && u.NID.Contains(clean))))
+                    .Take(15)
                     .ToList();
             }
 
             var model = new VolunteerDashboardViewModel
             {
+                OngoingCamps = ongoingCamps,
                 ApprovedCamps = approvedCamps!,
                 ActiveCamp = activeCamp,
                 SearchResults = searchResults,
@@ -69,6 +91,39 @@ namespace MediCamp.Controllers
             };
 
             return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult LookupPatient(int campId, string patientQuery)
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null) return RedirectToAction("Login", "Account");
+
+            if (string.IsNullOrWhiteSpace(patientQuery))
+            {
+                TempData["ErrorMessage"] = "Please enter a Patient Unique ID to lookup.";
+                return RedirectToAction(nameof(Dashboard), new { activeCampId = campId });
+            }
+
+            var clean = patientQuery.Trim();
+            var upper = clean.ToUpperInvariant();
+            var lower = clean.ToLowerInvariant();
+
+            var patient = _dbContext.Users.FirstOrDefault(u => 
+                u.Role == SystemRoles.Patient && u.IsActive &&
+                ((u.PatientUniqueId != null && u.PatientUniqueId.ToUpper() == upper) ||
+                 u.Id == clean ||
+                 u.PhoneNumber == clean ||
+                 (u.NID != null && u.NID == clean) ||
+                 u.FullName.ToLower().Contains(lower)));
+
+            if (patient == null)
+            {
+                TempData["ErrorMessage"] = $"No patient record found matching Unique ID \"{patientQuery}\". You can register them below.";
+                return RedirectToAction(nameof(Dashboard), new { activeCampId = campId, searchQuery = patientQuery });
+            }
+
+            return RedirectToAction(nameof(Triage), new { campId = campId, patientId = patient.Id });
         }
 
         [HttpGet]
@@ -212,7 +267,10 @@ namespace MediCamp.Controllers
             {
                 CampId = campId,
                 PatientId = patientId,
-                Patient = patient
+                Patient = patient,
+                Age = patient.Age,
+                BloodGroup = patient.BloodGroup,
+                Gender = patient.Gender
             };
 
             return View(model);
@@ -238,7 +296,36 @@ namespace MediCamp.Controllers
                 return RedirectToAction(nameof(Dashboard));
             }
 
+            var patient = _dbContext.Users.FirstOrDefault(u => u.Id == model.PatientId);
+            if (patient != null)
+            {
+                if (model.Age.HasValue && model.Age.Value >= 0)
+                {
+                    patient.DateOfBirth = DateTime.SpecifyKind(DateTime.UtcNow.AddYears(-model.Age.Value), DateTimeKind.Utc);
+                }
+                if (!string.IsNullOrWhiteSpace(model.BloodGroup) && model.BloodGroup != "Unknown")
+                {
+                    patient.BloodGroup = model.BloodGroup.Trim();
+                    var bloodProfile = _dbContext.BloodDonationProfiles.FirstOrDefault(b => b.UserId == patient.Id);
+                    if (bloodProfile != null)
+                    {
+                        bloodProfile.BloodGroup = patient.BloodGroup;
+                    }
+                }
+                if (!string.IsNullOrWhiteSpace(model.Gender))
+                {
+                    patient.Gender = model.Gender.Trim();
+                }
+            }
+
             var tokenNumber = _dbContext.TriageRecords.Count(t => t.CampId == model.CampId) + 1;
+
+            // Auto-calculate BMI if weight and height are provided
+            if (model.WeightKg.HasValue && model.HeightCm.HasValue && model.HeightCm.Value > 0)
+            {
+                double heightM = model.HeightCm.Value / 100.0;
+                model.BMI = Math.Round(model.WeightKg.Value / (heightM * heightM), 1);
+            }
 
             var record = new TriageRecord
             {
@@ -253,7 +340,8 @@ namespace MediCamp.Controllers
                 PresentingSymptoms = model.PresentingSymptoms,
                 UrgencyLevel = model.UrgencyLevel,
                 TokenNumber = tokenNumber,
-                IsSeenByDoctor = false
+                IsSeenByDoctor = false,
+                RecordedAt = DateTime.UtcNow
             };
 
             _dbContext.TriageRecords.Add(record);

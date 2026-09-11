@@ -21,18 +21,29 @@
     <div class="row g-4">
         <div class="col-lg-3">
             <div class="glass-card p-4 sticky-top" style="top: 2rem;">
-                <h5 class="fw-bold mb-3">Patient Info</h5>
+                <h5 class="fw-bold mb-3"><i class="fa-solid fa-id-card text-primary me-2"></i>Patient Profile</h5>
                 <div class="text-center mb-3">
-                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px; font-size: 2rem;">
+                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm" style="width: 72px; height: 72px; font-size: 1.8rem;">
                         <i class="fa-solid fa-user"></i>
                     </div>
                 </div>
-                <h6 class="fw-bold text-center mb-0">@Model.Patient?.FullName</h6>
-                <p class="text-center text-muted small mb-3">@Model.Patient?.PhoneNumber</p>
+                <h6 class="fw-bold text-center text-dark mb-1">@Model.Patient?.FullName</h6>
+                
+                @if (!string.IsNullOrEmpty(Model.Patient?.PatientUniqueId))
+                {
+                    <div class="text-center mb-2">
+                        <span class="badge bg-primary rounded-pill font-monospace px-3 py-1 fs-6 shadow-sm">
+                            <i class="fa-solid fa-id-badge me-1"></i>@Model.Patient.PatientUniqueId
+                        </span>
+                    </div>
+                }
+
+                <p class="text-center text-muted small mb-3"><i class="fa-solid fa-phone me-1 text-primary"></i>@Model.Patient?.PhoneNumber</p>
                 <hr />
                 <div class="small mb-2"><strong>Blood Group:</strong> <span class="badge bg-danger float-end">@(Model.Patient?.BloodGroup ?? "Unknown")</span></div>
                 <div class="small mb-2"><strong>Gender:</strong> <span class="float-end">@(Model.Patient?.Gender ?? "N/A")</span></div>
-                <div class="small"><strong>DOB:</strong> <span class="float-end">@(Model.Patient?.DateOfBirth?.ToString("MMM dd, yyyy") ?? "N/A")</span></div>
+                <div class="small mb-2"><strong>DOB:</strong> <span class="float-end">@(Model.Patient?.DateOfBirth?.ToString("MMM dd, yyyy") ?? "N/A")</span></div>
+                <div class="small"><strong>Location:</strong> <span class="float-end text-muted">@Model.Patient?.Upazila, @Model.Patient?.District</span></div>
             </div>
         </div>
 
@@ -42,20 +53,58 @@
                     <input type="hidden" asp-for="CampId" />
                     <input type="hidden" asp-for="PatientId" />
                     
-                    <h5 class="fw-bold text-dark border-bottom pb-2 mb-4"><i class="fa-solid fa-heart-pulse text-danger me-2"></i>Vital Signs</h5>
+                    <!-- Patient Basic Demographics Verification -->
+                    <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">
+                        <i class="fa-solid fa-user-pen text-primary me-2"></i>Patient Demographics Verification
+                    </h5>
+                    <div class="row g-3 mb-4 bg-light p-3 rounded-3 border">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small text-muted">Patient Age (Years) *</label>
+                            <div class="input-group">
+                                <input asp-for="Age" type="number" class="form-control shadow-none bg-white fw-bold" min="0" max="150" placeholder="e.g. 35" />
+                                <span class="input-group-text bg-white">yrs</span>
+                            </div>
+                            <span asp-validation-for="Age" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small text-muted">Blood Group *</label>
+                            <select asp-for="BloodGroup" class="form-select shadow-none bg-white fw-bold">
+                                <option value="Unknown">Unknown / Test at Camp</option>
+                                <option value="A+">A+ (A Positive)</option>
+                                <option value="A-">A- (A Negative)</option>
+                                <option value="B+">B+ (B Positive)</option>
+                                <option value="B-">B- (B Negative)</option>
+                                <option value="AB+">AB+ (AB Positive)</option>
+                                <option value="AB-">AB- (AB Negative)</option>
+                                <option value="O+">O+ (O Positive)</option>
+                                <option value="O-">O- (O Negative)</option>
+                            </select>
+                            <span asp-validation-for="BloodGroup" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small text-muted">Gender *</label>
+                            <select asp-for="Gender" class="form-select shadow-none bg-white fw-bold">
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold text-dark border-bottom pb-2 mb-4"><i class="fa-solid fa-heart-pulse text-danger me-2"></i>Vital Signs Recording</h5>
                     
                     <div class="row g-4 mb-4">
                         <div class="col-md-4">
-                            <label class="form-label fw-bold small text-muted">Blood Pressure</label>
+                            <label class="form-label fw-bold small text-muted">Blood Pressure (BP)</label>
                             <div class="input-group">
-                                <input asp-for="BloodPressure" type="text" class="form-control shadow-none bg-light" placeholder="120/80" />
+                                <input asp-for="BloodPressure" type="text" class="form-control shadow-none bg-light fw-bold" placeholder="e.g. 120/80" />
                                 <span class="input-group-text bg-light">mmHg</span>
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-bold small text-muted">Temperature</label>
+                            <label class="form-label fw-bold small text-muted">Temperature (Temp)</label>
                             <div class="input-group">
-                                <input asp-for="TemperatureF" type="number" step="0.1" class="form-control shadow-none bg-light" placeholder="98.6" />
+                                <input asp-for="TemperatureF" type="number" step="0.1" class="form-control shadow-none bg-light fw-bold" placeholder="e.g. 98.6" />
                                 <span class="input-group-text bg-light">°F</span>
                             </div>
                             <span asp-validation-for="TemperatureF" class="text-danger small"></span>
@@ -63,21 +112,25 @@
                         <div class="col-md-4">
                             <label class="form-label fw-bold small text-muted">Weight</label>
                             <div class="input-group">
-                                <input asp-for="WeightKg" id="WeightKg" type="number" step="0.1" class="form-control shadow-none bg-light" placeholder="70" />
+                                <input asp-for="WeightKg" id="WeightKg" type="number" step="0.1" class="form-control shadow-none bg-light fw-bold" placeholder="e.g. 65" />
                                 <span class="input-group-text bg-light">kg</span>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label fw-bold small text-muted">Height</label>
                             <div class="input-group">
-                                <input asp-for="HeightCm" id="HeightCm" type="number" step="0.1" class="form-control shadow-none bg-light" placeholder="170" />
+                                <input asp-for="HeightCm" id="HeightCm" type="number" step="0.1" class="form-control shadow-none bg-light fw-bold" placeholder="e.g. 165" />
                                 <span class="input-group-text bg-light">cm</span>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold small text-muted">BMI (Auto-calculated)</label>
+                        <div class="col-md-8">
+                            <label class="form-label fw-bold small text-muted d-flex justify-content-between">
+                                <span>BMI (Formula: weight(kg) / (height(m))²)</span>
+                                <span id="bmiCategoryBadge" class="badge bg-secondary-subtle text-muted rounded-pill px-3 py-1">Pending height & weight</span>
+                            </label>
                             <div class="input-group">
-                                <input asp-for="BMI" id="BMI" type="number" step="0.01" class="form-control shadow-none bg-light fw-bold text-primary" readonly placeholder="-" />
+                                <span class="input-group-text bg-light fw-bold text-primary">BMI</span>
+                                <input asp-for="BMI" id="BMI" type="number" step="0.01" class="form-control shadow-none bg-light fw-black text-primary fs-5" readonly placeholder="Auto-calculated" />
                             </div>
                         </div>
                     </div>
@@ -85,31 +138,37 @@
                     <h5 class="fw-bold text-dark border-bottom pb-2 mb-4 mt-5"><i class="fa-solid fa-stethoscope text-primary me-2"></i>Clinical Assessment</h5>
 
                     <div class="mb-4">
-                        <label class="form-label fw-bold small text-muted">Presenting Symptoms</label>
-                        <textarea asp-for="PresentingSymptoms" class="form-control shadow-none bg-light" rows="3" placeholder="Describe the patient's primary complaints..."></textarea>
+                        <label class="form-label fw-bold small text-muted">Presenting Symptoms / Chief Complaints</label>
+                        <textarea asp-for="PresentingSymptoms" class="form-control shadow-none bg-light" rows="3" placeholder="Describe the patient's primary symptoms, complaints, or reason for visit..."></textarea>
                     </div>
 
                     <div class="mb-4">
                         <label class="form-label fw-bold small text-muted">Urgency Level</label>
-                        <div class="d-flex gap-3">
+                        <div class="d-flex gap-3 flex-wrap">
                             <div class="form-check p-0">
                                 <input type="radio" class="btn-check" name="UrgencyLevel" id="urgencyNormal" value="Normal" checked>
-                                <label class="btn btn-outline-success fw-bold px-4" for="urgencyNormal">Normal</label>
+                                <label class="btn btn-outline-success fw-bold px-4 rounded-pill" for="urgencyNormal">
+                                    <i class="fa-solid fa-circle-check me-1"></i> Normal
+                                </label>
                             </div>
                             <div class="form-check p-0">
                                 <input type="radio" class="btn-check" name="UrgencyLevel" id="urgencyUrgent" value="Urgent">
-                                <label class="btn btn-outline-warning fw-bold px-4" for="urgencyUrgent">Urgent</label>
+                                <label class="btn btn-outline-warning fw-bold px-4 rounded-pill text-dark" for="urgencyUrgent">
+                                    <i class="fa-solid fa-circle-exclamation me-1"></i> Urgent
+                                </label>
                             </div>
                             <div class="form-check p-0">
                                 <input type="radio" class="btn-check" name="UrgencyLevel" id="urgencyEmergency" value="Emergency">
-                                <label class="btn btn-outline-danger fw-bold px-4" for="urgencyEmergency">Emergency</label>
+                                <label class="btn btn-outline-danger fw-bold px-4 rounded-pill" for="urgencyEmergency">
+                                    <i class="fa-solid fa-triangle-exclamation me-1"></i> Emergency
+                                </label>
                             </div>
                         </div>
                     </div>
 
-                    <div class="d-flex justify-content-end pt-3">
-                        <button type="submit" class="btn btn-warning btn-lg fw-bold px-5 shadow-sm rounded-pill text-dark">
-                            Generate Queue Token <i class="fa-solid fa-ticket ms-2"></i>
+                    <div class="d-flex justify-content-end pt-3 border-top">
+                        <button type="submit" class="btn btn-warning btn-lg fw-bold px-5 shadow rounded-pill text-dark">
+                            <i class="fa-solid fa-ticket me-2"></i> Save Vitals & Issue Token
                         </button>
                     </div>
                 </form>
@@ -125,22 +184,48 @@
             const weightInput = document.getElementById('WeightKg');
             const heightInput = document.getElementById('HeightCm');
             const bmiInput = document.getElementById('BMI');
+            const badge = document.getElementById('bmiCategoryBadge');
 
             function calculateBMI() {
                 const weight = parseFloat(weightInput.value);
                 const height = parseFloat(heightInput.value);
 
-                if (!isNaN(weight) && !isNaN(height) && height > 0) {
+                if (!isNaN(weight) && !isNaN(height) && height > 0 && weight > 0) {
                     const heightMeters = height / 100;
                     const bmi = weight / (heightMeters * heightMeters);
                     bmiInput.value = bmi.toFixed(2);
+
+                    let category = "Normal";
+                    let badgeClass = "bg-success text-white";
+
+                    if (bmi < 18.5) {
+                        category = "Underweight";
+                        badgeClass = "bg-warning text-dark";
+                    } else if (bmi < 25.0) {
+                        category = "Normal";
+                        badgeClass = "bg-success text-white";
+                    } else if (bmi < 30.0) {
+                        category = "Overweight";
+                        badgeClass = "bg-warning text-dark";
+                    } else {
+                        category = "Obese";
+                        badgeClass = "bg-danger text-white";
+                    }
+
+                    badge.className = `badge ${badgeClass} rounded-pill px-3 py-1 fw-bold`;
+                    badge.innerHTML = `<i class="fa-solid fa-heart-pulse me-1"></i> Category: ${category} (BMI ${bmi.toFixed(1)})`;
                 } else {
                     bmiInput.value = '';
+                    badge.className = 'badge bg-secondary-subtle text-muted rounded-pill px-3 py-1';
+                    badge.innerText = 'Pending height & weight';
                 }
             }
 
             weightInput.addEventListener('input', calculateBMI);
             heightInput.addEventListener('input', calculateBMI);
+
+            // Trigger on load if initial values exist
+            calculateBMI();
         });
     </script>
 }

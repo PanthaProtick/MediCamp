@@ -48,6 +48,11 @@ namespace MediCamp.Models
 
         public string Role { get; set; } = SystemRoles.Patient;
 
+        // Unique 6-character alphanumeric ID for patients (e.g., A3K9P2)
+        [MaxLength(10)]
+        [Display(Name = "Patient Unique ID")]
+        public string? PatientUniqueId { get; set; }
+
         // Fields specific to Host (Organization)
         [MaxLength(150)]
         [Display(Name = "Organization Name")]

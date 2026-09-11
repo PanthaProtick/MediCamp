@@ -31,6 +31,7 @@ namespace MediCamp.Data
         public DbSet<CampPatientRegistration> CampPatientRegistrations { get; set; }
         public DbSet<BloodRequest> BloodRequests { get; set; }
         public DbSet<BloodDonationLog> BloodDonationLogs { get; set; }
+        public DbSet<CampExpense> CampExpenses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

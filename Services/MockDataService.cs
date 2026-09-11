@@ -60,13 +60,17 @@ namespace MediCamp.Services
         public ApplicationUser? GetUserByEmailOrNid(string identifier)
         {
             if (string.IsNullOrWhiteSpace(identifier)) return null;
-            return _dbContext.Users.FirstOrDefault(u => u.Email.ToLower() == identifier.ToLower() || u.NID == identifier);
+            var clean = identifier.Trim().ToLowerInvariant();
+            return _dbContext.Users.FirstOrDefault(u => u.Email.ToLower() == clean || (u.NID != null && u.NID.Trim() == identifier.Trim()));
         }
 
         public (bool Success, string Message, ApplicationUser? User) Authenticate(string identifier, string password)
         {
+            if (string.IsNullOrWhiteSpace(identifier) || string.IsNullOrWhiteSpace(password))
+                return (false, "Please enter both identifier and password.", null);
+
             var user = GetUserByEmailOrNid(identifier);
-            if (user == null || user.PasswordHash != password) 
+            if (user == null || user.PasswordHash != password.Trim()) 
                 return (false, "Invalid credentials.", null);
 
             if (!user.IsActive) 
@@ -84,6 +88,20 @@ namespace MediCamp.Services
             _dbContext.SaveChanges();
 
             return (true, "Authentication successful.", user);
+        }
+
+        public static string GenerateUniquePatientId(ApplicationDbContext dbContext)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            var random = new Random();
+            while (true)
+            {
+                var id = new string(Enumerable.Repeat(chars, 6).Select(s => s[random.Next(s.Length)]).ToArray());
+                if (!dbContext.Users.Any(u => u.PatientUniqueId == id))
+                {
+                    return id;
+                }
+            }
         }
 
         public (bool Success, string Message, ApplicationUser? User) RegisterPatient(RegisterPatientViewModel model)
@@ -107,6 +125,7 @@ namespace MediCamp.Services
                 District = model.District,
                 Upazila = model.Upazila,
                 Role = SystemRoles.Patient,
+                PatientUniqueId = GenerateUniquePatientId(_dbContext),
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
                 PasswordHash = model.Password
@@ -154,13 +173,15 @@ namespace MediCamp.Services
             if (_dbContext.Users.Any(u => u.Email.ToLower() == model.Email.ToLower()))
                 return (false, "Email already registered.", null);
 
+            string role = model.Role ?? SystemRoles.Patient;
             var newUser = new ApplicationUser
             {
                 Id = $"usr-gen-{Guid.NewGuid().ToString()[..8]}",
                 FullName = model.FullName.Trim(),
                 Email = model.Email.Trim().ToLowerInvariant(),
                 PhoneNumber = model.PhoneNumber.Trim(),
-                Role = model.Role ?? SystemRoles.Patient,
+                Role = role,
+                PatientUniqueId = role == SystemRoles.Patient ? GenerateUniquePatientId(_dbContext) : null,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
                 PasswordHash = model.Password
@@ -222,6 +243,11 @@ namespace MediCamp.Services
                 CreatedAt = DateTime.UtcNow,
                 PasswordHash = model.TemporaryPassword
             };
+
+            if (model.Role == SystemRoles.Patient)
+            {
+                newUser.PatientUniqueId = GenerateUniquePatientId(_dbContext);
+            }
 
             if (model.Role == SystemRoles.Host)
             {
