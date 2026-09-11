@@ -42,6 +42,72 @@ namespace MediCamp.Controllers
             return _dbContext.Users.FirstOrDefault(u => u.Id == userId);
         }
 
+        [HttpGet]
+        [Authorize(Roles = SystemRoles.Patient)]
+        public IActionResult RegisterForCamp(int campId)
+        {
+            var patient = GetCurrentUser();
+            if (patient == null) return RedirectToAction("Login", "Account");
+
+            var camp = _dbContext.Camps.FirstOrDefault(c => c.Id == campId &&
+                (c.Status == "Scheduled" || c.Status == "Ongoing"));
+            if (camp == null)
+            {
+                TempData["ErrorMessage"] = "This camp is not available for registration.";
+                return RedirectToAction("Camps", "Home");
+            }
+
+            var alreadyRegistered = _dbContext.CampPatientRegistrations.Any(r =>
+                r.CampId == campId && r.PatientId == patient.Id && r.Status == "Registered");
+
+            return View(new CampPatientRegistrationViewModel
+            {
+                Camp = camp,
+                Patient = patient,
+                AlreadyRegistered = alreadyRegistered
+            });
+        }
+
+        [HttpPost]
+        [Authorize(Roles = SystemRoles.Patient)]
+        [ValidateAntiForgeryToken]
+        [ActionName("RegisterForCamp")]
+        public IActionResult RegisterForCampSubmit(int campId)
+        {
+            var patient = GetCurrentUser();
+            if (patient == null) return RedirectToAction("Login", "Account");
+
+            var camp = _dbContext.Camps.FirstOrDefault(c => c.Id == campId &&
+                (c.Status == "Scheduled" || c.Status == "Ongoing"));
+            if (camp == null)
+            {
+                TempData["ErrorMessage"] = "This camp is not available for registration.";
+                return RedirectToAction("Camps", "Home");
+            }
+
+            var alreadyRegistered = _dbContext.CampPatientRegistrations.Any(r =>
+                r.CampId == campId && r.PatientId == patient.Id && r.Status == "Registered");
+            if (!alreadyRegistered)
+            {
+                _dbContext.CampPatientRegistrations.Add(new CampPatientRegistration
+                {
+                    CampId = campId,
+                    PatientId = patient.Id,
+                    Status = "Registered",
+                    RegisteredAt = DateTime.UtcNow
+                });
+                camp.RegisteredPatientsCount++;
+                _dbContext.SaveChanges();
+                TempData["SuccessMessage"] = $"You are registered for {camp.Title}. Please arrive at the venue on time.";
+            }
+            else
+            {
+                TempData["SuccessMessage"] = "You are already registered for this camp.";
+            }
+
+            return RedirectToAction("Camps", "Home");
+        }
+
         // ==========================================
         // 1. PATIENT MEDICAL HISTORY & PROFILE
         // ==========================================
