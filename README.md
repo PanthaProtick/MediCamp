@@ -31,11 +31,12 @@ MediCamp is a role-based web application tailored to streamline the execution of
 ---
 
 ## Current Progress
-**Phase 1 (Foundation & Authentication) is currently complete.**
+**Phases 1–7 are currently implemented.**
 - Role-based authentication (Admin, Host, Doctor, Volunteer, Pharmacist, Patient) is fully implemented using ASP.NET Core Cookie Authentication.
 - Registration flows tailored for specific roles (e.g., Doctors requiring BMDC numbers, Hosts requiring NGO licenses) are functional.
-- The system currently operates on an **In-Memory Mock Data Service**. Data is not persistent and will reset when the application restarts.
-- Frontend layouts (Views) and controllers for standard routing are established.
+- EF Core with PostgreSQL persistence is implemented for users, camps, staffing, triage, consultations, prescriptions, inventory, follow-ups, and blood donation workflows.
+- Patient medical history, digital prescriptions, volunteer follow-up management, and the blood donation hub are implemented.
+- Frontend layouts and controllers are organized by role and workflow.
 
 ---
 
@@ -43,8 +44,8 @@ MediCamp is a role-based web application tailored to streamline the execution of
 - **Framework:** ASP.NET Core MVC (v10.0)
 - **Language:** C#
 - **Frontend:** HTML5, CSS3, Razor Views, Bootstrap 5
-- **Data Access (Planned):** Entity Framework Core with Npgsql (PostgreSQL)
-- **Current Data Layer:** `IMockDataService` (In-Memory Testing)
+- **Data Access:** Entity Framework Core with Npgsql (PostgreSQL)
+- **Supporting Service:** `IMockDataService` remains for selected staffing and account workflows.
 
 ---
 
@@ -88,8 +89,8 @@ MediCamp/
 ---
 
 ## Environment Variables
-Currently, there are no sensitive environment variables configured as the app runs in an offline mocked state.
-*Future implementation will require:*
+The application requires a PostgreSQL connection configured as `ConnectionStrings__DefaultConnection` or in `appsettings.json`.
+*Optional deployment configuration includes:*
 - `ConnectionStrings__DefaultConnection` (PostgreSQL Database URL)
 - `JWT_Secret` or specific cookie security salts if applicable.
 
@@ -107,20 +108,20 @@ The frontend utilizes **ASP.NET Core Razor Pages** built primarily with standard
 ---
 
 ## Known Issues
-- **Volatile Data:** The application relies on `MockDataService`. All registered users, patients, and sessions are wiped when the application process stops.
-- **Database Pending:** Entity Framework and real database context (`DbContext`) are not yet integrated.
+- **Mixed service boundaries:** Selected staffing and account operations still use `IMockDataService` while core clinical workflows use EF Core.
+- **Reporting pending:** Phase 8 reporting and analytics dashboards remain to be implemented.
 
 ---
 
 ## Roadmap
 The system is being built across 8 distinct phases:
-1. **[Completed] Foundation & Auth:** Login, Register, Role assignment.
-2. **[Pending] Master Data:** Admin setup for Locations, Medicines, Hospitals.
-3. **[Pending] Camp Management:** NGO camp setup and public directory.
-4. **[Pending] Field Staffing & Inventory:** Allocating meds and staff to camps.
-5. **[Pending] Field Operations (Triage):** Volunteer patient entry and token generation.
-6. **[Pending] Clinical Workflow:** Doctor consultation & Pharmacist dispensing.
-7. **[Pending] Patient Portal:** Follow-ups & Blood Donation Hub.
+1. **[Completed] Foundation & Auth:** Login, registration, and role assignment.
+2. **[Completed] Master Data:** Locations, medicines, hospitals, and blood groups.
+3. **[Completed] Camp Management:** NGO camp setup, approval, and public directory.
+4. **[Completed] Field Staffing & Inventory:** Staff requests and medicine allocation.
+5. **[Completed] Field Operations (Triage):** Patient entry, vitals, and token generation.
+6. **[Completed] Clinical Workflow:** Doctor consultation, prescriptions, referrals, and dispensing.
+7. **[Completed] Patient Portal:** Medical history, follow-ups, and blood donation hub.
 8. **[Pending] Reporting:** Analytics and monitoring dashboards for Admins/NGOs.
 
 ---

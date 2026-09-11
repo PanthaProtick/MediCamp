@@ -276,6 +276,11 @@ namespace MediCamp.Controllers
             var userId = GetCurrentUserId();
             if (userId == null) return RedirectToAction("Login", "Account");
 
+            if (!IsApprovedVolunteerForCamp(userId, campId))
+            {
+                return Forbid();
+            }
+
             var camp = _dbContext.Camps.FirstOrDefault(c => c.Id == campId);
             if (camp == null)
             {
@@ -290,6 +295,16 @@ namespace MediCamp.Controllers
                 .ThenBy(f => f.ScheduledDate)
                 .ToList();
 
+            // Also load patients seen in this camp for schedule modal
+            var campPatients = _dbContext.TriageRecords
+                .Include(t => t.Patient)
+                .Where(t => t.CampId == campId && t.Patient != null)
+                .Select(t => t.Patient!)
+                .Distinct()
+                .ToList();
+
+            ViewBag.CampPatients = campPatients;
+
             var model = new VolunteerFollowUpViewModel
             {
                 Camp = camp,
@@ -303,20 +318,73 @@ namespace MediCamp.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult UpdateFollowUpStatus(int followUpId, string status, string? notes, int campId)
         {
-            var followUp = _dbContext.PatientFollowUps.FirstOrDefault(f => f.Id == followUpId);
+            var userId = GetCurrentUserId();
+            if (userId == null) return RedirectToAction("Login", "Account");
+
+            if (!IsApprovedVolunteerForCamp(userId, campId) || status is not ("Pending" or "Contacted" or "Resolved"))
+            {
+                return Forbid();
+            }
+
+            var followUp = _dbContext.PatientFollowUps.FirstOrDefault(f => f.Id == followUpId && f.CampId == campId);
             if (followUp != null)
             {
                 followUp.Status = status;
-                if (!string.IsNullOrWhiteSpace(notes))
-                {
-                    followUp.VolunteerNotes = notes;
-                }
+                followUp.VolunteerNotes = string.IsNullOrWhiteSpace(notes) ? followUp.VolunteerNotes : notes.Trim();
                 followUp.LastContactedAt = DateTime.UtcNow;
                 _dbContext.SaveChanges();
                 TempData["SuccessMessage"] = "Follow-up status updated.";
             }
 
             return RedirectToAction(nameof(FollowUps), new { campId = campId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ScheduleFollowUp(int campId, string patientId, string reason, DateTime scheduledDate)
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null) return RedirectToAction("Login", "Account");
+
+            if (!IsApprovedVolunteerForCamp(userId, campId))
+            {
+                return Forbid();
+            }
+
+            if (string.IsNullOrWhiteSpace(patientId) || string.IsNullOrWhiteSpace(reason))
+            {
+                TempData["ErrorMessage"] = "Please select a patient and provide a follow-up reason.";
+                return RedirectToAction(nameof(FollowUps), new { campId });
+            }
+
+            var patientWasSeenAtCamp = _dbContext.TriageRecords.Any(t => t.CampId == campId && t.PatientId == patientId);
+            if (!patientWasSeenAtCamp || scheduledDate.Date < DateTime.UtcNow.Date)
+            {
+                TempData["ErrorMessage"] = "Select a patient from this camp and choose today or a future date.";
+                return RedirectToAction(nameof(FollowUps), new { campId });
+            }
+
+            var followUp = new PatientFollowUp
+            {
+                CampId        = campId,
+                PatientId     = patientId,
+                Reason        = reason,
+                ScheduledDate = DateTime.SpecifyKind(scheduledDate, DateTimeKind.Utc),
+                Status        = "Pending",
+                CreatedAt     = DateTime.UtcNow
+            };
+
+            _dbContext.PatientFollowUps.Add(followUp);
+            _dbContext.SaveChanges();
+
+            TempData["SuccessMessage"] = "New patient follow-up scheduled successfully.";
+            return RedirectToAction(nameof(FollowUps), new { campId });
+        }
+
+        private bool IsApprovedVolunteerForCamp(string userId, int campId)
+        {
+            return _dbContext.CampVolunteerRequests.Any(r =>
+                r.CampId == campId && r.VolunteerId == userId && r.Status == "Approved");
         }
     }
 }

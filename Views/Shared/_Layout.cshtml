@@ -139,6 +139,19 @@
                                     </a>
                                 </li>
                             }
+                            @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Patient"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link nav-link-custom @(ViewContext.RouteData.Values["Action"]?.ToString() == "History" && ViewContext.RouteData.Values["Controller"]?.ToString() == "Patient" ? "active" : "")" asp-controller="Patient" asp-action="History">
+                                        <i class="fa-solid fa-notes-medical me-1 text-champagne"></i> My Medical History
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link nav-link-custom @(ViewContext.RouteData.Values["Action"]?.ToString() == "BloodDonation" && ViewContext.RouteData.Values["Controller"]?.ToString() == "Patient" ? "active" : "")" asp-controller="Patient" asp-action="BloodDonation">
+                                        <i class="fa-solid fa-droplet me-1 text-champagne"></i> Blood Donation Hub
+                                    </a>
+                                </li>
+                            }
                             @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin"))
                             {
                                 <li class="nav-item">

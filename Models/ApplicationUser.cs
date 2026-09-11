@@ -28,6 +28,8 @@ namespace MediCamp.Models
         [Display(Name = "Date of Birth")]
         public DateTime? DateOfBirth { get; set; }
 
+        public int? Age => DateOfBirth.HasValue ? (int)((DateTime.UtcNow - DateOfBirth.Value).TotalDays / 365.25) : null;
+
         [MaxLength(15)]
         public string? Gender { get; set; } = "Male"; // Male, Female, Other
 
