@@ -179,6 +179,12 @@
                                         <a asp-controller="Host" asp-action="ManageStaff" asp-route-id="@camp.Id" class="btn btn-primary btn-sm border mb-1">
                                             <i class="fa-solid fa-users me-1"></i> Manage Staff
                                         </a>
+                                        <a asp-controller="Host" asp-action="ManageInventory" asp-route-id="@camp.Id" class="btn btn-info btn-sm border text-white mb-1">
+                                            <i class="fa-solid fa-boxes-stacked me-1"></i> Inventory
+                                        </a>
+                                        <a asp-controller="Host" asp-action="MonitorCamp" asp-route-id="@camp.Id" class="btn btn-sm border text-white mb-1" style="background-color: #0d9488;">
+                                            <i class="fa-solid fa-chart-line me-1"></i> Monitor
+                                        </a>
                                     }
                                 </td>
                             </tr>

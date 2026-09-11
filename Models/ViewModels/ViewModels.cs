@@ -439,4 +439,29 @@ namespace MediCamp.Models.ViewModels
         public MediCamp.Models.Domain.Consultation? Consultation { get; set; }
         public List<MediCamp.Models.Domain.PrescriptionItem> PrescriptionItems { get; set; } = new();
     }
+
+    public class HostManageInventoryViewModel
+    {
+        public MediCamp.Models.Domain.Camp Camp { get; set; } = new();
+        public List<MediCamp.Models.Domain.CampInventory> CurrentInventory { get; set; } = new();
+        public List<MediCamp.Models.Domain.MasterMedicine> AvailableMedicines { get; set; } = new();
+        
+        [Required(ErrorMessage = "Please select a medicine.")]
+        public int SelectedMedicineId { get; set; }
+
+        [Required]
+        [Range(1, 100000, ErrorMessage = "Quantity must be greater than 0.")]
+        public int QuantityToAllocate { get; set; }
+    }
+
+    public class HostMonitorCampViewModel
+    {
+        public MediCamp.Models.Domain.Camp Camp { get; set; } = new();
+        
+        [Required]
+        [Range(0.01, 10000000, ErrorMessage = "Expense must be greater than 0.")]
+        public decimal AdditionalExpense { get; set; }
+        
+        public string? ExpenseNotes { get; set; }
+    }
 }

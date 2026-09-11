@@ -1,0 +1,118 @@
+@model MediCamp.Models.ViewModels.HostManageInventoryViewModel
+
+@{
+    ViewData["Title"] = "Manage Camp Inventory";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge badge-role-host"><i class="fa-solid fa-boxes-stacked"></i> Inventory</span>
+                <span class="text-muted small">@Model.Camp.Title</span>
+            </div>
+            <h2 class="fw-bold text-dark mb-0">Allocated Medicine Stock</h2>
+        </div>
+        <a asp-action="MyCamps" class="btn btn-light shadow-sm fw-bold rounded-pill px-4">
+            <i class="fa-solid fa-arrow-left me-2"></i>Back to Camps
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <!-- Allocation Form -->
+        <div class="col-lg-4">
+            <div class="glass-card p-4 sticky-top" style="top: 2rem;">
+                <h5 class="fw-bold mb-3"><i class="fa-solid fa-plus-circle text-primary me-2"></i>Allocate Stock</h5>
+                <form asp-action="AllocateMedicine" asp-route-campId="@Model.Camp.Id" method="post">
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">Select Master Medicine</label>
+                        <select asp-for="SelectedMedicineId" class="form-select shadow-none bg-light" required>
+                            <option value="">-- Choose Medicine --</option>
+                            @foreach(var group in Model.AvailableMedicines.GroupBy(m => m.Category))
+                            {
+                                <optgroup label="@group.Key">
+                                    @foreach(var med in group)
+                                    {
+                                        <option value="@med.Id">@med.BrandName (@med.GenericName) - @med.Strength</option>
+                                    }
+                                </optgroup>
+                            }
+                        </select>
+                        <span asp-validation-for="SelectedMedicineId" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-muted">Quantity to Allocate</label>
+                        <input asp-for="QuantityToAllocate" type="number" min="1" class="form-control shadow-none bg-light" required placeholder="e.g., 500" />
+                        <span asp-validation-for="QuantityToAllocate" class="text-danger small"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-sapphire w-100 fw-bold shadow-sm">
+                        <i class="fa-solid fa-box-open me-2"></i>Allocate to Camp
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Inventory List -->
+        <div class="col-lg-8">
+            <div class="glass-card p-4">
+                <h5 class="fw-bold mb-4">Current Camp Inventory</h5>
+                
+                @if (!Model.CurrentInventory.Any())
+                {
+                    <div class="text-center py-5">
+                        <i class="fa-solid fa-box-open fs-1 text-muted mb-3 opacity-25"></i>
+                        <h5 class="text-muted fw-bold">No Stock Allocated</h5>
+                        <p class="small text-secondary">Allocate medicines from the master list using the form.</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Medicine Details</th>
+                                    <th>Category</th>
+                                    <th class="text-center">Allocated</th>
+                                    <th class="text-center">Dispensed</th>
+                                    <th class="text-center">Remaining</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.CurrentInventory)
+                                {
+                                    var remaining = item.QuantityAllocated - item.QuantityDispensed;
+                                    var rowClass = remaining <= 0 ? "table-danger opacity-75" : (remaining < (item.QuantityAllocated * 0.2) ? "table-warning" : "");
+                                    
+                                    <tr class="@rowClass">
+                                        <td>
+                                            <div class="fw-bold text-dark">@item.MasterMedicine?.BrandName</div>
+                                            <div class="small text-muted">@item.MasterMedicine?.GenericName • @item.MasterMedicine?.Strength</div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-light text-dark border">
+                                                @item.MasterMedicine?.Category
+                                            </span>
+                                        </td>
+                                        <td class="text-center fw-bold">@item.QuantityAllocated.ToString("N0")</td>
+                                        <td class="text-center">@item.QuantityDispensed.ToString("N0")</td>
+                                        <td class="text-center fw-bold @(remaining <= 0 ? "text-danger" : "text-success")">
+                                            @remaining.ToString("N0")
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
