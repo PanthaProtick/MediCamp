@@ -21,25 +21,32 @@
             <div class="col-md-4">
                 <input type="text" name="search" value="@ViewBag.SearchTerm" class="form-control form-control-custom" placeholder="Search by camp title, venue, or NGO..." />
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <select name="district" class="form-select form-select-custom" onchange="this.form.submit()">
                     <option value="All" selected="@(ViewBag.SelectedDistrict == "All" || string.IsNullOrEmpty(ViewBag.SelectedDistrict))">All Districts</option>
-                    <option value="Kurigram" selected="@(ViewBag.SelectedDistrict == "Kurigram")">Kurigram</option>
-                    <option value="Sunamganj" selected="@(ViewBag.SelectedDistrict == "Sunamganj")">Sunamganj</option>
-                    <option value="Bandarban" selected="@(ViewBag.SelectedDistrict == "Bandarban")">Bandarban</option>
-                    <option value="Satkhira" selected="@(ViewBag.SelectedDistrict == "Satkhira")">Satkhira</option>
-                    <option value="Rangpur" selected="@(ViewBag.SelectedDistrict == "Rangpur")">Rangpur</option>
-                    <option value="Dhaka" selected="@(ViewBag.SelectedDistrict == "Dhaka")">Dhaka</option>
+                    @if(ViewBag.Districts != null)
+                    {
+                        foreach(var d in (List<string>)ViewBag.Districts)
+                        {
+                            <option value="@d" selected="@(ViewBag.SelectedDistrict == d)">@d</option>
+                        }
+                    }
                 </select>
             </div>
-            <div class="col-md-3">
-                <select name="campType" class="form-select form-select-custom" onchange="this.form.submit()">
-                    <option value="All" selected="@(ViewBag.SelectedType == "All" || string.IsNullOrEmpty(ViewBag.SelectedType))">All Camp Types</option>
-                    <option value="General" selected="@(ViewBag.SelectedType == "General")">General Healthcare</option>
-                    <option value="Maternal" selected="@(ViewBag.SelectedType == "Maternal")">Maternal & Child Care</option>
-                    <option value="Eye" selected="@(ViewBag.SelectedType == "Eye")">Eye & Dental</option>
-                    <option value="Diabetes" selected="@(ViewBag.SelectedType == "Diabetes")">Non-Communicable Diseases</option>
+            <div class="col-md-2">
+                <select name="upazila" class="form-select form-select-custom" onchange="this.form.submit()">
+                    <option value="All" selected="@(ViewBag.SelectedUpazila == "All" || string.IsNullOrEmpty(ViewBag.SelectedUpazila))">All Upazilas</option>
+                    @if(ViewBag.Upazilas != null)
+                    {
+                        foreach(var u in (List<string>)ViewBag.Upazilas)
+                        {
+                            <option value="@u" selected="@(ViewBag.SelectedUpazila == u)">@u</option>
+                        }
+                    }
                 </select>
+            </div>
+            <div class="col-md-2">
+                <input type="date" name="startDate" value="@ViewBag.SelectedDate" class="form-control form-control-custom" onchange="this.form.submit()" placeholder="After Date" />
             </div>
             <div class="col-md-2 d-flex gap-2">
                 <button type="submit" class="btn btn-sapphire w-100 btn-sm-custom py-2">

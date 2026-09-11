@@ -23,7 +23,7 @@ namespace MediCamp.Controllers
             return View(model);
         }
 
-        public IActionResult Camps(string? district, string? campType, string? search)
+        public IActionResult Camps(string? district, string? upazila, DateTime? startDate, string? search)
         {
             var camps = _dataService.GetAllCamps()
                 .Where(c => c.Status == "Scheduled" || c.Status == "Ongoing" || c.Status == "Completed")
@@ -34,9 +34,14 @@ namespace MediCamp.Controllers
                 camps = camps.Where(c => c.District.Equals(district, StringComparison.OrdinalIgnoreCase)).ToList();
             }
 
-            if (!string.IsNullOrWhiteSpace(campType) && campType != "All")
+            if (!string.IsNullOrWhiteSpace(upazila) && upazila != "All")
             {
-                camps = camps.Where(c => c.CampType.Contains(campType, StringComparison.OrdinalIgnoreCase)).ToList();
+                camps = camps.Where(c => c.Upazila.Equals(upazila, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
+            if (startDate.HasValue)
+            {
+                camps = camps.Where(c => c.StartDate.Date >= startDate.Value.Date).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(search))
@@ -48,8 +53,19 @@ namespace MediCamp.Controllers
             }
 
             ViewBag.SelectedDistrict = district;
-            ViewBag.SelectedType = campType;
+            ViewBag.SelectedUpazila = upazila;
+            ViewBag.SelectedDate = startDate?.ToString("yyyy-MM-dd");
             ViewBag.SearchTerm = search;
+
+            // Extract distinct values for dropdowns
+            ViewBag.Districts = _dataService.GetAllCamps().Select(c => c.District).Distinct().OrderBy(d => d).ToList();
+            
+            var upazilasQuery = _dataService.GetAllCamps().AsEnumerable();
+            if (!string.IsNullOrWhiteSpace(district) && district != "All")
+            {
+                upazilasQuery = upazilasQuery.Where(c => c.District.Equals(district, StringComparison.OrdinalIgnoreCase));
+            }
+            ViewBag.Upazilas = upazilasQuery.Select(c => c.Upazila).Distinct().OrderBy(u => u).ToList();
 
             return View(camps);
         }
