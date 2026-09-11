@@ -3,7 +3,7 @@
     ViewData["Title"] = "Home - Smart Camp Management";
 }
 
-<!-- Hero Section matching User's Exact Emerald Ink & Champagne Demo Mockup -->
+<!-- Hero Section with Spatial Depth Perspective & Caustic Glows -->
 <section class="hero-emerald-banner">
     <div class="container position-relative" style="z-index: 2;">
         <div class="row align-items-center g-5">
@@ -11,83 +11,85 @@
             <!-- Left Hero Content -->
             <div class="col-lg-7">
                 <div class="hero-badge-pill">
-                    <span class="text-success me-1">●</span> SDG 3 & 10 Aligned • 100% Free Rural Healthcare OS
+                    <span class="text-success me-1">●</span> <span data-i18n="hero.badge">SDG 3 & 10 Aligned • 100% Free Rural Healthcare OS</span>
                 </div>
                 
                 <h1 class="hero-title-emerald">
-                    Empowering Community Health Through <span class="text-champagne">Smart Camp Management</span>
+                    <span data-i18n="hero.title">Smart Healthcare Camps.</span>
                 </h1>
                 
-                <p class="lead opacity-90 text-light mb-4" style="font-size: 1.12rem; line-height: 1.75; max-width: 620px;">
-                    MediCamp is a role-based digital health ecosystem built to transform temporary NGO medical camps across rural Bangladesh. Replacing fragile paper slips with longitudinal patient EMRs, atomic inventory auto-deduction, and closed-loop hospital referrals.
+                <p class="lead opacity-90 text-secondary mb-4" data-i18n="hero.desc" style="font-size: 1.15rem; line-height: 1.75; max-width: 620px;">
+                    Orchestrating NGO medical outreach across rural Bangladesh.
                 </p>
                 
                 <div class="d-flex flex-wrap gap-3 mb-4">
-                    <a asp-controller="Home" asp-action="Camps" class="btn btn-champagne">
+                    <a asp-controller="Home" asp-action="Camps" class="btn btn-champagne" data-i18n="hero.btnCamps">
                         <i class="fa-solid fa-location-dot me-1"></i> Find Upcoming Camps
                     </a>
-                    <a asp-controller="Account" asp-action="RegisterHost" class="btn btn-outline-champagne">
+                    <a asp-controller="Account" asp-action="RegisterHost" class="btn btn-outline-champagne" data-i18n="hero.btnHost">
                         <i class="fa-solid fa-building-ngo me-1"></i> Register as Host NGO
                     </a>
-                    <a asp-controller="Account" asp-action="RegisterPatient" asp-route-donor="true" class="btn btn-blood-red">
+                    <a asp-controller="Account" asp-action="RegisterPatient" asp-route-donor="true" class="btn btn-blood-red" data-i18n="hero.btnBlood">
                         <i class="fa-solid fa-droplet me-1"></i> Join Blood Donors
                     </a>
                 </div>
             </div>
 
-            <!-- Right Live System Status Card (Exact UI Layout from Demo Image) -->
+            <!-- Right Live System Status Card (Liquid Glass with Caustic Glow) -->
             <div class="col-lg-5">
-                <div class="live-status-card">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="badge px-3 py-1 fw-bold text-uppercase" style="background: rgba(16, 185, 129, 0.25); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4); font-size: 0.72rem; letter-spacing: 0.05em;">
-                            LIVE SYSTEM STATUS
-                        </span>
-                        <span class="small text-light opacity-75 fw-semibold">
-                            <i class="fa-regular fa-clock me-1"></i> Synced Live
-                        </span>
-                    </div>
-
-                    <h4 class="fw-bold text-white mb-1">Kurigram Char Camp Active</h4>
-                    <p class="small text-light opacity-75 mb-3">
-                        Host: Friendship Bangladesh Healthcare • Venue: Rowmari
-                    </p>
-
-                    <!-- Queue Progress Box -->
-                    <div class="p-3 rounded-4 mb-3" style="background: rgba(2, 44, 34, 0.75); border: 1px solid rgba(16, 185, 129, 0.25);">
-                        <div class="d-flex justify-content-between align-items-center small mb-2">
-                            <span class="text-light opacity-75 font-monospace">Today's Patient Queue</span>
-                            <span class="fw-bold text-champagne">492 / 650 Served</span>
+                <div class="caustic-glow-wrap spatial-stage">
+                    <div class="live-status-card liquid-glass-card">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="badge px-3 py-1 fw-bold text-uppercase" data-i18n="status.live" style="background: rgba(38, 213, 175, 0.18); color: var(--accent-focal); border: 1px solid rgba(38, 213, 175, 0.35); font-size: 0.72rem; letter-spacing: 0.06em;">
+                                LIVE SYSTEM STATUS
+                            </span>
+                            <span class="small opacity-75 fw-semibold" data-i18n="status.synced">
+                                <i class="fa-regular fa-clock me-1 text-emerald-light"></i> Synced Live
+                            </span>
                         </div>
-                        <div class="progress mb-2" style="height: 6px; background: rgba(255,255,255,0.15);">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: 76%" aria-valuenow="76" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center text-light opacity-75" style="font-size: 0.76rem;">
-                            <span>Avg Wait Time: <strong class="text-white">22 mins</strong></span>
-                            <span>Stock Outages: <strong class="text-emerald-light" style="color: #6ee7b7;">0 reported</strong></span>
-                        </div>
-                    </div>
 
-                    <!-- Metrics Grid -->
-                    <div class="row g-2 mb-3">
-                        <div class="col-6">
-                            <div class="p-3 rounded-4 text-center" style="background: rgba(2, 44, 34, 0.75); border: 1px solid rgba(16, 185, 129, 0.2);">
-                                <div class="fs-4 fw-bold text-champagne mb-0">18,400+</div>
-                                <div class="small text-light opacity-75" style="font-size: 0.75rem;">Blood Donors Ready</div>
+                        <h4 class="fw-bold mb-1" data-i18n="status.campTitle">Kurigram Char Camp Active</h4>
+                        <p class="small text-secondary mb-3" data-i18n="status.campSub">
+                            Host: Friendship Bangladesh Healthcare • Venue: Rowmari
+                        </p>
+
+                        <!-- Queue Progress Box -->
+                        <div class="p-3 rounded-4 mb-3 status-progress-box">
+                            <div class="d-flex justify-content-between align-items-center small mb-2">
+                                <span class="text-secondary font-monospace" data-i18n="status.queueTitle">Today's Patient Queue</span>
+                                <span class="fw-bold text-emerald-light" style="color: var(--accent-focal);" data-i18n="status.queueCount">492 / 650 Served</span>
+                            </div>
+                            <div class="progress mb-2" style="height: 6px; background: rgba(0,0,0,0.15);">
+                                <div class="progress-bar" role="progressbar" style="width: 76%; background: linear-gradient(90deg, #12b893, #26d5af);" aria-valuenow="76" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center text-secondary" style="font-size: 0.78rem;">
+                                <span><span data-i18n="status.avgWait">Avg Wait Time:</span> <strong data-i18n="status.avgWaitVal">22 mins</strong></span>
+                                <span><span data-i18n="status.stockOut">Stock Outages:</span> <strong style="color: var(--accent-focal);" data-i18n="status.stockOutVal">0 reported</strong></span>
                             </div>
                         </div>
-                        <div class="col-6">
-                            <div class="p-3 rounded-4 text-center" style="background: rgba(2, 44, 34, 0.75); border: 1px solid rgba(16, 185, 129, 0.2);">
-                                <div class="fs-4 fw-bold text-emerald-light mb-0" style="color: #6ee7b7;">&lt; 45s</div>
-                                <div class="small text-light opacity-75" style="font-size: 0.75rem;">Triage Intake Speed</div>
+
+                        <!-- Metrics Grid -->
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <div class="p-3 rounded-4 text-center status-metric-box">
+                                    <div class="fs-4 fw-bold mb-0 text-emerald-light" style="color: var(--accent-focal);" data-i18n="status.donorsCount">18,400+</div>
+                                    <div class="small text-secondary" style="font-size: 0.75rem;" data-i18n="status.donorsLabel">Blood Donors Ready</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-3 rounded-4 text-center status-metric-box">
+                                    <div class="fs-4 fw-bold mb-0 text-teal" style="color: var(--teal-300);" data-i18n="status.triageSpeed">&lt; 45s</div>
+                                    <div class="small text-secondary" style="font-size: 0.75rem;" data-i18n="status.triageLabel">Triage Intake Speed</div>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Hospital Referral Alert Banner -->
-                    <div class="p-3 rounded-4 d-flex align-items-center gap-2 small" style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); color: #d1fae5;">
-                        <i class="fa-solid fa-bell text-warning"></i>
-                        <div>
-                            <strong>Hospital Referral:</strong> 2 critical patients routed to Rangpur Sadar Hospital.
+                        <!-- Hospital Referral Alert Banner -->
+                        <div class="p-3 rounded-4 d-flex align-items-center gap-2 small" style="background: rgba(38, 213, 175, 0.12); border: 1px solid rgba(38, 213, 175, 0.3); color: var(--accent-focal);">
+                            <i class="fa-solid fa-bell text-warning"></i>
+                            <div>
+                                <strong data-i18n="status.referralLabel">Hospital Referral:</strong> <span data-i18n="status.referralText">2 critical patients routed to Rangpur Sadar Hospital.</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -97,152 +99,261 @@
     </div>
 </section>
 
-<!-- 6 System Actors Architecture -->
-<section class="py-5">
-    <div class="container">
-        <div class="text-center max-w-700 mx-auto mb-5">
-            <span class="badge text-uppercase fw-bold px-3 py-1 mb-2" style="background: rgba(6, 78, 59, 0.1); color: #064e3b; border-radius: 50rem;">Role-Based Ecosystem</span>
-            <h2 class="fw-bold fs-1 text-dark">One Platform, Six Specialized Roles</h2>
-            <p class="text-secondary">
-                MediCamp provides each healthcare participant with a focused dashboard optimized for low-bandwidth field deployment.
+<!-- ==========================================================================
+     RE-ARCHITECTED BENTO GRID HIERARCHY (Apple/Linear-Inspired UI)
+     ========================================================================== -->
+<section class="py-5 spatial-stage">
+    <div class="container py-4">
+        
+        <!-- Bento Header -->
+        <div class="text-center mx-auto mb-4" style="max-width: 760px;">
+            <span class="bento-chip mb-2" data-i18n="roles.badge">
+                <i class="fa-solid fa-shapes me-1"></i> Role-Based Ecosystem
+            </span>
+            <h2 class="fw-bold fs-1 mb-2" data-i18n="roles.heading">One Platform, Six Specialized Roles</h2>
+            <p class="text-secondary" data-i18n="roles.subheading">
+                MediCamp provides each healthcare participant with a focused, low-latency dashboard designed for low-bandwidth rural field deployment.
             </p>
         </div>
 
-        <div class="row g-4">
-            <!-- 1. Admin -->
-            <div class="col-md-6 col-lg-4">
-                <div class="glass-card h-100 p-4">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <span class="badge badge-role-admin"><i class="fa-solid fa-shield-halved"></i> Governance</span>
-                        <span class="text-muted small fw-semibold">Role 01</span>
+        <!-- Asymmetrical Bento Grid -->
+        <div class="bento-grid">
+            
+            <!-- Bento Cell 1: WIDE FEATURE PANEL (8 Cols) - Central Governance & NGO Operations -->
+            <div class="bento-cell-wide">
+                <div class="liquid-glass-card h-100 p-4 p-md-5 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                            <div class="d-flex gap-2">
+                                <span class="badge badge-role-admin"><i class="fa-solid fa-shield-halved"></i> Governance</span>
+                                <span class="badge badge-role-host"><i class="fa-solid fa-building-ngo"></i> NGO Host</span>
+                            </div>
+                            <span class="text-muted small fw-semibold font-monospace">Roles 01 & 02 • Core Infrastructure</span>
+                        </div>
+
+                        <h3 class="fw-bold fs-3 mb-2" data-i18n="roles.r1Title">Central Governance & NGO Host Coordination</h3>
+                        <p class="text-secondary mb-4" style="max-width: 650px;" data-i18n="roles.r2Desc">
+                            Empowers System Administrators to approve NGO Host applications and supervise master medicine registries, while allowing Organizing NGOs to budget field camps, allocate clinician teams, and track emergency expenditures.
+                        </p>
+
+                        <!-- Bento Sub-Metrics Row -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-sm-4">
+                                <div class="p-3 sub-card">
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <i class="fa-solid fa-boxes-stacked text-emerald-light"></i>
+                                        <span class="small fw-semibold">Master Medicines</span>
+                                    </div>
+                                    <div class="fs-5 fw-bold text-emerald-light">1,240+ Items</div>
+                                    <span class="small text-secondary" style="font-size: 0.72rem;">Standard Essential List</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="p-3 sub-card">
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <i class="fa-solid fa-handshake-angle text-teal"></i>
+                                        <span class="small fw-semibold">NGO Verification</span>
+                                    </div>
+                                    <div class="fs-5 fw-bold text-teal">100% Audited</div>
+                                    <span class="small text-secondary" style="font-size: 0.72rem;">NID & NGOAB Verified</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="p-3 sub-card">
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <i class="fa-solid fa-chart-line text-emerald-light"></i>
+                                        <span class="small fw-semibold">Expense Ledger</span>
+                                    </div>
+                                    <div class="fs-5 fw-bold">Live Synced</div>
+                                    <span class="small text-secondary" style="font-size: 0.72rem;">Audit-Ready Transparency</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <h4 class="fw-bold mb-2">System Administrator</h4>
-                    <p class="text-secondary small mb-3">
-                        Controls global user accounts, approves NGO Host registrations, maintains master medicine lists, and generates national reports.
-                    </p>
-                    <a asp-controller="Account" asp-action="Login" class="small fw-bold text-decoration-none text-purple">
-                        Sign In as Admin <i class="fa-solid fa-chevron-right ms-1"></i>
-                    </a>
+
+                    <div class="d-flex flex-wrap gap-3 pt-3 border-top border-secondary border-opacity-25">
+                        <a asp-controller="Account" asp-action="Login" class="btn btn-champagne btn-sm-custom" data-i18n="roles.r1Btn">
+                            Sign In as Admin <i class="fa-solid fa-arrow-right ms-1"></i>
+                        </a>
+                        <a asp-controller="Account" asp-action="RegisterHost" class="btn btn-outline-champagne btn-sm-custom" data-i18n="roles.r2Btn">
+                            Register NGO Host <i class="fa-solid fa-building-ngo ms-1"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
 
-            <!-- 2. Host NGO -->
-            <div class="col-md-6 col-lg-4">
-                <div class="glass-card h-100 p-4">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <span class="badge badge-role-host"><i class="fa-solid fa-building-ngo"></i> NGO Organizer</span>
-                        <span class="text-muted small fw-semibold">Role 02</span>
+            <!-- Bento Cell 2: TALL FOCAL PANEL (4 Cols, Spans 2 Rows) - Volunteer Clinician Desk -->
+            <div class="bento-cell-tall">
+                <div class="liquid-glass-card h-100 p-4 p-md-5 d-flex flex-column justify-content-between" style="border-top: 2px solid var(--accent-focal);">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="badge badge-role-doctor"><i class="fa-solid fa-user-doctor"></i> Clinician Desk</span>
+                            <span class="text-muted small fw-semibold">Role 03</span>
+                        </div>
+
+                        <div class="bento-icon-badge mb-3">
+                            <i class="fa-solid fa-stethoscope"></i>
+                        </div>
+
+                        <h3 class="fw-bold fs-4 mb-2" data-i18n="roles.r3Title">Volunteer Doctor</h3>
+                        <p class="text-secondary small mb-4" data-i18n="roles.r3Desc">
+                            Reviews patient medical history across prior camps, inputs diagnoses, builds camp-inventory-mapped e-prescriptions, and creates closed-loop hospital referrals.
+                        </p>
+
+                        <!-- Workflow Progress Feature in Bento -->
+                        <div class="sub-card p-3 mb-3">
+                            <div class="small fw-bold text-emerald-light mb-2">
+                                <i class="fa-solid fa-arrows-spin me-1"></i> Clinical Workflow Engine
+                            </div>
+                            <ul class="list-unstyled small mb-0 d-flex flex-column gap-2 text-secondary">
+                                <li class="d-flex align-items-center gap-2">
+                                    <i class="fa-solid fa-circle-check text-success" style="font-size: 0.8rem;"></i>
+                                    <span>Instant Longitudinal EMR Retrieval</span>
+                                </li>
+                                <li class="d-flex align-items-center gap-2">
+                                    <i class="fa-solid fa-circle-check text-success" style="font-size: 0.8rem;"></i>
+                                    <span>Real-Time Inventory Drug Picker</span>
+                                </li>
+                                <li class="d-flex align-items-center gap-2">
+                                    <i class="fa-solid fa-circle-check text-success" style="font-size: 0.8rem;"></i>
+                                    <span>District Hospital Referral Routing</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="p-3 rounded-3" style="background: rgba(38, 213, 175, 0.08); border: 1px solid rgba(38, 213, 175, 0.2);">
+                            <div class="small fw-semibold text-emerald-light mb-1">Low-Bandwidth Optimized</div>
+                            <p class="small text-secondary mb-0" style="font-size: 0.78rem;">
+                                Operates reliably even under 2G village connectivity with client-side offline queue cache.
+                            </p>
+                        </div>
                     </div>
-                    <h4 class="fw-bold mb-2">Host (Organizing NGO)</h4>
-                    <p class="text-secondary small mb-3">
-                        Plans camps with budgets, assigns doctors and volunteers, allocates medicine stock, and monitors field expenses.
-                    </p>
-                    <a asp-controller="Account" asp-action="RegisterHost" class="small fw-bold text-decoration-none text-primary">
-                        Register NGO Host <i class="fa-solid fa-chevron-right ms-1"></i>
-                    </a>
+
+                    <div class="pt-4 border-top border-secondary border-opacity-25 mt-4">
+                        <a asp-controller="Account" asp-action="RegisterDoctor" class="btn btn-champagne w-100 btn-sm-custom" data-i18n="roles.r3Btn">
+                            <i class="fa-solid fa-stethoscope me-1"></i> Register as Doctor
+                        </a>
+                    </div>
                 </div>
             </div>
 
-            <!-- 3. Doctor -->
-            <div class="col-md-6 col-lg-4">
-                <div class="glass-card h-100 p-4">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <span class="badge badge-role-doctor"><i class="fa-solid fa-user-doctor"></i> Clinician</span>
-                        <span class="text-muted small fw-semibold">Role 03</span>
+            <!-- Bento Cell 3: COMPACT FEATURE (4 Cols) - Field Triage & Screening -->
+            <div class="bento-cell-compact">
+                <div class="liquid-glass-card h-100 p-4 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="badge badge-role-volunteer"><i class="fa-solid fa-hand-holding-heart"></i> Field Triage</span>
+                            <span class="text-muted small fw-semibold">Role 04</span>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="bento-icon-badge" style="background: rgba(245, 158, 11, 0.16); color: #fbbf24; border-color: rgba(245, 158, 11, 0.35);">
+                                <i class="fa-solid fa-heart-pulse"></i>
+                            </div>
+                            <div>
+                                <h4 class="fw-bold fs-5 mb-0" data-i18n="roles.r4Title">Field Volunteer</h4>
+                                <span class="small text-secondary">Screening & Patient Intake</span>
+                            </div>
+                        </div>
+
+                        <p class="text-secondary small mb-3" data-i18n="roles.r4Desc">
+                            Searches or registers patients by NID, records vital signs (BP, BMI, Temp), issues digital queue tokens, and logs follow-up home visits.
+                        </p>
                     </div>
-                    <h4 class="fw-bold mb-2">Volunteer Doctor</h4>
-                    <p class="text-secondary small mb-3">
-                        Reviews patient medical history across prior camps, inputs diagnoses, builds e-prescriptions, and creates hospital referrals.
-                    </p>
-                    <a asp-controller="Account" asp-action="RegisterDoctor" class="small fw-bold text-decoration-none text-teal">
-                        Register as Doctor <i class="fa-solid fa-chevron-right ms-1"></i>
-                    </a>
+
+                    <div class="pt-3 border-top border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+                        <span class="small text-muted font-monospace">&lt; 45s per intake</span>
+                        <a asp-controller="Account" asp-action="RegisterVolunteer" class="btn btn-outline-champagne btn-sm-custom" data-i18n="roles.r4Btn">
+                            Register <i class="fa-solid fa-chevron-right ms-1"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
 
-            <!-- 4. Volunteer -->
-            <div class="col-md-6 col-lg-4">
-                <div class="glass-card h-100 p-4">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <span class="badge badge-role-volunteer"><i class="fa-solid fa-hand-holding-heart"></i> Field Triage</span>
-                        <span class="text-muted small fw-semibold">Role 04</span>
+            <!-- Bento Cell 4: COMPACT FEATURE (4 Cols) - Camp Dispensary & Inventory -->
+            <div class="bento-cell-compact">
+                <div class="liquid-glass-card h-100 p-4 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="badge badge-role-pharmacist"><i class="fa-solid fa-prescription-bottle-medical"></i> Dispensary</span>
+                            <span class="text-muted small fw-semibold">Role 05</span>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="bento-icon-badge" style="background: rgba(56, 189, 248, 0.16); color: #38bdf8; border-color: rgba(56, 189, 248, 0.35);">
+                                <i class="fa-solid fa-pills"></i>
+                            </div>
+                            <div>
+                                <h4 class="fw-bold fs-5 mb-0" data-i18n="roles.r5Title">Camp Pharmacist</h4>
+                                <span class="small text-secondary">Atomic Stock Auto-Deduction</span>
+                            </div>
+                        </div>
+
+                        <p class="text-secondary small mb-3" data-i18n="roles.r5Desc">
+                            Receives live prescription queues from doctor workspaces, dispenses medicines with barcode verification, and requests emergency restocks.
+                        </p>
                     </div>
-                    <h4 class="fw-bold mb-2">Field Volunteer</h4>
-                    <p class="text-secondary small mb-3">
-                        Searches or registers patients by NID, records vital signs (BP, BMI, Temp), issues queue tokens, and logs follow-up visits.
-                    </p>
-                    <a asp-controller="Account" asp-action="RegisterVolunteer" class="small fw-bold text-decoration-none text-warning">
-                        Register as Volunteer <i class="fa-solid fa-chevron-right ms-1"></i>
-                    </a>
+
+                    <div class="pt-3 border-top border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+                        <span class="small text-muted font-monospace">0 Stock-Outs</span>
+                        <a asp-controller="Account" asp-action="RegisterPharmacist" class="btn btn-outline-champagne btn-sm-custom" data-i18n="roles.r5Btn">
+                            Register <i class="fa-solid fa-chevron-right ms-1"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
 
-            <!-- 5. Pharmacist -->
-            <div class="col-md-6 col-lg-4">
-                <div class="glass-card h-100 p-4">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <span class="badge badge-role-pharmacist"><i class="fa-solid fa-prescription-bottle-medical"></i> Dispensary</span>
-                        <span class="text-muted small fw-semibold">Role 05</span>
+            <!-- Bento Cell 5: WIDE COMMUNITY PANEL (8 Cols) - Patient Records & Blood Donor Network -->
+            <div class="bento-cell-community">
+                <div class="liquid-glass-card h-100 p-4 p-md-5 d-flex flex-column justify-content-between" style="background: linear-gradient(135deg, var(--glass-fill) 0%, rgba(225, 29, 72, 0.08) 100%);">
+                    <div>
+                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                            <div class="d-flex gap-2">
+                                <span class="badge badge-role-patient"><i class="fa-solid fa-user"></i> Role 06: Community Patient</span>
+                                <span class="badge bg-danger text-white"><i class="fa-solid fa-droplet me-1"></i> Voluntary Blood Donor Network</span>
+                            </div>
+                            <span class="text-muted small fw-semibold font-monospace">18,400+ Donors Ready</span>
+                        </div>
+
+                        <h3 class="fw-bold fs-3 mb-2" data-i18n="blood.heading">Community Health Records & Blood Donation Hub</h3>
+                        <p class="text-secondary mb-4" style="max-width: 680px;" data-i18n="blood.desc">
+                            Patients can access lifetime e-prescriptions, view upcoming village camp schedules, and opt-in as voluntary blood donors during registration. Search donors by blood group (A+, B+, O+, AB-) and district for emergency hospital referrals.
+                        </p>
+
+                        <!-- Blood Group Interactive Pills -->
+                        <div class="d-flex flex-wrap gap-2 mb-4">
+                            <span class="badge px-3 py-2 sub-card fw-bold" style="color: #f43f5e; border-color: rgba(244, 63, 94, 0.3);">A+ Positive</span>
+                            <span class="badge px-3 py-2 sub-card fw-bold" style="color: #f43f5e; border-color: rgba(244, 63, 94, 0.3);">B+ Positive</span>
+                            <span class="badge px-3 py-2 sub-card fw-bold" style="color: #f43f5e; border-color: rgba(244, 63, 94, 0.3);">O+ Universal Donor</span>
+                            <span class="badge px-3 py-2 sub-card fw-bold" style="color: #f43f5e; border-color: rgba(244, 63, 94, 0.3);">AB+ Universal Recipient</span>
+                            <span class="badge px-3 py-2 sub-card fw-bold" style="color: #f43f5e; border-color: rgba(244, 63, 94, 0.3);">64 Districts Covered</span>
+                        </div>
                     </div>
-                    <h4 class="fw-bold mb-2">Camp Pharmacist</h4>
-                    <p class="text-secondary small mb-3">
-                        Receives live prescription queues from doctor workspaces, dispenses medicines with stock auto-deduction, and requests restocks.
-                    </p>
-                    <a asp-controller="Account" asp-action="RegisterPharmacist" class="small fw-bold text-decoration-none text-info">
-                        Register as Pharmacist <i class="fa-solid fa-chevron-right ms-1"></i>
-                    </a>
+
+                    <div class="d-flex flex-wrap gap-3 pt-3 border-top border-secondary border-opacity-25">
+                        <a asp-controller="Account" asp-action="RegisterPatient" class="btn btn-champagne btn-sm-custom" data-i18n="roles.r6Btn">
+                            <i class="fa-solid fa-user-plus me-1"></i> Register Patient Account
+                        </a>
+                        <a asp-controller="Account" asp-action="RegisterPatient" asp-route-donor="true" class="btn btn-blood-red btn-sm-custom" data-i18n="blood.btn">
+                            <i class="fa-solid fa-heart-circle-plus me-1"></i> Opt-in as Blood Donor
+                        </a>
+                    </div>
                 </div>
             </div>
 
-            <!-- 6. Patient -->
-            <div class="col-md-6 col-lg-4">
-                <div class="glass-card h-100 p-4">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <span class="badge badge-role-patient"><i class="fa-solid fa-user"></i> Community</span>
-                        <span class="text-muted small fw-semibold">Role 06</span>
-                    </div>
-                    <h4 class="fw-bold mb-2">Registered Patient</h4>
-                    <p class="text-secondary small mb-3">
-                        Views upcoming camp schedules, accesses digital health records, and opts into the community Blood Donor Registry.
-                    </p>
-                    <a asp-controller="Account" asp-action="RegisterPatient" class="small fw-bold text-decoration-none text-danger">
-                        Register Patient Account <i class="fa-solid fa-chevron-right ms-1"></i>
-                    </a>
-                </div>
-            </div>
         </div>
     </div>
 </section>
 
-<!-- Blood Donation Feature Spotlight Banner -->
-<section class="py-5" style="background: rgba(220, 38, 38, 0.04); border-top: 1px solid rgba(220, 38, 38, 0.15); border-bottom: 1px solid rgba(220, 38, 38, 0.15);">
-    <div class="container">
-        <div class="row align-items-center g-4">
-            <div class="col-md-8">
-                <span class="badge bg-danger text-white px-3 py-1 fw-bold text-uppercase mb-2"><i class="fa-solid fa-droplet me-1"></i> Integrated Blood Donor Network</span>
-                <h2 class="fw-bold text-dark mb-2">Voluntary Blood Donation Hub</h2>
-                <p class="text-secondary mb-0">
-                    Patients can opt-in as voluntary blood donors during registration. Search donors by blood group (A+, B+, O+, AB-) and district for emergency hospital referrals.
-                </p>
-            </div>
-            <div class="col-md-4 text-md-end">
-                <a asp-controller="Account" asp-action="RegisterPatient" asp-route-donor="true" class="btn btn-blood-red btn-lg">
-                    <i class="fa-solid fa-heart-circle-plus me-2"></i> Opt-in as Donor Now
-                </a>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Upcoming Camps Preview -->
-<section class="py-5">
-    <div class="container">
+<!-- Upcoming Camps Preview with Liquid Glass Cards -->
+<section class="py-5 spatial-stage">
+    <div class="container py-4">
         <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
             <div>
-                <h2 class="fw-bold mb-1 text-dark">Upcoming Community Health Camps</h2>
-                <p class="text-secondary mb-0">Free medical consultations and medicines scheduled in rural upazilas.</p>
+                <h2 class="fw-bold mb-1" data-i18n="camps.heading">Upcoming Community Health Camps</h2>
+                <p class="text-secondary mb-0" data-i18n="camps.subheading">Free medical consultations and medicines scheduled in rural upazilas.</p>
             </div>
-            <a asp-controller="Home" asp-action="Camps" class="btn btn-outline-sapphire">
+            <a asp-controller="Home" asp-action="Camps" class="btn btn-outline-sapphire" data-i18n="camps.btnBrowseAll">
                 <i class="fa-solid fa-list-check me-1"></i> Browse All Camps
             </a>
         </div>
@@ -251,28 +362,28 @@
             @foreach (var camp in Model.UpcomingCamps)
             {
                 <div class="col-lg-4 col-md-6">
-                    <div class="glass-card h-100 p-4 d-flex flex-column justify-content-between">
+                    <div class="liquid-glass-card h-100 p-4 d-flex flex-column justify-content-between">
                         <div>
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="badge @(camp.Status == "Ongoing" ? "bg-success" : "bg-primary") px-2 py-1 small">
+                                <span class="badge @(camp.Status == "Ongoing" ? "badge-status-active" : "badge-role-host") px-2 py-1 small">
                                     <i class="fa-solid fa-circle-dot me-1"></i> @camp.Status
                                 </span>
-                                <span class="text-muted small fw-bold"><i class="fa-solid fa-calendar-days text-primary me-1"></i>@camp.StartDate.ToString("dd MMM yyyy")</span>
+                                <span class="text-secondary small fw-bold"><i class="fa-solid fa-calendar-days text-emerald-light me-1"></i>@camp.StartDate.ToString("dd MMM yyyy")</span>
                             </div>
-                            <h5 class="fw-bold text-dark mb-2">@camp.Title</h5>
+                            <h5 class="fw-bold mb-2">@camp.Title</h5>
                             <div class="mb-3">
-                                <span class="badge bg-light text-dark border small"><i class="fa-solid fa-stethoscope me-1 text-primary"></i>@camp.CampType</span>
+                                <span class="badge badge-dark-glass small"><i class="fa-solid fa-stethoscope me-1 text-emerald-light"></i>@camp.CampType</span>
                             </div>
                             <div class="small text-secondary mb-3">
                                 <div class="mb-1"><i class="fa-solid fa-location-dot text-danger me-2"></i><strong>@camp.Upazila, @camp.District</strong></div>
                                 <div class="mb-1"><i class="fa-solid fa-school text-muted me-2"></i>@camp.Venue</div>
-                                <div><i class="fa-solid fa-building-ngo text-primary me-2"></i>@camp.HostOrganization</div>
+                                <div><i class="fa-solid fa-building-ngo text-emerald-light me-2"></i>@camp.HostOrganization</div>
                             </div>
                         </div>
 
-                        <div class="pt-3 border-top d-flex justify-content-between align-items-center">
-                            <span class="small text-muted">Expected: <strong>@camp.ExpectedPatients</strong> Patients</span>
-                            <a asp-controller="Account" asp-action="RegisterPatient" class="btn btn-sapphire btn-sm-custom">
+                        <div class="pt-3 border-top border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+                            <span class="small text-secondary"><span data-i18n="camps.expected">Expected:</span> <strong>@camp.ExpectedPatients</strong> <span data-i18n="camps.patients">Patients</span></span>
+                            <a asp-controller="Account" asp-action="RegisterPatient" class="btn btn-sapphire btn-sm-custom" data-i18n="camps.registerPatient">
                                 Register Patient
                             </a>
                         </div>

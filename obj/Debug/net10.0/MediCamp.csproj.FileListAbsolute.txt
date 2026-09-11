@@ -24,7 +24,6 @@ D:\3.2\MediCamp\obj\Debug\net10.0\scopedcss\bundle\MediCamp.styles.css
 D:\3.2\MediCamp\obj\Debug\net10.0\scopedcss\projectbundle\MediCamp.bundle.scp.css
 D:\3.2\MediCamp\obj\Debug\net10.0\compressed\bt9hhnvs4i-{0}-b9sayid5wm-b9sayid5wm.gz
 D:\3.2\MediCamp\obj\Debug\net10.0\compressed\2mb5515aqh-{0}-61n19gt1b8-61n19gt1b8.gz
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\bzhkr1d6no-{0}-xtxxf3hu2r-xtxxf3hu2r.gz
 D:\3.2\MediCamp\obj\Debug\net10.0\compressed\z983zekxqp-{0}-bqjiyaj88i-bqjiyaj88i.gz
 D:\3.2\MediCamp\obj\Debug\net10.0\compressed\39ik3u6u5g-{0}-c2jlpeoesf-c2jlpeoesf.gz
 D:\3.2\MediCamp\obj\Debug\net10.0\compressed\aj2ndzffqg-{0}-erw9l3u2r3-erw9l3u2r3.gz
@@ -96,4 +95,5 @@ D:\3.2\MediCamp\obj\Debug\net10.0\refint\MediCamp.dll
 D:\3.2\MediCamp\obj\Debug\net10.0\MediCamp.pdb
 D:\3.2\MediCamp\obj\Debug\net10.0\MediCamp.genruntimeconfig.cache
 D:\3.2\MediCamp\obj\Debug\net10.0\ref\MediCamp.dll
-D:\3.2\MediCamp\obj\Debug\net10.0\compressed\bvnugnltr5-{0}-ofe07h6k3c-ofe07h6k3c.gz
+D:\3.2\MediCamp\obj\Debug\net10.0\compressed\bvnugnltr5-{0}-ita4lahg6h-ita4lahg6h.gz
+D:\3.2\MediCamp\obj\Debug\net10.0\compressed\bzhkr1d6no-{0}-53di42tfqc-53di42tfqc.gz
