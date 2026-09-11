@@ -28,6 +28,8 @@ namespace MediCamp.Data
         public DbSet<Hospital> Hospitals { get; set; }
         public DbSet<BloodGroupMaster> BloodGroupMasters { get; set; }
         public DbSet<PatientFollowUp> PatientFollowUps { get; set; }
+        public DbSet<BloodRequest> BloodRequests { get; set; }
+        public DbSet<BloodDonationLog> BloodDonationLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

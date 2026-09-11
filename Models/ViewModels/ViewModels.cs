@@ -673,4 +673,181 @@ namespace MediCamp.Models.ViewModels
         public int RestockMedicineId { get; set; }
         public int RestockQuantity { get; set; }
     }
+
+    // ==========================================
+    // PHASE 7 — PATIENT PORTAL & BLOOD DONATION
+    // ==========================================
+
+    public class PatientVisitTimelineItem
+    {
+        public int TriageId { get; set; }
+        public string CampTitle { get; set; } = string.Empty;
+        public string Location { get; set; } = string.Empty;
+        public string Venue { get; set; } = string.Empty;
+        public DateTime VisitDate { get; set; }
+        public int TokenNumber { get; set; }
+        public string UrgencyLevel { get; set; } = "Normal";
+
+        // Vitals
+        public string? BloodPressure { get; set; }
+        public double? TemperatureF { get; set; }
+        public double? WeightKg { get; set; }
+        public double? HeightCm { get; set; }
+        public double? BMI { get; set; }
+        public string? PresentingSymptoms { get; set; }
+
+        // Doctor Consultation
+        public string? DoctorName { get; set; }
+        public string? Diagnosis { get; set; }
+        public string? ClinicalNotes { get; set; }
+        public string? Advice { get; set; }
+        public DateTime? ConsultedAt { get; set; }
+
+        // Prescription
+        public int? PrescriptionId { get; set; }
+        public bool IsPrescriptionDispensed { get; set; }
+        public DateTime? DispensedAt { get; set; }
+        public List<PrescriptionItemDetail> PrescriptionItems { get; set; } = new();
+
+        // Referral
+        public string? ReferredHospital { get; set; }
+        public string? ReferralReason { get; set; }
+        public string? ReferralUrgency { get; set; }
+
+        // Follow-Up
+        public string? FollowUpReason { get; set; }
+        public DateTime? FollowUpScheduledDate { get; set; }
+        public string? FollowUpStatus { get; set; }
+    }
+
+    public class PrescriptionItemDetail
+    {
+        public string MedicineName { get; set; } = string.Empty;
+        public string Dosage { get; set; } = string.Empty;
+        public int DurationDays { get; set; }
+        public string? Instructions { get; set; }
+        public int QuantityPrescribed { get; set; }
+        public int QuantityDispensed { get; set; }
+    }
+
+    public class PatientProfileHistoryViewModel
+    {
+        public ApplicationUser Patient { get; set; } = new();
+        public MediCamp.Models.Domain.BloodDonationProfile? BloodProfile { get; set; }
+        public List<PatientVisitTimelineItem> Visits { get; set; } = new();
+        public int TotalVisitsCount => Visits.Count;
+        public int TotalPrescriptionsCount => Visits.Count(v => v.PrescriptionId.HasValue);
+    }
+
+    public class DigitalPrescriptionViewModel
+    {
+        public MediCamp.Models.Domain.Prescription Prescription { get; set; } = new();
+        public MediCamp.Models.Domain.Consultation? Consultation { get; set; }
+        public MediCamp.Models.Domain.TriageRecord? TriageRecord { get; set; }
+        public ApplicationUser? Patient { get; set; }
+        public ApplicationUser? Doctor { get; set; }
+        public MediCamp.Models.Domain.Camp? Camp { get; set; }
+        public List<MediCamp.Models.Domain.PrescriptionItem> Items { get; set; } = new();
+        public MediCamp.Models.Domain.Referral? Referral { get; set; }
+    }
+
+    public class DonorSearchResultItem
+    {
+        public string UserId { get; set; } = string.Empty;
+        public string FullName { get; set; } = string.Empty;
+        public string BloodGroup { get; set; } = string.Empty;
+        public string District { get; set; } = string.Empty;
+        public string Upazila { get; set; } = string.Empty;
+        public string PhoneNumber { get; set; } = string.Empty;
+        public bool IsAvailableDonor { get; set; }
+        public DateTime? LastDonatedDate { get; set; }
+        public int TotalDonationsCount { get; set; }
+        public bool IsEligibleToDonate
+        {
+            get
+            {
+                if (!IsAvailableDonor) return false;
+                if (!LastDonatedDate.HasValue) return true;
+                return (DateTime.UtcNow - LastDonatedDate.Value).TotalDays >= 90;
+            }
+        }
+    }
+
+    public class BloodDonationHubViewModel
+    {
+        public ApplicationUser? CurrentUser { get; set; }
+        public MediCamp.Models.Domain.BloodDonationProfile? MyProfile { get; set; }
+
+        // Search parameters & results
+        public string? SelectedBloodGroup { get; set; }
+        public string? SelectedDistrict { get; set; }
+        public string? SelectedUpazila { get; set; }
+        public List<DonorSearchResultItem> Donors { get; set; } = new();
+
+        // Requests feed
+        public List<MediCamp.Models.Domain.BloodRequest> OpenRequests { get; set; } = new();
+        public List<MediCamp.Models.Domain.BloodRequest> MyRequests { get; set; } = new();
+        public List<MediCamp.Models.Domain.BloodDonationLog> MyDonationLogs { get; set; } = new();
+
+        // Reference lists
+        public List<string> AllBloodGroups { get; set; } = new() { "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-" };
+        public List<string> Districts { get; set; } = new();
+        public List<string> Upazilas { get; set; } = new();
+    }
+
+    public class CreateBloodRequestInput
+    {
+        [System.ComponentModel.DataAnnotations.Required]
+        public string BloodGroup { get; set; } = string.Empty;
+
+        [System.ComponentModel.DataAnnotations.Required]
+        [System.ComponentModel.DataAnnotations.Range(1, 20)]
+        public int UnitsRequired { get; set; } = 1;
+
+        [System.ComponentModel.DataAnnotations.Required]
+        public string Urgency { get; set; } = "Urgent"; // Normal, Urgent, Critical
+
+        [System.ComponentModel.DataAnnotations.Required]
+        [System.ComponentModel.DataAnnotations.MaxLength(150)]
+        public string HospitalName { get; set; } = string.Empty;
+
+        [System.ComponentModel.DataAnnotations.Required]
+        [System.ComponentModel.DataAnnotations.MaxLength(50)]
+        public string District { get; set; } = string.Empty;
+
+        [System.ComponentModel.DataAnnotations.MaxLength(50)]
+        public string? Upazila { get; set; }
+
+        [System.ComponentModel.DataAnnotations.Required]
+        [System.ComponentModel.DataAnnotations.MaxLength(20)]
+        public string ContactNumber { get; set; } = string.Empty;
+
+        [System.ComponentModel.DataAnnotations.MaxLength(500)]
+        public string? Reason { get; set; }
+
+        public DateTime? NeededByDate { get; set; }
+    }
+
+    public class LogBloodDonationInput
+    {
+        [System.ComponentModel.DataAnnotations.Required]
+        [System.ComponentModel.DataAnnotations.MaxLength(150)]
+        public string VenueOrHospital { get; set; } = string.Empty;
+
+        [System.ComponentModel.DataAnnotations.Required]
+        public DateTime DonatedDate { get; set; } = DateTime.UtcNow;
+
+        public int? BloodRequestId { get; set; }
+
+        [System.ComponentModel.DataAnnotations.MaxLength(500)]
+        public string? Notes { get; set; }
+    }
+
+    public class VolunteerScheduleFollowUpInput
+    {
+        public int CampId { get; set; }
+        public string PatientId { get; set; } = string.Empty;
+        public string Reason { get; set; } = string.Empty;
+        public DateTime ScheduledDate { get; set; } = DateTime.UtcNow.AddDays(3);
+    }
 }

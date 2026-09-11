@@ -406,4 +406,68 @@ namespace MediCamp.Models.Domain
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? LastContactedAt { get; set; }
     }
+
+    public class BloodRequest
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        public string RequesterId { get; set; } = string.Empty;
+        [ForeignKey("RequesterId")]
+        public ApplicationUser? Requester { get; set; }
+
+        [Required]
+        [MaxLength(10)]
+        public string BloodGroup { get; set; } = string.Empty;
+
+        public int UnitsRequired { get; set; } = 1;
+
+        [MaxLength(20)]
+        public string Urgency { get; set; } = "Urgent"; // Normal, Urgent, Critical
+
+        [MaxLength(150)]
+        public string HospitalName { get; set; } = string.Empty;
+
+        [MaxLength(50)]
+        public string District { get; set; } = string.Empty;
+
+        [MaxLength(50)]
+        public string Upazila { get; set; } = string.Empty;
+
+        [MaxLength(20)]
+        public string ContactNumber { get; set; } = string.Empty;
+
+        [MaxLength(500)]
+        public string? Reason { get; set; }
+
+        [MaxLength(30)]
+        public string Status { get; set; } = "Open"; // Open, Fulfilled, Cancelled
+
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? NeededByDate { get; set; }
+    }
+
+    public class BloodDonationLog
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        public string DonorId { get; set; } = string.Empty;
+        [ForeignKey("DonorId")]
+        public ApplicationUser? Donor { get; set; }
+
+        public DateTime DonatedDate { get; set; } = DateTime.UtcNow;
+
+        [MaxLength(150)]
+        public string VenueOrHospital { get; set; } = string.Empty;
+
+        public int? BloodRequestId { get; set; }
+        [ForeignKey("BloodRequestId")]
+        public BloodRequest? BloodRequest { get; set; }
+
+        [MaxLength(500)]
+        public string? Notes { get; set; }
+    }
 }
