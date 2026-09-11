@@ -124,7 +124,8 @@ h1, h2, h3, h4, h5, h6, .brand-font {
   transition: var(--transition-smooth);
 }
 
-.navbar-brand:hover .brand-badge-logo {
+.navbar-brand:hover .brand-badge-logo,
+.navbar-brand:hover .brand-badge-logo-img {
   transform: rotate(-6deg) scale(1.06);
 }
 
@@ -144,10 +145,10 @@ h1, h2, h3, h4, h5, h6, .brand-font {
 }
 
 /* ==========================================================================
-   Hero Section — Emerald Ink (#064e3b) & Champagne (#f8e7c9)
+   Hero Section — Deep Slate Teal & Emerald Ink Gradient
    ========================================================================== */
 .hero-emerald-banner {
-  background: linear-gradient(135deg, #022c22 0%, #064e3b 60%, #044e3a 100%);
+  background: linear-gradient(135deg, #0f172a 0%, #044e3a 50%, #0f766e 100%);
   color: #ffffff;
   padding: 4.5rem 0 5.5rem;
   position: relative;
