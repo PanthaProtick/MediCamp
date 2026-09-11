@@ -850,4 +850,11 @@ namespace MediCamp.Models.ViewModels
         public string Reason { get; set; } = string.Empty;
         public DateTime ScheduledDate { get; set; } = DateTime.UtcNow.AddDays(3);
     }
+
+    public class CampPatientRegistrationViewModel
+    {
+        public MediCamp.Models.Domain.Camp Camp { get; set; } = new();
+        public ApplicationUser Patient { get; set; } = new();
+        public bool AlreadyRegistered { get; set; }
+    }
 }

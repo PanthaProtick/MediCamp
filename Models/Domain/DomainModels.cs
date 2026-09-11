@@ -407,6 +407,27 @@ namespace MediCamp.Models.Domain
         public DateTime? LastContactedAt { get; set; }
     }
 
+    public class CampPatientRegistration
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        public int CampId { get; set; }
+        [ForeignKey("CampId")]
+        public Camp? Camp { get; set; }
+
+        [Required]
+        public string PatientId { get; set; } = string.Empty;
+        [ForeignKey("PatientId")]
+        public ApplicationUser? Patient { get; set; }
+
+        [MaxLength(30)]
+        public string Status { get; set; } = "Registered";
+
+        public DateTime RegisteredAt { get; set; } = DateTime.UtcNow;
+    }
+
     public class BloodRequest
     {
         [Key]

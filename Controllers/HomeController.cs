@@ -93,6 +93,12 @@ namespace MediCamp.Controllers
                         .Where(r => r.VolunteerId == userId)
                         .ToDictionary(r => r.CampId, r => r.Status);
                 }
+                else if (User.IsInRole(SystemRoles.Patient))
+                {
+                    ViewBag.UserCampStatus = _dbContext.CampPatientRegistrations
+                        .Where(r => r.PatientId == userId && r.Status == "Registered")
+                        .ToDictionary(r => r.CampId, r => r.Status);
+                }
             }
 
             return View(camps);

@@ -1,0 +1,53 @@
+@model MediCamp.Models.ViewModels.CampPatientRegistrationViewModel
+
+@{
+    ViewData["Title"] = "Register for Camp - MediCamp";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="glass-card p-4 p-md-5">
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <div class="bg-success text-white rounded-3 d-flex align-items-center justify-content-center" style="width:52px;height:52px;">
+                        <i class="fa-solid fa-id-card"></i>
+                    </div>
+                    <div>
+                        <span class="badge bg-success-subtle text-success">Patient Registration</span>
+                        <h2 class="fw-bold text-dark mb-0">Register for this camp</h2>
+                    </div>
+                </div>
+
+                <div class="bg-light rounded-3 p-3 mb-4">
+                    <h5 class="fw-bold text-dark mb-1">@Model.Camp.Title</h5>
+                    <div class="small text-muted mb-1"><i class="fa-solid fa-location-dot text-danger me-1"></i>@Model.Camp.Venue, @Model.Camp.Upazila, @Model.Camp.District</div>
+                    <div class="small text-muted"><i class="fa-solid fa-calendar text-primary me-1"></i>@Model.Camp.StartDate.ToString("dd MMM yyyy") - @Model.Camp.EndDate.ToString("dd MMM yyyy")</div>
+                </div>
+
+                @if (Model.AlreadyRegistered)
+                {
+                    <div class="alert alert-success"><i class="fa-solid fa-circle-check me-2"></i>You are already registered for this camp.</div>
+                    <a asp-controller="Home" asp-action="Camps" class="btn btn-sapphire rounded-pill px-4">Back to Camp Directory</a>
+                }
+                else
+                {
+                    <h6 class="fw-bold text-dark">Patient details</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6"><span class="small text-muted d-block">Full name</span><strong>@Model.Patient.FullName</strong></div>
+                        <div class="col-md-6"><span class="small text-muted d-block">Phone</span><strong>@Model.Patient.PhoneNumber</strong></div>
+                        <div class="col-md-6"><span class="small text-muted d-block">Blood group</span><strong>@(Model.Patient.BloodGroup ?? "Not provided")</strong></div>
+                        <div class="col-md-6"><span class="small text-muted d-block">Location</span><strong>@Model.Patient.Upazila, @Model.Patient.District</strong></div>
+                    </div>
+                    <form asp-action="RegisterForCamp" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="campId" value="@Model.Camp.Id" />
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a asp-controller="Home" asp-action="Camps" class="btn btn-light border rounded-pill px-4">Cancel</a>
+                            <button type="submit" class="btn btn-sapphire rounded-pill px-4"><i class="fa-solid fa-check me-1"></i>Confirm Camp Registration</button>
+                        </div>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+</div>
