@@ -114,6 +114,44 @@ namespace MediCamp.Controllers
 
             return RedirectToAction(nameof(Requests));
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ApplyToCamp(int campId, string? returnUrl = null)
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null) return RedirectToAction("Login", "Account");
+
+            var camp = _dbContext.Camps.FirstOrDefault(c => c.Id == campId);
+            if (camp == null)
+            {
+                TempData["ErrorMessage"] = "Camp not found.";
+                return Redirect(returnUrl ?? Url.Action("Camps", "Home")!);
+            }
+
+            var existing = _dbContext.CampVolunteerRequests
+                .FirstOrDefault(r => r.CampId == campId && r.VolunteerId == userId);
+
+            if (existing != null)
+            {
+                TempData["ErrorMessage"] = $"You already have a request for \"{camp.Title}\" (Status: {existing.Status}).";
+                return Redirect(returnUrl ?? Url.Action("Camps", "Home")!);
+            }
+
+            var newRequest = new CampVolunteerRequest
+            {
+                CampId = campId,
+                VolunteerId = userId,
+                Status = "Pending",
+                RequestedAt = DateTime.UtcNow
+            };
+
+            _dbContext.CampVolunteerRequests.Add(newRequest);
+            _dbContext.SaveChanges();
+
+            TempData["SuccessMessage"] = $"Your request to join \"{camp.Title}\" as Volunteer has been submitted to the host.";
+            return Redirect(returnUrl ?? Url.Action("Camps", "Home")!);
+        }
         [HttpGet]
         public IActionResult CreatePatient()
         {

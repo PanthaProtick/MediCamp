@@ -87,6 +87,11 @@
                                 var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                                 var doctorPendingCount = currentUserId != null ? MockDataService.GetRequestsForDoctor(currentUserId).Count(r => r.Status == "Pending") : 0;
                                 <li class="nav-item">
+                                    <a class="nav-link nav-link-custom @(ViewContext.RouteData.Values["Action"]?.ToString() == "Queue" && ViewContext.RouteData.Values["Controller"]?.ToString() == "Doctor" ? "active" : "")" asp-controller="Doctor" asp-action="Queue">
+                                        <i class="fa-solid fa-stethoscope me-1 text-champagne"></i> Patient Queue
+                                    </a>
+                                </li>
+                                <li class="nav-item">
                                     <a class="nav-link nav-link-custom @(ViewContext.RouteData.Values["Action"]?.ToString() == "Requests" && ViewContext.RouteData.Values["Controller"]?.ToString() == "Doctor" ? "active" : "")" asp-controller="Doctor" asp-action="Requests">
                                         <i class="fa-solid fa-envelope-open-text me-1 text-champagne"></i> Camp Invitations
                                         @if (doctorPendingCount > 0)
@@ -119,6 +124,11 @@
                             {
                                 var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                                 var pharmacistPendingCount = currentUserId != null ? MockDataService.GetRequestsForPharmacist(currentUserId).Count(r => r.Status == "Pending") : 0;
+                                <li class="nav-item">
+                                    <a class="nav-link nav-link-custom @(ViewContext.RouteData.Values["Action"]?.ToString() == "Dashboard" && ViewContext.RouteData.Values["Controller"]?.ToString() == "Pharmacist" ? "active" : "")" asp-controller="Pharmacist" asp-action="Dashboard">
+                                        <i class="fa-solid fa-gauge me-1 text-champagne"></i> Pharmacy
+                                    </a>
+                                </li>
                                 <li class="nav-item">
                                     <a class="nav-link nav-link-custom @(ViewContext.RouteData.Values["Action"]?.ToString() == "Requests" && ViewContext.RouteData.Values["Controller"]?.ToString() == "Pharmacist" ? "active" : "")" asp-controller="Pharmacist" asp-action="Requests">
                                         <i class="fa-solid fa-pills me-1 text-champagne"></i> Camp Invitations

@@ -1,6 +1,7 @@
 @model List<CampOverviewItem>
 @{
     ViewData["Title"] = "Public Camp Directory - MediCamp";
+    var userCampStatus = ViewBag.UserCampStatus as Dictionary<int, string>;
 }
 
 <div class="container py-5">
@@ -10,10 +11,54 @@
             <h2 class="fw-bold text-dark mb-1">Healthcare Camps in Bangladesh</h2>
             <p class="text-secondary small mb-0">Search and filter active and scheduled medical camps across districts.</p>
         </div>
-        <a asp-controller="Account" asp-action="Register" class="btn btn-sapphire">
-            <i class="fa-solid fa-user-plus me-1"></i> Register as Patient
-        </a>
+        <div>
+            @if (User.IsInRole(SystemRoles.Pharmacist))
+            {
+                <a asp-controller="Pharmacist" asp-action="Dashboard" class="btn btn-sapphire">
+                    <i class="fa-solid fa-pills me-1"></i> Pharmacist Dashboard
+                </a>
+            }
+            else if (User.IsInRole(SystemRoles.Doctor))
+            {
+                <a asp-controller="Doctor" asp-action="Queue" class="btn btn-sapphire">
+                    <i class="fa-solid fa-stethoscope me-1"></i> Doctor Queue
+                </a>
+            }
+            else if (User.IsInRole(SystemRoles.Volunteer))
+            {
+                <a asp-controller="Volunteer" asp-action="Dashboard" class="btn btn-sapphire">
+                    <i class="fa-solid fa-clipboard-user me-1"></i> Volunteer Dashboard
+                </a>
+            }
+            else if (User.IsInRole(SystemRoles.Host))
+            {
+                <a asp-controller="Host" asp-action="Dashboard" class="btn btn-sapphire">
+                    <i class="fa-solid fa-hospital-user me-1"></i> Host Dashboard
+                </a>
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Register" class="btn btn-sapphire">
+                    <i class="fa-solid fa-user-plus me-1"></i> Register as Patient
+                </a>
+            }
+        </div>
     </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm mb-4" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm mb-4" role="alert">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
 
     <!-- Filter Bar -->
     <div class="glass-card p-3 mb-4">
@@ -75,6 +120,8 @@
         {
             @foreach (var camp in Model)
             {
+                string? myStatus = userCampStatus != null && userCampStatus.ContainsKey(camp.Id) ? userCampStatus[camp.Id] : null;
+
                 <div class="col-lg-6">
                     <div class="glass-card h-100 p-4 d-flex flex-column justify-content-between">
                         <div>
@@ -122,11 +169,123 @@
                             </div>
                         </div>
 
-                        <div class="pt-3 border-top d-flex justify-content-between align-items-center">
+                        <div class="pt-3 border-top d-flex justify-content-between align-items-center flex-wrap gap-2">
                             <span class="small text-muted">Free Consultation & Medicines</span>
-                            <a asp-controller="Account" asp-action="Register" class="btn btn-sapphire btn-sm-custom">
-                                <i class="fa-solid fa-id-card me-1"></i> Register as Patient
-                            </a>
+
+                            @if (User.IsInRole(SystemRoles.Pharmacist))
+                            {
+                                @if (myStatus == "Approved")
+                                {
+                                    if (camp.Status == "Ongoing")
+                                    {
+                                        <a asp-controller="Pharmacist" asp-action="Dashboard" asp-route-activeCampId="@camp.Id" class="btn btn-sm-custom text-white" style="background:#6610f2;">
+                                            <i class="fa-solid fa-pills me-1"></i> Enter Pharmacy
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success py-2 px-3"><i class="fa-solid fa-circle-check me-1"></i> Assigned Pharmacist</span>
+                                    }
+                                }
+                                else if (myStatus == "Pending")
+                                {
+                                    <span class="badge bg-warning text-dark py-2 px-3"><i class="fa-solid fa-clock me-1"></i> Request Pending</span>
+                                }
+                                else if (myStatus == "Denied")
+                                {
+                                    <span class="badge bg-danger py-2 px-3"><i class="fa-solid fa-circle-xmark me-1"></i> Request Declined</span>
+                                }
+                                else
+                                {
+                                    <form asp-controller="Pharmacist" asp-action="ApplyToCamp" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="campId" value="@camp.Id" />
+                                        <button type="submit" class="btn btn-sm-custom text-white fw-bold shadow-sm" style="background:#6610f2;">
+                                            <i class="fa-solid fa-pills me-1"></i> Request to Join as Pharmacist
+                                        </button>
+                                    </form>
+                                }
+                            }
+                            else if (User.IsInRole(SystemRoles.Doctor))
+                            {
+                                @if (myStatus == "Approved")
+                                {
+                                    if (camp.Status == "Ongoing")
+                                    {
+                                        <a asp-controller="Doctor" asp-action="Queue" asp-route-activeCampId="@camp.Id" class="btn btn-primary btn-sm-custom">
+                                            <i class="fa-solid fa-stethoscope me-1"></i> Consult Queue
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success py-2 px-3"><i class="fa-solid fa-circle-check me-1"></i> Assigned Doctor</span>
+                                    }
+                                }
+                                else if (myStatus == "Pending")
+                                {
+                                    <span class="badge bg-warning text-dark py-2 px-3"><i class="fa-solid fa-clock me-1"></i> Request Pending</span>
+                                }
+                                else if (myStatus == "Denied")
+                                {
+                                    <span class="badge bg-danger py-2 px-3"><i class="fa-solid fa-circle-xmark me-1"></i> Request Declined</span>
+                                }
+                                else
+                                {
+                                    <form asp-controller="Doctor" asp-action="ApplyToCamp" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="campId" value="@camp.Id" />
+                                        <button type="submit" class="btn btn-primary btn-sm-custom fw-bold shadow-sm">
+                                            <i class="fa-solid fa-user-doctor me-1"></i> Request to Join as Doctor
+                                        </button>
+                                    </form>
+                                }
+                            }
+                            else if (User.IsInRole(SystemRoles.Volunteer))
+                            {
+                                @if (myStatus == "Approved")
+                                {
+                                    if (camp.Status == "Ongoing")
+                                    {
+                                        <a asp-controller="Volunteer" asp-action="Dashboard" asp-route-activeCampId="@camp.Id" class="btn btn-info btn-sm-custom text-white">
+                                            <i class="fa-solid fa-clipboard-user me-1"></i> Start Triage
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success py-2 px-3"><i class="fa-solid fa-circle-check me-1"></i> Assigned Volunteer</span>
+                                    }
+                                }
+                                else if (myStatus == "Pending")
+                                {
+                                    <span class="badge bg-warning text-dark py-2 px-3"><i class="fa-solid fa-clock me-1"></i> Request Pending</span>
+                                }
+                                else if (myStatus == "Denied")
+                                {
+                                    <span class="badge bg-danger py-2 px-3"><i class="fa-solid fa-circle-xmark me-1"></i> Request Declined</span>
+                                }
+                                else
+                                {
+                                    <form asp-controller="Volunteer" asp-action="ApplyToCamp" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="campId" value="@camp.Id" />
+                                        <button type="submit" class="btn btn-info btn-sm-custom text-white fw-bold shadow-sm">
+                                            <i class="fa-solid fa-handshake-angle me-1"></i> Request to Join as Volunteer
+                                        </button>
+                                    </form>
+                                }
+                            }
+                            else if (User.IsInRole(SystemRoles.Host) || User.IsInRole(SystemRoles.Admin))
+                            {
+                                <a asp-controller="Host" asp-action="Details" asp-route-id="@camp.Id" class="btn btn-outline-primary btn-sm-custom">
+                                    <i class="fa-solid fa-gear me-1"></i> Manage Camp
+                                </a>
+                            }
+                            else
+                            {
+                                <a asp-controller="Account" asp-action="Register" class="btn btn-sapphire btn-sm-custom">
+                                    <i class="fa-solid fa-id-card me-1"></i> Register as Patient
+                                </a>
+                            }
                         </div>
                     </div>
                 </div>
