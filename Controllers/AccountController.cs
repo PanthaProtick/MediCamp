@@ -6,16 +6,19 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace MediCamp.Controllers
 {
     public class AccountController : Controller
     {
         private readonly IMockDataService _dataService;
+        private readonly MediCamp.Data.ApplicationDbContext _context;
 
-        public AccountController(IMockDataService dataService)
+        public AccountController(IMockDataService dataService, MediCamp.Data.ApplicationDbContext context)
         {
             _dataService = dataService;
+            _context = context;
         }
 
         [HttpGet]
@@ -70,6 +73,137 @@ namespace MediCamp.Controllers
             if (user == null) return NotFound();
 
             return View(user);
+        }
+
+        [HttpGet]
+        [Authorize]
+        public IActionResult EditProfile()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId)) return RedirectToAction("Login");
+
+            var user = _dataService.GetUserById(userId);
+            if (user == null) return NotFound();
+
+            var model = new EditProfileViewModel
+            {
+                Id = user.Id,
+                FullName = user.FullName,
+                PhoneNumber = user.PhoneNumber,
+                NID = user.NID,
+                DateOfBirth = user.DateOfBirth,
+                Gender = user.Gender,
+                BloodGroup = user.BloodGroup,
+                District = user.District,
+                Upazila = user.Upazila,
+                Address = user.Address,
+                MedicalSpecialization = user.MedicalSpecialization,
+                BMDCRegNo = user.BMDCRegNo,
+                OrganizationName = user.OrganizationName,
+                OrganizationType = user.OrganizationType,
+                OrganizationRegNo = user.OrganizationRegNo,
+                FocalPersonContact = user.FocalPersonContact
+            };
+
+            ViewBag.Role = user.Role;
+            return View(model);
+        }
+
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public IActionResult EditProfile(EditProfileViewModel model)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId)) return RedirectToAction("Login");
+            
+            var user = _dataService.GetUserById(userId);
+            if (user == null) return NotFound();
+
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Role = user.Role;
+                return View(model);
+            }
+
+            var (success, message) = _dataService.UpdateUserProfile(userId, model);
+            
+            if (success)
+            {
+                TempData["SuccessMessage"] = message;
+                return RedirectToAction(nameof(Profile));
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, message);
+                ViewBag.Role = user.Role;
+                return View(model);
+            }
+        }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> PatientHistory()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId)) return RedirectToAction("Login");
+
+            // Fetch triage records along with nested consultations and prescriptions
+            var history = await _context.TriageRecords
+                .Include(t => t.Camp)
+                .Include(t => t.Volunteer)
+                .Where(t => t.PatientId == userId)
+                .OrderByDescending(t => t.RecordedAt)
+                .ToListAsync();
+
+            // Load consultations and prescriptions manually since EF Core Include chain can sometimes be tricky or heavy
+            foreach (var triage in history)
+            {
+                var consultation = await _context.Consultations
+                    .Include(c => c.Doctor)
+                    .FirstOrDefaultAsync(c => c.TriageRecordId == triage.Id);
+                    
+                if (consultation != null)
+                {
+                    // Manually assign it to avoid relying on lazy loading if it's disabled
+                    // But we can just query it and pass it to a ViewModel.
+                    // Wait, TriageRecord doesn't have a Consultation navigation property, Consultation has TriageRecordId!
+                }
+            }
+
+            // A better way: Use a ViewModel to map everything.
+            var viewModels = new List<PatientHistoryViewModel>();
+
+            foreach (var t in history)
+            {
+                var consultation = await _context.Consultations
+                    .Include(c => c.Doctor)
+                    .FirstOrDefaultAsync(c => c.TriageRecordId == t.Id);
+                    
+                var prescriptions = new List<MediCamp.Models.Domain.PrescriptionItem>();
+                if (consultation != null)
+                {
+                    var rx = await _context.Prescriptions
+                        .FirstOrDefaultAsync(p => p.ConsultationId == consultation.Id);
+                        
+                    if (rx != null)
+                    {
+                        prescriptions = await _context.PrescriptionItems
+                            .Include(pi => pi.MasterMedicine)
+                            .Where(pi => pi.PrescriptionId == rx.Id)
+                            .ToListAsync();
+                    }
+                }
+
+                viewModels.Add(new PatientHistoryViewModel
+                {
+                    TriageRecord = t,
+                    Consultation = consultation,
+                    PrescriptionItems = prescriptions
+                });
+            }
+
+            return View(viewModels);
         }
 
         // =========================================================================

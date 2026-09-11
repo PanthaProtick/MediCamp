@@ -25,6 +25,8 @@ namespace MediCamp.Data
         public DbSet<CampStaffRequest> CampStaffRequests { get; set; }
         public DbSet<CampVolunteerRequest> CampVolunteerRequests { get; set; }
         public DbSet<CampPharmacistRequest> CampPharmacistRequests { get; set; }
+        public DbSet<Hospital> Hospitals { get; set; }
+        public DbSet<BloodGroupMaster> BloodGroupMasters { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

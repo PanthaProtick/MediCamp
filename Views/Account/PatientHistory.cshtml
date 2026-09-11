@@ -1,0 +1,140 @@
+@model IEnumerable<MediCamp.Models.ViewModels.PatientHistoryViewModel>
+
+@{
+    ViewData["Title"] = "My Medical History";
+}
+
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h2 class="fw-bold mb-1"><i class="fa-solid fa-clock-rotate-left text-primary me-2"></i>My Medical History</h2>
+            <p class="text-muted mb-0">Timeline of your past camp visits, diagnoses, and prescriptions.</p>
+        </div>
+        <a asp-action="Profile" class="btn btn-light rounded-pill px-4 fw-bold shadow-sm">
+            <i class="fa-solid fa-arrow-left me-2"></i>Back to Profile
+        </a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white">
+            <div class="display-1 text-muted mb-3 opacity-25">
+                <i class="fa-solid fa-folder-open"></i>
+            </div>
+            <h4 class="text-muted fw-bold">No Medical History Found</h4>
+            <p class="text-muted">You haven't visited any MediCamp clinics yet.</p>
+        </div>
+    }
+    else
+    {
+        <div class="timeline position-relative">
+            @foreach (var item in Model)
+            {
+                <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+                    <div class="card-header bg-primary text-white p-4 d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold">
+                            <i class="fa-solid fa-calendar-check me-2"></i> @item.TriageRecord.RecordedAt.ToString("MMMM dd, yyyy")
+                        </h5>
+                        <span class="badge bg-white text-primary rounded-pill px-3 py-2 fw-bold">
+                            <i class="fa-solid fa-tent me-1"></i> @item.TriageRecord.Camp?.Title
+                        </span>
+                    </div>
+                    
+                    <div class="card-body p-4 p-md-5 bg-white">
+                        <div class="row g-4">
+                            <!-- Triage Info -->
+                            <div class="col-md-4 border-end">
+                                <h6 class="text-uppercase fw-bold text-muted small mb-3">Triage Details</h6>
+                                <ul class="list-unstyled mb-0">
+                                    <li class="mb-2"><i class="fa-solid fa-heart-pulse text-danger me-2 w-20px"></i> <strong>BP:</strong> @(item.TriageRecord.BloodPressure ?? "N/A")</li>
+                                    <li class="mb-2"><i class="fa-solid fa-temperature-half text-warning me-2 w-20px"></i> <strong>Temp:</strong> @(item.TriageRecord.TemperatureF?.ToString() ?? "N/A") °F</li>
+                                    <li class="mb-2"><i class="fa-solid fa-weight-scale text-info me-2 w-20px"></i> <strong>Weight:</strong> @(item.TriageRecord.WeightKg?.ToString() ?? "N/A") kg</li>
+                                    <li><i class="fa-solid fa-notes-medical text-primary me-2 w-20px"></i> <strong>Symptoms:</strong> @(item.TriageRecord.PresentingSymptoms ?? "None recorded")</li>
+                                </ul>
+                            </div>
+
+                            <!-- Consultation Info -->
+                            <div class="col-md-4 border-end px-md-4">
+                                <h6 class="text-uppercase fw-bold text-muted small mb-3">Consultation</h6>
+                                @if (item.Consultation != null)
+                                {
+                                    <p class="mb-2"><i class="fa-solid fa-user-doctor text-primary me-2"></i> <strong>Dr. @item.Consultation.Doctor?.FullName</strong></p>
+                                    
+                                    <div class="bg-light rounded-3 p-3 mt-3">
+                                        <p class="mb-1 fw-bold text-dark">Diagnosis:</p>
+                                        <p class="text-muted small mb-2">@(item.Consultation.Diagnosis ?? "Pending")</p>
+                                        
+                                        <p class="mb-1 fw-bold text-dark">Advice:</p>
+                                        <p class="text-muted small mb-0">@(item.Consultation.Advice ?? "None")</p>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="text-center py-4">
+                                        <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 rounded-pill px-3 py-2">
+                                            <i class="fa-solid fa-hourglass-half me-1"></i> Waiting for Doctor
+                                        </span>
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Prescription Info -->
+                            <div class="col-md-4 ps-md-4">
+                                <h6 class="text-uppercase fw-bold text-muted small mb-3">Prescription</h6>
+                                @if (item.PrescriptionItems.Any())
+                                {
+                                    <ul class="list-group list-group-flush">
+                                        @foreach (var med in item.PrescriptionItems)
+                                        {
+                                            <li class="list-group-item bg-transparent px-0 py-2 border-light">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div>
+                                                        <p class="fw-bold text-dark mb-0">@med.MasterMedicine?.BrandName</p>
+                                                        <small class="text-muted">@med.Dosage - @med.DurationDays days</small>
+                                                    </div>
+                                                </div>
+                                                @if (!string.IsNullOrEmpty(med.Instructions))
+                                                {
+                                                    <p class="small text-primary mt-1 mb-0"><i class="fa-solid fa-circle-info me-1"></i>@med.Instructions</p>
+                                                }
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                                else if (item.Consultation != null)
+                                {
+                                    <p class="text-muted small text-center py-4">No medicines prescribed.</p>
+                                }
+                                else
+                                {
+                                    <p class="text-muted small text-center py-4">N/A</p>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<style>
+    .w-20px {
+        width: 20px;
+        text-align: center;
+    }
+    .timeline::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 24px;
+        width: 4px;
+        background: #e2e8f0;
+        border-radius: 4px;
+        z-index: -1;
+    }
+    .card {
+        margin-left: 20px;
+    }
+</style>

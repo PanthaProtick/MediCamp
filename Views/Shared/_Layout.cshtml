@@ -5,7 +5,13 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - MediCamp | Community Healthcare Camp System</title>
+    
+    <!-- Favicon / Browser Tab Title Logo -->
+    <link rel="icon" type="image/png" href="~/images/logo.png" asp-append-version="true" />
+    <link rel="shortcut icon" type="image/x-icon" href="~/favicon.ico" asp-append-version="true" />
+    <link rel="apple-touch-icon" href="~/images/logo.png" />
+
+    <title>@(ViewData["Title"]?.ToString() == "MediCamp" || string.IsNullOrEmpty(ViewData["Title"]?.ToString()) ? "MediCamp" : $"{ViewData["Title"]} - MediCamp")</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -35,9 +41,7 @@
             <nav class="navbar navbar-expand-lg glass-nav">
                 <div class="container">
                     <a class="navbar-brand d-flex align-items-center gap-2" asp-controller="Home" asp-action="Index">
-                        <div class="brand-badge-logo">
-                            <i class="fa-solid fa-heart-pulse"></i>
-                        </div>
+                        <img src="~/images/logo.png" alt="MediCamp Logo" class="brand-badge-logo-img" style="width: 44px; height: 44px; object-fit: contain; border-radius: 12px; transition: var(--transition-smooth);" />
                         <div class="d-flex flex-column">
                             <span class="brand-font fs-4 fw-bold text-white lh-1">Medi<span class="text-champagne">Camp</span></span>
                             <span class="text-champagne opacity-75" style="font-size: 0.68rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;">Healthcare Camps Bangladesh</span>
@@ -244,9 +248,7 @@
                     <div class="row g-4 mb-4">
                         <div class="col-lg-5">
                             <div class="d-flex align-items-center gap-2 mb-3">
-                                <div class="brand-badge-logo" style="width: 36px; height: 36px; font-size: 1rem;">
-                                    <i class="fa-solid fa-heart-pulse"></i>
-                                </div>
+                                <img src="~/images/logo.png" alt="MediCamp Logo" style="width: 36px; height: 36px; object-fit: contain; border-radius: 10px;" />
                                 <span class="brand-font fs-4 fw-bold text-white">Medi<span style="color: #60a5fa;">Camp</span></span>
                             </div>
                             <p class="text-secondary small mb-3" style="line-height: 1.7; max-width: 420px;">

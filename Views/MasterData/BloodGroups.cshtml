@@ -1,0 +1,46 @@
+@model IEnumerable<MediCamp.Models.Domain.BloodGroupMaster>
+@{ ViewData["Title"] = "Blood Group Management"; }
+
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold"><i class="fa-solid fa-droplet text-danger me-2"></i>Blood Group Management</h2>
+        <a asp-action="CreateBloodGroup" class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm">
+            <i class="fa-solid fa-plus me-2"></i>Add Group
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Group Name</th>
+                        <th>Status</th>
+                        <th class="text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="ps-4 fw-bold text-danger fs-5">@item.GroupName</td>
+                            <td>
+                                @if (item.IsActive) { <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25">Active</span> }
+                                else { <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25">Inactive</span> }
+                            </td>
+                            <td class="text-end pe-4">
+                                <a asp-action="EditBloodGroup" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary rounded-pill px-3">Edit</a>
+                                <form asp-action="DeleteBloodGroup" asp-route-id="@item.Id" method="post" class="d-inline" onsubmit="return confirm('Delete this blood group?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                    @if(!Model.Any()) {
+                        <tr><td colspan="3" class="text-center py-4 text-muted">No blood groups found.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

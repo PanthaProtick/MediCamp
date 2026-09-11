@@ -1,0 +1,162 @@
+@model MediCamp.Models.ViewModels.EditProfileViewModel
+
+@{
+    ViewData["Title"] = "Edit Profile";
+    var role = ViewBag.Role as string;
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header p-4" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;">
+                    <h3 class="mb-0 fw-bold text-white d-flex align-items-center">
+                        <i class="fa-solid fa-user-pen me-3"></i>Edit Profile
+                    </h3>
+                </div>
+                
+                <div class="card-body p-4 p-md-5 bg-white">
+                    <form asp-action="EditProfile" method="post">
+                        <input type="hidden" asp-for="Id" />
+                        
+                        <h5 class="fw-bold mb-4 text-dark border-bottom border-2 border-light pb-2">
+                            <i class="fa-solid fa-address-card text-primary me-2"></i>Personal Information
+                        </h5>
+                        
+                        <div class="row g-4 mb-5">
+                            <div class="col-md-6">
+                                <label asp-for="FullName" class="form-label fw-bold small text-muted text-uppercase"></label>
+                                <input asp-for="FullName" class="form-control bg-light" />
+                                <span asp-validation-for="FullName" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="PhoneNumber" class="form-label fw-bold small text-muted text-uppercase"></label>
+                                <input asp-for="PhoneNumber" class="form-control bg-light" />
+                                <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="NID" class="form-label fw-bold small text-muted text-uppercase"></label>
+                                <input asp-for="NID" class="form-control bg-light" />
+                                <span asp-validation-for="NID" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="DateOfBirth" class="form-label fw-bold small text-muted text-uppercase"></label>
+                                <input asp-for="DateOfBirth" type="date" class="form-control bg-light" />
+                                <span asp-validation-for="DateOfBirth" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Gender" class="form-label fw-bold small text-muted text-uppercase"></label>
+                                <select asp-for="Gender" class="form-select bg-light">
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="BloodGroup" class="form-label fw-bold small text-muted text-uppercase"></label>
+                                <select asp-for="BloodGroup" class="form-select bg-light">
+                                    <option value="">Select</option>
+                                    <option value="A+">A+</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B+">B+</option>
+                                    <option value="B-">B-</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="AB-">AB-</option>
+                                    <option value="O+">O+</option>
+                                    <option value="O-">O-</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <h5 class="fw-bold mb-4 text-dark border-bottom border-2 border-light pb-2">
+                            <i class="fa-solid fa-location-dot text-primary me-2"></i>Location Details
+                        </h5>
+                        
+                        <div class="row g-4 mb-5">
+                            <div class="col-md-6">
+                                <label asp-for="District" class="form-label fw-bold small text-muted text-uppercase"></label>
+                                <input asp-for="District" class="form-control bg-light" />
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Upazila" class="form-label fw-bold small text-muted text-uppercase"></label>
+                                <input asp-for="Upazila" class="form-control bg-light" />
+                            </div>
+                            <div class="col-12">
+                                <label asp-for="Address" class="form-label fw-bold small text-muted text-uppercase"></label>
+                                <input asp-for="Address" class="form-control bg-light" />
+                            </div>
+                        </div>
+
+                        @if (role == MediCamp.Models.SystemRoles.Doctor)
+                        {
+                            <h5 class="fw-bold mb-4 text-dark border-bottom border-2 border-light pb-2">
+                                <i class="fa-solid fa-user-doctor text-teal me-2"></i>Professional Details
+                            </h5>
+                            <div class="row g-4 mb-5">
+                                <div class="col-md-6">
+                                    <label asp-for="MedicalSpecialization" class="form-label fw-bold small text-muted text-uppercase"></label>
+                                    <input asp-for="MedicalSpecialization" class="form-control bg-light" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="BMDCRegNo" class="form-label fw-bold small text-muted text-uppercase"></label>
+                                    <input asp-for="BMDCRegNo" class="form-control bg-light" />
+                                </div>
+                            </div>
+                        }
+
+                        @if (role == MediCamp.Models.SystemRoles.Host)
+                        {
+                            <h5 class="fw-bold mb-4 text-dark border-bottom border-2 border-light pb-2">
+                                <i class="fa-solid fa-building-ngo text-success me-2"></i>Organization Details
+                            </h5>
+                            <div class="row g-4 mb-5">
+                                <div class="col-md-6">
+                                    <label asp-for="OrganizationName" class="form-label fw-bold small text-muted text-uppercase"></label>
+                                    <input asp-for="OrganizationName" class="form-control bg-light" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="OrganizationType" class="form-label fw-bold small text-muted text-uppercase"></label>
+                                    <input asp-for="OrganizationType" class="form-control bg-light" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="OrganizationRegNo" class="form-label fw-bold small text-muted text-uppercase"></label>
+                                    <input asp-for="OrganizationRegNo" class="form-control bg-light" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="FocalPersonContact" class="form-label fw-bold small text-muted text-uppercase"></label>
+                                    <input asp-for="FocalPersonContact" class="form-control bg-light" />
+                                </div>
+                            </div>
+                        }
+
+                        <div class="text-center mt-5 pt-4 border-top border-light d-flex justify-content-center gap-3">
+                            <a asp-action="Profile" class="btn btn-light rounded-pill px-5 py-2 fw-bold shadow-sm">
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn btn-champagne rounded-pill px-5 py-2 fw-bold shadow-sm hover-lift">
+                                <i class="fa-solid fa-floppy-disk me-2"></i>Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+<style>
+    .hover-lift {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .hover-lift:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+    }
+    .text-teal {
+        color: #0d9488 !important;
+    }
+</style>
