@@ -1,264 +1,317 @@
 @model MediCamp.Models.ViewModels.AdminCampApprovalsViewModel
 @{
-    ViewData["Title"] = "Camp Approvals - Governance Portal";
+    ViewData["Title"] = "Camp Approvals & Clinical Governance - MediCamp";
 }
 
-<div class="container py-4">
-    <!-- Top Header -->
-    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
-        <div>
-            <div class="d-flex align-items-center gap-2 mb-1">
-                <span class="badge badge-role-admin"><i class="fa-solid fa-shield-halved"></i> Governance</span>
-                <span class="text-muted small">Medical Camps Management</span>
+<div class="container-fluid px-lg-4 py-4">
+
+    <!-- Top Navigation Breadcrumb & Header -->
+    <div class="glass-card p-4 mb-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                    <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-outline-dark btn-sm rounded-pill px-3 py-1">
+                        <i class="fa-solid fa-arrow-left me-1"></i> Admin Dashboard
+                    </a>
+                    <span class="badge badge-role-admin"><i class="fa-solid fa-shield-halved me-1"></i> Clinical Governance</span>
+                    <span class="badge bg-champagne text-dark border px-2.5 py-1 fw-bold">Camp Applications</span>
+                </div>
+                <h2 class="fw-bold text-dark mb-1">Camp Verification & Approval Queue</h2>
+                <p class="text-secondary small mb-0">
+                    Review incoming medical camp proposals, verify clinical feasibility, check for geographical conflicts, and approve for directory publication.
+                </p>
             </div>
-            <h2 class="fw-bold text-dark mb-0">Camp Applications</h2>
-            <p class="text-secondary small mb-0">Review submitted healthcare camps for clinical and logistical approval.</p>
-        </div>
-        
-        <div class="d-flex align-items-center">
-            @if (Model.PendingCamps.Any())
-            {
-                <span class="badge bg-warning text-dark px-3 py-2 fs-6 rounded-pill shadow-sm">
-                    <i class="fa-solid fa-clock me-1"></i> @Model.PendingCamps.Count Pending
-                </span>
-            }
-            else
-            {
-                <span class="badge bg-light text-muted border px-3 py-2 rounded-pill">
-                    <i class="fa-solid fa-check-double me-1"></i> All Caught Up
-                </span>
-            }
+
+            <div class="d-flex align-items-center gap-2">
+                <a asp-controller="Admin" asp-action="HostApprovals" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                    <i class="fa-solid fa-building-circle-check me-1"></i> Host Approvals
+                </a>
+                <a asp-controller="Admin" asp-action="Reports" class="btn btn-sapphire btn-sm rounded-pill px-3 shadow-sm">
+                    <i class="fa-solid fa-chart-pie me-1"></i> Global Analytics
+                </a>
+            </div>
         </div>
     </div>
 
+    <!-- Alert Notifications -->
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm border-0" role="alert">
-            <i class="fa-solid fa-circle-check me-2"></i> @TempData["SuccessMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <div class="alert alert-success alert-dismissible fade show rounded-4 shadow-sm border-0 d-flex align-items-center mb-4" role="alert">
+            <i class="fa-solid fa-circle-check fs-5 me-2 text-success"></i>
+            <div>@TempData["SuccessMessage"]</div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
     @if (TempData["ErrorMessage"] != null)
     {
-        <div class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm border-0" role="alert">
-            <i class="fa-solid fa-triangle-exclamation me-2"></i> @TempData["ErrorMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <div class="alert alert-danger alert-dismissible fade show rounded-4 shadow-sm border-0 d-flex align-items-center mb-4" role="alert">
+            <i class="fa-solid fa-triangle-exclamation fs-5 me-2 text-danger"></i>
+            <div>@TempData["ErrorMessage"]</div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
-    <!-- Filter Tabs -->
-    <ul class="nav nav-tabs nav-tabs-custom mb-4" id="campTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <a class="nav-link @(Model.ActiveTab == "Pending" ? "active" : "")" asp-action="CampApprovals" asp-route-tab="Pending">
-                <i class="fa-solid fa-hourglass-half me-1"></i> Pending Approval 
-                @if(Model.PendingCamps.Any()){ <span class="badge bg-warning text-dark ms-1">@Model.PendingCamps.Count</span> }
-            </a>
-        </li>
-        <li class="nav-item" role="presentation">
-            <a class="nav-link @(Model.ActiveTab == "Scheduled" ? "active" : "")" asp-action="CampApprovals" asp-route-tab="Scheduled">
-                <i class="fa-solid fa-calendar-check me-1"></i> Scheduled
-            </a>
-        </li>
-        <li class="nav-item" role="presentation">
-            <a class="nav-link @(Model.ActiveTab == "Rejected" ? "active" : "")" asp-action="CampApprovals" asp-route-tab="Rejected">
-                <i class="fa-solid fa-ban me-1"></i> Rejected
-            </a>
-        </li>
-    </ul>
-
-    <!-- Tab Content -->
-    <div class="tab-content">
-        <!-- PENDING TAB -->
-        @if (Model.ActiveTab == "Pending")
-        {
-            <div class="tab-pane fade show active" id="pending">
-                @if (!Model.PendingCamps.Any())
-                {
-                    <div class="text-center py-5 glass-card">
-                        <div class="stat-icon stat-icon-amber mx-auto mb-3" style="width: 64px; height: 64px; font-size: 1.8rem; background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
-                            <i class="fa-solid fa-check-double"></i>
-                        </div>
-                        <h5 class="fw-bold text-dark mb-1">Queue is Empty</h5>
-                        <p class="text-secondary small">No pending camp applications right now.</p>
+    <!-- Metric Summary KPI Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-sm-4">
+            <div class="p-3 bg-white rounded-4 border shadow-sm border-start border-4 border-warning h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="text-secondary small fw-bold text-uppercase d-block mb-1">Pending Review</span>
+                        <h3 class="fw-bold text-warning mb-0">@Model.PendingCamps.Count</h3>
                     </div>
-                }
-                else
+                    <div class="stat-icon bg-warning-subtle text-warning" style="width: 44px; height: 44px; border-radius: 12px; font-size: 1.2rem;">
+                        <i class="fa-solid fa-hourglass-half"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="p-3 bg-white rounded-4 border shadow-sm border-start border-4 border-success h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="text-secondary small fw-bold text-uppercase d-block mb-1">Approved & Scheduled</span>
+                        <h3 class="fw-bold text-success mb-0">@Model.ScheduledCamps.Count</h3>
+                    </div>
+                    <div class="stat-icon bg-success-subtle text-success" style="width: 44px; height: 44px; border-radius: 12px; font-size: 1.2rem;">
+                        <i class="fa-solid fa-calendar-check"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="p-3 bg-white rounded-4 border shadow-sm border-start border-4 border-danger h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="text-secondary small fw-bold text-uppercase d-block mb-1">Rejected Proposals</span>
+                        <h3 class="fw-bold text-danger mb-0">@Model.RejectedCamps.Count</h3>
+                    </div>
+                    <div class="stat-icon bg-danger-subtle text-danger" style="width: 44px; height: 44px; border-radius: 12px; font-size: 1.2rem;">
+                        <i class="fa-solid fa-ban"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Structured Data Panel -->
+    <div class="glass-card mb-4 overflow-hidden">
+        
+        <!-- Filter Toolbar -->
+        <div class="p-3 bg-white border-bottom d-flex flex-wrap align-items-center justify-content-between gap-3">
+            
+            <!-- Tabs -->
+            <div class="d-flex gap-2 flex-wrap">
+                <a class="btn btn-sm rounded-pill px-3 fw-bold @(Model.ActiveTab == "Pending" ? "btn-warning text-dark shadow-xs" : "btn-light text-secondary border")" 
+                   asp-action="CampApprovals" asp-route-tab="Pending">
+                    <i class="fa-solid fa-hourglass-half me-1"></i> Pending Queue 
+                    <span class="badge bg-dark text-white rounded-pill ms-1">@Model.PendingCamps.Count</span>
+                </a>
+                <a class="btn btn-sm rounded-pill px-3 fw-bold @(Model.ActiveTab == "Scheduled" ? "btn-success text-white shadow-xs" : "btn-light text-secondary border")" 
+                   asp-action="CampApprovals" asp-route-tab="Scheduled">
+                    <i class="fa-solid fa-calendar-check me-1"></i> Scheduled History 
+                    <span class="badge bg-white text-success rounded-pill ms-1">@Model.ScheduledCamps.Count</span>
+                </a>
+                <a class="btn btn-sm rounded-pill px-3 fw-bold @(Model.ActiveTab == "Rejected" ? "btn-danger text-white shadow-xs" : "btn-light text-secondary border")" 
+                   asp-action="CampApprovals" asp-route-tab="Rejected">
+                    <i class="fa-solid fa-ban me-1"></i> Rejected History 
+                    <span class="badge bg-white text-danger rounded-pill ms-1">@Model.RejectedCamps.Count</span>
+                </a>
+            </div>
+
+            <!-- Instant Search Box -->
+            <div class="d-flex align-items-center gap-2 flex-grow-1 justify-content-end" style="max-width: 400px;">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-light border-end-0 text-muted">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </span>
+                    <input type="text" id="campFilterInput" class="form-control border-start-0" placeholder="Instant filter by title, location, host, type..." />
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="p-4 bg-light">
+            @{
+                var activeList = Model.ActiveTab switch
                 {
-                    <div class="row g-4">
-                        @foreach (var camp in Model.PendingCamps)
+                    "Scheduled" => Model.ScheduledCamps,
+                    "Rejected" => Model.RejectedCamps,
+                    _ => Model.PendingCamps
+                };
+            }
+
+            @if (!activeList.Any())
+            {
+                <div class="text-center py-5 bg-white rounded-4 border shadow-sm my-3">
+                    <div class="stat-icon bg-light text-secondary mx-auto mb-3" style="width: 64px; height: 64px; font-size: 1.6rem; border-radius: 50%;">
+                        <i class="fa-solid fa-tent"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-1">No @Model.ActiveTab.ToLower() camps found</h5>
+                    <p class="text-secondary small mb-0">All submitted applications in this category have been processed or queue is empty.</p>
+                </div>
+            }
+            else
+            {
+                <div class="row g-4" id="campListContainer">
+                    @foreach (var camp in activeList)
+                    {
+                        var statusBadge = Model.ActiveTab switch
                         {
-                            <div class="col-12" id="camp-card-@camp.Id">
-                                <div class="card border rounded-4 shadow-sm bg-white overflow-hidden">
-                                    <div class="card-body p-4 position-relative">
-                                        <div class="position-absolute top-0 end-0 mt-4 me-4">
-                                            <span class="small text-muted"><i class="fa-solid fa-clock me-1"></i>Submitted @camp.SubmittedDate.ToString("dd MMM yyyy")</span>
-                                        </div>
+                            "Scheduled" => "bg-success-subtle text-success border-success-subtle",
+                            "Rejected" => "bg-danger-subtle text-danger border-danger-subtle",
+                            _ => "bg-warning-subtle text-warning border-warning-subtle"
+                        };
 
-                                        <div class="d-flex align-items-center gap-2 mb-2">
-                                            <h4 class="fw-bold text-dark mb-0">@camp.Title</h4>
-                                            <span class="badge bg-teal-subtle text-teal border border-teal-subtle py-1"><i class="fa-solid fa-stethoscope me-1"></i>@camp.CampType</span>
-                                        </div>
-
-                                        <div class="mb-3 text-secondary small">
-                                            <span class="me-3"><i class="fa-solid fa-building text-primary me-1"></i> <strong>Host:</strong> @camp.HostOrganizationName</span>
-                                            <span class="me-3"><i class="fa-solid fa-location-dot text-danger me-1"></i> <strong>Location:</strong> @camp.Venue, @camp.Upazila, @camp.District</span>
-                                            <span><i class="fa-solid fa-calendar-days text-info me-1"></i> <strong>Dates:</strong> @camp.StartDate.ToString("dd MMM") - @camp.EndDate.ToString("dd MMM yyyy")</span>
-                                        </div>
-
-                                        <div class="d-flex flex-wrap gap-2 mb-3">
-                                            <div class="badge bg-light text-dark border px-2 py-1"><i class="fa-solid fa-users text-secondary me-1"></i> Expected Patients: @camp.ExpectedPatients.ToString("N0")</div>
-                                            <div class="badge bg-light text-dark border px-2 py-1"><i class="fa-solid fa-coins text-success me-1"></i> Budget: ৳ @camp.TotalBudget.ToString("N0")</div>
-                                        </div>
-
-                                        @if (camp.HasDateConflict)
-                                        {
-                                            <div class="alert alert-warning py-2 px-3 small rounded-3 d-flex align-items-center mb-3">
-                                                <i class="fa-solid fa-triangle-exclamation text-danger fs-5 me-2"></i>
-                                                <span><strong>Date Conflict:</strong> @camp.ConflictWarningMessage</span>
+                        <div class="col-12 camp-card-item" id="camp-card-@camp.Id">
+                            <div class="card border rounded-4 shadow-sm bg-white overflow-hidden">
+                                <div class="card-body p-4">
+                                    
+                                    <!-- Top Row: Camp Title, Type, Status, Timestamp -->
+                                    <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+                                        <div>
+                                            <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                                                <h4 class="fw-bold text-dark mb-0 searchable-text">@camp.Title</h4>
+                                                <span class="badge bg-teal-subtle text-teal border border-teal-subtle px-2.5 py-1 fw-semibold searchable-text">
+                                                    <i class="fa-solid fa-stethoscope me-1"></i>@camp.CampType
+                                                </span>
+                                                <span class="badge @statusBadge border px-2.5 py-1 fw-bold">
+                                                    @Model.ActiveTab
+                                                </span>
                                             </div>
-                                        }
-
-                                        @if (camp.HasCapacitySanityFlag)
-                                        {
-                                            <div class="alert alert-info py-2 px-3 small rounded-3 d-flex align-items-center mb-3">
-                                                <i class="fa-solid fa-circle-info text-primary fs-5 me-2"></i>
-                                                <span><strong>Notice:</strong> @camp.CapacitySanityMessage</span>
-                                            </div>
-                                        }
-
-                                        <!-- Inline Reject Form (hidden by default) -->
-                                        <div class="border rounded-3 p-3 mb-3 bg-light" id="rejectForm-@camp.Id" style="display: none;">
-                                            <h6 class="fw-bold text-danger mb-2"><i class="fa-solid fa-ban me-1"></i> Reject Camp Application</h6>
-                                            <p class="text-secondary small mb-2">Provide a reason for rejecting <strong>"@camp.Title"</strong>. The host will see this feedback.</p>
-                                            <form asp-action="RejectCamp" method="post">
-                                                <input type="hidden" name="id" value="@camp.Id" />
-                                                <div class="mb-2">
-                                                    <textarea name="rejectionReason" class="form-control" rows="3" required placeholder="Provide clinical or logistical reasons for rejection..."></textarea>
-                                                </div>
-                                                <div class="d-flex gap-2 justify-content-end">
-                                                    <button type="button" class="btn btn-light border btn-sm" onclick="document.getElementById('rejectForm-@camp.Id').style.display='none'">Cancel</button>
-                                                    <button type="submit" class="btn btn-danger btn-sm"><i class="fa-solid fa-ban me-1"></i> Confirm Reject</button>
-                                                </div>
-                                            </form>
+                                            <span class="text-muted small">
+                                                <i class="fa-solid fa-clock me-1"></i>Submitted on @camp.SubmittedDate.ToString("dd MMM yyyy, hh:mm tt")
+                                            </span>
                                         </div>
 
-                                        <div class="d-flex justify-content-end gap-2 border-top pt-3 mt-3">
-                                            <button type="button" class="btn btn-outline-danger btn-sm px-3" onclick="document.getElementById('rejectForm-@camp.Id').style.display='block';">
-                                                <i class="fa-solid fa-xmark me-1"></i> Reject
-                                            </button>
-                                            <form asp-action="ApproveCamp" method="post" class="d-inline">
-                                                <input type="hidden" name="id" value="@camp.Id" />
-                                                <button type="submit" class="btn btn-sm px-4 shadow-sm" style="background-color: #0d9488; color: white;">
-                                                    <i class="fa-solid fa-check me-1"></i> Approve
-                                                </button>
-                                            </form>
+                                        <div class="text-end">
+                                            <span class="text-secondary small d-block">Est. Budget per Patient</span>
+                                            <strong class="text-dark fs-6">
+                                                ৳@(camp.ExpectedPatients > 0 ? (camp.TotalBudget / camp.ExpectedPatients).ToString("N0") : "0")
+                                            </strong>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                }
-            </div>
-        }
 
-        <!-- SCHEDULED TAB -->
-        @if (Model.ActiveTab == "Scheduled")
-        {
-            <div class="tab-pane fade show active" id="scheduled">
-                @if (!Model.ScheduledCamps.Any())
-                {
-                    <div class="text-center py-5 glass-card">
-                        <div class="stat-icon stat-icon-teal mx-auto mb-3" style="width: 64px; height: 64px; font-size: 1.8rem; background: rgba(13, 148, 136, 0.1); color: #0d9488;">
-                            <i class="fa-solid fa-calendar-check"></i>
-                        </div>
-                        <h5 class="fw-bold text-dark mb-1">No Scheduled Camps</h5>
-                        <p class="text-secondary small">There are currently no approved camps waiting to start.</p>
-                    </div>
-                }
-                else
-                {
-                    <div class="row g-4">
-                        @foreach (var camp in Model.ScheduledCamps)
-                        {
-                            <div class="col-12">
-                                <div class="card border rounded-4 shadow-sm bg-white overflow-hidden">
-                                    <div class="card-body p-4 position-relative">
-                                        <div class="position-absolute top-0 end-0 mt-4 me-4">
-                                            <span class="badge badge-status-active"><i class="fa-solid fa-calendar-check me-1"></i> Scheduled</span>
+                                    <!-- Structured 4-Column Metadata Grid -->
+                                    <div class="row g-3 p-3 bg-light rounded-3 border mb-3">
+                                        <div class="col-md-3 col-sm-6">
+                                            <span class="text-secondary small fw-bold text-uppercase d-block" style="font-size: 0.7rem;">Host Organization</span>
+                                            <div class="fw-bold text-dark text-truncate searchable-text">
+                                                <i class="fa-solid fa-building text-primary me-1"></i>@camp.HostOrganizationName
+                                            </div>
                                         </div>
-
-                                        <div class="d-flex align-items-center gap-2 mb-2 mt-2">
-                                            <h4 class="fw-bold text-dark mb-0">@camp.Title</h4>
-                                            <span class="badge bg-teal-subtle text-teal border border-teal-subtle py-1"><i class="fa-solid fa-stethoscope me-1"></i>@camp.CampType</span>
+                                        <div class="col-md-3 col-sm-6">
+                                            <span class="text-secondary small fw-bold text-uppercase d-block" style="font-size: 0.7rem;">Location & Venue</span>
+                                            <div class="fw-bold text-dark text-truncate searchable-text">
+                                                <i class="fa-solid fa-location-dot text-danger me-1"></i>@camp.Venue, @camp.Upazila, @camp.District
+                                            </div>
                                         </div>
-
-                                        <div class="mb-3 text-secondary small">
-                                            <span class="me-3"><i class="fa-solid fa-building text-primary me-1"></i> <strong>Host:</strong> @camp.HostOrganizationName</span>
-                                            <span class="me-3"><i class="fa-solid fa-location-dot text-danger me-1"></i> <strong>Location:</strong> @camp.Venue, @camp.Upazila, @camp.District</span>
-                                            <span><i class="fa-solid fa-calendar-days text-info me-1"></i> <strong>Dates:</strong> @camp.StartDate.ToString("dd MMM") - @camp.EndDate.ToString("dd MMM yyyy")</span>
+                                        <div class="col-md-3 col-sm-6">
+                                            <span class="text-secondary small fw-bold text-uppercase d-block" style="font-size: 0.7rem;">Schedule Timeline</span>
+                                            <div class="fw-bold text-dark searchable-text">
+                                                <i class="fa-solid fa-calendar-days text-info me-1"></i>@camp.StartDate.ToString("dd MMM") - @camp.EndDate.ToString("dd MMM yyyy")
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-6">
+                                            <span class="text-secondary small fw-bold text-uppercase d-block" style="font-size: 0.7rem;">Capacity & Budget</span>
+                                            <div class="fw-bold text-success">
+                                                <i class="fa-solid fa-users text-secondary me-1"></i>@camp.ExpectedPatients.ToString("N0") pts &bull; ৳@camp.TotalBudget.ToString("N0")
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                }
-            </div>
-        }
 
-        <!-- REJECTED TAB -->
-        @if (Model.ActiveTab == "Rejected")
-        {
-            <div class="tab-pane fade show active" id="rejected">
-                @if (!Model.RejectedCamps.Any())
-                {
-                    <div class="text-center py-5 glass-card">
-                        <div class="stat-icon stat-icon-sapphire mx-auto mb-3" style="width: 64px; height: 64px; font-size: 1.8rem; background: rgba(30, 58, 138, 0.1); color: #1e3a8a;">
-                            <i class="fa-solid fa-list"></i>
-                        </div>
-                        <h5 class="fw-bold text-dark mb-1">No Rejected Camps</h5>
-                        <p class="text-secondary small">You have not rejected any camp applications.</p>
-                    </div>
-                }
-                else
-                {
-                    <div class="row g-4">
-                        @foreach (var camp in Model.RejectedCamps)
-                        {
-                            <div class="col-12">
-                                <div class="card border rounded-4 shadow-sm bg-white overflow-hidden opacity-75">
-                                    <div class="card-body p-4 position-relative">
-                                        <div class="position-absolute top-0 end-0 mt-4 me-4">
-                                            <span class="badge bg-secondary"><i class="fa-solid fa-ban me-1"></i> Rejected</span>
-                                        </div>
-
-                                        <div class="d-flex align-items-center gap-2 mb-2 mt-2">
-                                            <h4 class="fw-bold text-dark mb-0 text-decoration-line-through">@camp.Title</h4>
-                                            <span class="badge bg-teal-subtle text-teal border border-teal-subtle py-1"><i class="fa-solid fa-stethoscope me-1"></i>@camp.CampType</span>
-                                        </div>
-
-                                        <div class="mb-3 text-secondary small">
-                                            <span class="me-3"><i class="fa-solid fa-building text-primary me-1"></i> <strong>Host:</strong> @camp.HostOrganizationName</span>
-                                            <span class="me-3"><i class="fa-solid fa-location-dot text-danger me-1"></i> <strong>Location:</strong> @camp.Venue, @camp.Upazila, @camp.District</span>
-                                            <span><i class="fa-solid fa-calendar-days text-info me-1"></i> <strong>Dates:</strong> @camp.StartDate.ToString("dd MMM") - @camp.EndDate.ToString("dd MMM yyyy")</span>
-                                        </div>
-                                        
-                                        <div class="alert alert-danger py-2 px-3 small rounded-3 d-flex align-items-start mb-0">
-                                            <i class="fa-solid fa-circle-exclamation text-danger fs-6 me-2 mt-1"></i>
+                                    <!-- Warning & Conflict Alerts -->
+                                    @if (camp.HasDateConflict)
+                                    {
+                                        <div class="alert alert-warning py-2.5 px-3 small rounded-3 d-flex align-items-center mb-3">
+                                            <i class="fa-solid fa-triangle-exclamation text-danger fs-5 me-2 flex-shrink-0"></i>
                                             <div>
-                                                <strong>Rejection Reason:</strong><br/>
+                                                <strong>Regional Schedule Conflict:</strong> @camp.ConflictWarningMessage
+                                            </div>
+                                        </div>
+                                    }
+
+                                    @if (camp.HasCapacitySanityFlag)
+                                    {
+                                        <div class="alert alert-info py-2.5 px-3 small rounded-3 d-flex align-items-center mb-3">
+                                            <i class="fa-solid fa-circle-info text-primary fs-5 me-2 flex-shrink-0"></i>
+                                            <div>
+                                                <strong>Budget Sanity Flag:</strong> @camp.CapacitySanityMessage
+                                            </div>
+                                        </div>
+                                    }
+
+                                    @if (Model.ActiveTab == "Rejected" && !string.IsNullOrEmpty(camp.CampRejectionReason))
+                                    {
+                                        <div class="alert alert-danger py-2.5 px-3 small rounded-3 d-flex align-items-start mb-3">
+                                            <i class="fa-solid fa-ban text-danger fs-6 me-2 mt-0.5 flex-shrink-0"></i>
+                                            <div>
+                                                <strong>Official Rejection Feedback:</strong><br/>
                                                 <span class="text-dark">@camp.CampRejectionReason</span>
                                             </div>
                                         </div>
+                                    }
+
+                                    <!-- Inline Rejection Form (Hidden by default) -->
+                                    <div class="border rounded-4 p-4 mb-3 bg-white shadow-xs" id="rejectForm-@camp.Id" style="display: none; border-color: #fca5a5 !important;">
+                                        <h6 class="fw-bold text-danger mb-1"><i class="fa-solid fa-ban me-1"></i> Reject Camp Application</h6>
+                                        <p class="text-secondary small mb-2">Provide clinical or logistical reasons for rejecting <strong>"@camp.Title"</strong>. The host will receive this notification.</p>
+                                        <form asp-action="RejectCamp" method="post">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@camp.Id" />
+                                            <div class="mb-2">
+                                                <textarea name="rejectionReason" class="form-control rounded-3" rows="3" required placeholder="e.g. Inadequate clinical coverage, overlapping dates in upazila, or invalid venue authorization..."></textarea>
+                                            </div>
+                                            <div class="d-flex gap-2 justify-content-end">
+                                                <button type="button" class="btn btn-light border btn-sm rounded-pill px-3" onclick="document.getElementById('rejectForm-@camp.Id').style.display='none'">Cancel</button>
+                                                <button type="submit" class="btn btn-danger btn-sm rounded-pill px-4 fw-bold"><i class="fa-solid fa-ban me-1"></i> Confirm Reject</button>
+                                            </div>
+                                        </form>
                                     </div>
+
+                                    <!-- Action Buttons -->
+                                    @if (Model.ActiveTab == "Pending")
+                                    {
+                                        <div class="d-flex justify-content-end gap-2 border-top pt-3 mt-2">
+                                            <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-4 fw-bold" onclick="document.getElementById('rejectForm-@camp.Id').style.display='block';">
+                                                <i class="fa-solid fa-xmark me-1"></i> Reject
+                                            </button>
+                                            <form asp-action="ApproveCamp" method="post" class="d-inline m-0">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@camp.Id" />
+                                                <button type="submit" class="btn btn-success btn-sm rounded-pill px-4 fw-bold shadow-xs" onclick="return confirm('Approve camp \'@camp.Title\' and publish to public directory?');">
+                                                    <i class="fa-solid fa-check me-1"></i> Approve & Publish
+                                                </button>
+                                            </form>
+                                        </div>
+                                    }
                                 </div>
                             </div>
-                        }
-                    </div>
-                }
-            </div>
-        }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <div class="p-3 bg-white border-top d-flex justify-content-between align-items-center">
+            <span class="small text-muted">Showing <strong>@activeList.Count</strong> medical camp(s) in <strong>@Model.ActiveTab</strong> tab</span>
+            <span class="small text-muted"><i class="fa-solid fa-shield-halved text-success me-1"></i>Admin Executive Authority</span>
+        </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        // Real-time client side search filtering
+        document.getElementById('campFilterInput')?.addEventListener('keyup', function () {
+            const query = this.value.toLowerCase().trim();
+            const cards = document.querySelectorAll('.camp-card-item');
+            cards.forEach(card => {
+                const text = card.innerText.toLowerCase();
+                card.style.display = text.includes(query) ? '' : 'none';
+            });
+        });
+    </script>
+}
+

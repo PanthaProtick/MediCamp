@@ -1033,6 +1033,8 @@ namespace MediCamp.Models.ViewModels
 
     public class AdminDashboardViewModel
     {
+        public ApplicationUser? AdminUser { get; set; }
+
         // High-level Metrics
         public int TotalCampsCount { get; set; }
         public int ActiveCampsCount { get; set; }
@@ -1054,6 +1056,8 @@ namespace MediCamp.Models.ViewModels
         public int TotalPatientsCount { get; set; }
 
         public int PendingHostApprovalsCount { get; set; }
+        public int PendingDoctorApprovalsCount { get; set; }
+        public int UrgentBloodRequestsCount { get; set; }
 
         // Operational Telemetry
         public int TotalConsultationsCount { get; set; }
@@ -1062,10 +1066,24 @@ namespace MediCamp.Models.ViewModels
         public decimal TotalSystemBudget { get; set; }
         public decimal TotalSystemExpenses { get; set; }
 
+        // Dynamic Computed Ratios
+        public int PatientServedPercentage => (TotalPatientsRegistered + TotalPatientsServed) > 0
+            ? (int)Math.Min(100, Math.Round((double)TotalPatientsServed / (TotalPatientsRegistered > 0 ? TotalPatientsRegistered : TotalPatientsServed) * 100))
+            : (TotalPatientsServed > 0 ? 100 : 0);
+
+        public int BudgetUtilizationPercentage => TotalSystemBudget > 0
+            ? (int)Math.Min(100, Math.Round((double)TotalSystemExpenses / (double)TotalSystemBudget * 100))
+            : 0;
+
+        public int CampCompletionRate => TotalCampsCount > 0
+            ? (int)Math.Round((double)CompletedCampsCount / TotalCampsCount * 100)
+            : 0;
+
         // Quick Lists
         public List<Camp> ActiveAndUpcomingCamps { get; set; } = new();
         public List<ApplicationUser> RecentPendingHosts { get; set; } = new();
         public List<Consultation> RecentConsultations { get; set; } = new();
+        public List<Camp> AllCamps { get; set; } = new();
     }
 
     public class DiseaseStatItem
