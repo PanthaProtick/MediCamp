@@ -12,13 +12,6 @@
                     <h4 class="mb-0">Create Patient Profile</h4>
                 </div>
                 <div class="card-body bg-light">
-                    @if (TempData["SuccessMessage"] != null)
-                    {
-                        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
-                            @TempData["SuccessMessage"]
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    }
 
                     <form asp-action="CreatePatient" method="post">
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>

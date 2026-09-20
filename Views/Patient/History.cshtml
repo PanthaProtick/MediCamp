@@ -1,413 +1,522 @@
 @model MediCamp.Models.ViewModels.PatientProfileHistoryViewModel
-
 @{
-    ViewData["Title"] = "My Medical History — MediCamp";
+    ViewData["Title"] = "Patient Portal - My Medical History";
+    Layout = "_Layout";
 }
 
 <style>
-    .timeline-container {
+    /* Patient Timeline Custom Styling */
+    .patient-timeline-wrapper {
         position: relative;
-        padding-left: 2.5rem;
+        padding-left: 2.25rem;
     }
-    .timeline-container::before {
+    .patient-timeline-wrapper::before {
         content: '';
         position: absolute;
-        left: 14px;
-        top: 10px;
-        bottom: 10px;
+        left: 12px;
+        top: 15px;
+        bottom: 15px;
         width: 3px;
-        background: linear-gradient(180deg, #0d6efd 0%, #6610f2 50%, #20c997 100%);
+        background: linear-gradient(180deg, #10b981 0%, #059669 60%, #047857 100%);
         border-radius: 4px;
     }
-    .timeline-node {
+    .patient-timeline-card-node {
         position: relative;
-        margin-bottom: 2.5rem;
+        margin-bottom: 2.25rem;
     }
-    .timeline-dot {
+    .patient-timeline-icon-dot {
         position: absolute;
-        left: -2.5rem;
-        top: 20px;
+        left: -2.25rem;
+        top: 18px;
         width: 28px;
         height: 28px;
         border-radius: 50%;
-        background: #0d6efd;
+        background: #10b981;
         color: white;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 0.75rem;
-        border: 4px solid #fff;
-        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+        font-size: 0.78rem;
+        border: 3px solid #ffffff;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
     }
-    .vital-pill {
-        background: #f8f9fa;
-        border: 1px solid #e9ecef;
+    .patient-vital-chip {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
         border-radius: 12px;
-        padding: 0.5rem 0.9rem;
+        padding: 0.6rem 0.9rem;
         text-align: center;
         min-width: 90px;
+        flex: 1 1 auto;
     }
-    .vital-pill .val {
+    .patient-vital-chip .v-num {
         font-weight: 800;
-        color: #212529;
         font-size: 1.05rem;
+        line-height: 1.2;
     }
-    .vital-pill .lbl {
-        font-size: 0.68rem;
-        font-weight: 600;
+    .patient-vital-chip .v-tag {
+        font-size: 0.65rem;
+        font-weight: 700;
         text-transform: uppercase;
-        color: #6c757d;
+        color: #64748b;
         letter-spacing: 0.05em;
+        margin-top: 2px;
+    }
+    .patient-summary-box {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 1.25rem;
+        transition: all 0.2s ease;
+    }
+    .patient-summary-box:hover {
+        border-color: #10b981;
+        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.08);
     }
 </style>
 
-<div class="container py-4">
+<div class="container-fluid px-lg-4 py-4">
 
-    <!-- Flash Messages -->
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm mb-4" role="alert">
-            <i class="fa-solid fa-circle-check me-2"></i> @TempData["SuccessMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    }
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm mb-4" role="alert">
-            <i class="fa-solid fa-triangle-exclamation me-2"></i> @TempData["ErrorMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    }
 
-    <!-- Profile Header Card -->
-    <div class="glass-card p-4 mb-4">
-        <!-- Patient Unique ID Banner -->
-        <div class="p-3 bg-dark text-white rounded-4 border border-secondary shadow-sm d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
-            <div class="d-flex align-items-center gap-3">
-                <div class="bg-warning text-dark rounded-3 d-flex align-items-center justify-content-center shadow-sm" style="width:52px;height:52px;font-size:1.5rem;">
-                    <i class="fa-solid fa-id-card"></i>
-                </div>
-                <div>
-                    <div class="text-white-50 small fw-bold text-uppercase" style="letter-spacing:1px;">Unique Patient ID (For Camp Intake & Records)</div>
-                    <div class="d-flex align-items-center gap-2 mt-1">
-                        <span class="fs-2 fw-black font-monospace text-warning text-uppercase" id="patientUniqueIdText" style="letter-spacing: 2px;">@(Model.Patient.PatientUniqueId ?? "N/A")</span>
-                        @if (!string.IsNullOrWhiteSpace(Model.Patient.PatientUniqueId))
-                        {
-                            <button type="button" class="btn btn-sm btn-outline-warning rounded-pill px-3 py-1 ms-2 fw-bold" onclick="copyPatientId('@Model.Patient.PatientUniqueId', this)" title="Copy Patient ID">
-                                <i class="fa-solid fa-copy me-1"></i> Copy ID
+    <!-- Patient Dashboard Main Container with Rounded Card Frame -->
+    <div class="host-layout-card">
+        <div class="row g-0">
+
+            <!-- Left Emerald Sidebar (Matching Patient Navbar Details) -->
+            <div class="col-lg-3 col-xl-auto" style="min-width: 250px;">
+                <aside class="host-sidebar h-100">
+                    <div>
+                        <!-- Sidebar Brand / Patient Info -->
+                        <div class="host-sidebar-brand">
+                            <div class="host-sidebar-brand-icon" style="background: linear-gradient(135deg, #10b981 0%, #047857 100%);">
+                                <i class="fa-solid fa-hospital-user text-white"></i>
+                            </div>
+                            <div class="d-flex flex-column text-truncate">
+                                <span class="fw-bold text-white fs-5 lh-1 text-truncate">Patient Portal</span>
+                                <span class="text-champagne opacity-75 small text-uppercase mt-1" style="font-size: 0.68rem; letter-spacing: 0.06em;">Health Records</span>
+                            </div>
+                        </div>
+
+                        <!-- Sidebar Navigation Menu (Only Patient Scope) -->
+                        <nav class="d-flex flex-column">
+                            <a asp-controller="Patient" asp-action="History" class="host-nav-item active">
+                                <i class="fa-solid fa-notes-medical fs-6"></i>
+                                <span>My Medical History</span>
+                                @if (Model.Visits.Count > 0)
+                                {
+                                    <span class="badge bg-emerald rounded-pill ms-auto small fw-bold" style="background: #10b981; color: white; font-size: 0.7rem;">@Model.Visits.Count</span>
+                                }
+                            </a>
+                            <a asp-controller="Patient" asp-action="BloodDonation" class="host-nav-item">
+                                <i class="fa-solid fa-droplet fs-6"></i>
+                                <span>Blood Donation Hub</span>
+                            </a>
+                        </nav>
+                    </div>
+
+                    <!-- Sidebar Bottom: Logout Button in White Rounded Pill -->
+                    <div class="pt-4 mt-auto">
+                        <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+                            <button type="submit" class="host-logout-btn">
+                                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                                <span>Logout</span>
                             </button>
-                        }
+                        </form>
                     </div>
-                </div>
+                </aside>
             </div>
-            <div class="text-white-50 small text-md-end">
-                <div class="badge bg-warning text-dark fw-bold mb-1"><i class="fa-solid fa-shield-halved me-1"></i>Official Health ID</div>
-                <div>Present this 6-character code at Camp Triage, Doctor Desk & Pharmacy.</div>
-            </div>
-        </div>
 
-        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
-            <div class="d-flex align-items-center gap-3">
-                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow"
-                     style="width: 64px; height: 64px; font-size: 1.6rem;">
-                    <i class="fa-solid fa-user-shield"></i>
-                </div>
-                <div>
-                    <div class="d-flex align-items-center gap-2 mb-1">
-                        <h3 class="fw-black text-dark mb-0">@Model.Patient.FullName</h3>
-                        <span class="badge bg-danger rounded-pill px-3 py-1">
-                            <i class="fa-solid fa-droplet me-1"></i> @(Model.Patient.BloodGroup ?? "Unknown")
-                        </span>
-                    </div>
-                    <div class="text-secondary small d-flex flex-wrap gap-3">
-                        <span><i class="fa-solid fa-phone me-1 text-primary"></i> @Model.Patient.PhoneNumber</span>
-                        <span><i class="fa-solid fa-envelope me-1 text-primary"></i> @Model.Patient.Email</span>
-                        <span><i class="fa-solid fa-location-dot me-1 text-danger"></i> @Model.Patient.Upazila, @Model.Patient.District</span>
-                        @if (Model.Patient.Age.HasValue)
-                        {
-                            <span><i class="fa-solid fa-cake-candles me-1 text-warning"></i> @Model.Patient.Age yrs (@Model.Patient.Gender)</span>
-                        }
-                    </div>
-                </div>
-            </div>
-            <div class="d-flex gap-2">
-                <a asp-controller="Patient" asp-action="BloodDonation" class="btn btn-outline-danger rounded-pill fw-bold px-3">
-                    <i class="fa-solid fa-heart-pulse me-1"></i> Blood Donation Hub
-                </a>
-                <a asp-controller="Home" asp-action="Camps" class="btn btn-sapphire rounded-pill px-4">
-                    <i class="fa-solid fa-tent me-1"></i> Find Medical Camps
-                </a>
-            </div>
-        </div>
+            <!-- Right Details & Medical Records Panel -->
+            <div class="col-lg-9 col-xl">
+                <main class="host-main-panel h-100">
 
-        <!-- Quick Summary Bar -->
-        <div class="row g-3 mt-3 pt-3 border-top">
-            <div class="col-6 col-md-3">
-                <div class="p-2 text-center rounded bg-light border">
-                    <div class="fw-black fs-4 text-primary">@Model.TotalVisitsCount</div>
-                    <div class="text-muted small fw-bold">Camp Consultations</div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="p-2 text-center rounded bg-light border">
-                    <div class="fw-black fs-4 text-success">@Model.TotalPrescriptionsCount</div>
-                    <div class="text-muted small fw-bold">Digital Prescriptions</div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="p-2 text-center rounded bg-light border">
-                    <div class="fw-black fs-4 text-danger">@(Model.BloodProfile?.TotalDonationsCount ?? 0)</div>
-                    <div class="text-muted small fw-bold">Blood Donations</div>
-                </div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="p-2 text-center rounded bg-light border">
-                    <div class="fw-black fs-5 text-dark mt-1">
-                        @if (Model.BloodProfile?.IsAvailableDonor == true)
+                    <!-- Top Bar: Modern, Aligned, Structured -->
+                    <div class="patient-topbar">
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <div class="patient-id-badge-capsule">
+                                <div class="id-icon">
+                                    <i class="fa-solid fa-id-card"></i>
+                                </div>
+                                <div class="id-text">
+                                    <span class="id-label">Official Health ID</span>
+                                    <span class="id-code">@(Model.Patient.PatientUniqueId ?? "N/A")</span>
+                                </div>
+                                @if (!string.IsNullOrWhiteSpace(Model.Patient.PatientUniqueId))
+                                {
+                                    <button type="button" class="id-copy-btn" onclick="copyPatientId('@Model.Patient.PatientUniqueId', this)" title="Copy ID">
+                                        <i class="fa-regular fa-copy"></i>
+                                        <span>Copy</span>
+                                    </button>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-3 flex-wrap">
+                            <a asp-controller="Home" asp-action="Camps" class="patient-header-btn">
+                                <i class="fa-solid fa-tent text-emerald"></i>
+                                <span>Find Medical Camps</span>
+                            </a>
+
+                            <!-- Patient User Profile Pill -->
+                            <div class="patient-profile-pill">
+                                <div class="patient-avatar-circle">
+                                    @((Model.Patient.FullName ?? "P")[0])
+                                </div>
+                                <div class="patient-info-meta">
+                                    <span class="patient-name">@Model.Patient.FullName</span>
+                                    <span class="patient-role-tag"><i class="fa-solid fa-droplet text-danger me-1"></i>@(Model.Patient.BloodGroup ?? "Patient")</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Dashboard Content Area -->
+                    <div class="p-3 p-lg-4">
+
+                        <!-- Patient Overview Card -->
+                        <div class="glass-card p-4 mb-4 border-0 shadow-sm" style="background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);">
+                            <div class="row g-3 align-items-center justify-content-between">
+                                <div class="col-md-7">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="rounded-4 d-flex align-items-center justify-content-center text-white shadow-sm flex-shrink-0" style="width: 54px; height: 54px; background: linear-gradient(135deg, #10b981 0%, #047857 100%); font-size: 1.4rem;">
+                                            <i class="fa-solid fa-user-check"></i>
+                                        </div>
+                                        <div>
+                                            <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+                                                <h4 class="fw-bold text-dark mb-0">@Model.Patient.FullName</h4>
+                                                <span class="badge bg-danger rounded-pill px-3 py-1">
+                                                    <i class="fa-solid fa-droplet me-1"></i> @(Model.Patient.BloodGroup ?? "Blood Group N/A")
+                                                </span>
+                                            </div>
+                                            <div class="text-muted small d-flex flex-wrap gap-3">
+                                                <span><i class="fa-solid fa-phone me-1 text-emerald"></i> @(Model.Patient.PhoneNumber ?? "No Phone")</span>
+                                                <span><i class="fa-solid fa-location-dot me-1 text-danger"></i> @(Model.Patient.Upazila ?? "Area"), @(Model.Patient.District ?? "District")</span>
+                                                @if (Model.Patient.Age.HasValue)
+                                                {
+                                                    <span><i class="fa-solid fa-cake-candles me-1 text-warning"></i> @Model.Patient.Age yrs (@Model.Patient.Gender)</span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-5 text-md-end">
+                                    <div class="d-inline-flex flex-column align-items-md-end">
+                                        <div class="text-muted small fw-bold text-uppercase" style="letter-spacing: 0.05em;">Intake Health Code</div>
+                                        <div class="fs-4 fw-black font-monospace text-emerald text-uppercase" style="letter-spacing: 2px;">
+                                            @(Model.Patient.PatientUniqueId ?? "N/A")
+                                        </div>
+                                        <div class="text-muted small" style="font-size: 0.76rem;">Present this code at camp triage & pharmacy</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4 Stat Metric Cards (Structured & Responsive) -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-12 col-sm-6 col-xl-3">
+                                <div class="patient-summary-box h-100">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <div class="metric-icon-box bg-emerald-light">
+                                            <i class="fa-solid fa-tent text-emerald"></i>
+                                        </div>
+                                        <span class="badge bg-light text-muted small border">Consultations</span>
+                                    </div>
+                                    <div class="fs-3 fw-black text-dark mb-0">@Model.TotalVisitsCount</div>
+                                    <div class="text-muted small fw-semibold">Camp Consultations</div>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-sm-6 col-xl-3">
+                                <div class="patient-summary-box h-100">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <div class="metric-icon-box bg-champagne-light">
+                                            <i class="fa-solid fa-file-prescription text-champagne"></i>
+                                        </div>
+                                        <span class="badge bg-light text-muted small border">Prescriptions</span>
+                                    </div>
+                                    <div class="fs-3 fw-black text-dark mb-0">@Model.TotalPrescriptionsCount</div>
+                                    <div class="text-muted small fw-semibold">Digital Prescriptions</div>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-sm-6 col-xl-3">
+                                <div class="patient-summary-box h-100">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <div class="metric-icon-box" style="background: #fee2e2;">
+                                            <i class="fa-solid fa-droplet text-danger"></i>
+                                        </div>
+                                        <span class="badge bg-light text-muted small border">Donations</span>
+                                    </div>
+                                    <div class="fs-3 fw-black text-dark mb-0">@(Model.BloodProfile?.TotalDonationsCount ?? 0)</div>
+                                    <div class="text-muted small fw-semibold">Blood Donations</div>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-sm-6 col-xl-3">
+                                <div class="patient-summary-box h-100">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <div class="metric-icon-box bg-emerald-light">
+                                            <i class="fa-solid fa-heart-pulse text-emerald"></i>
+                                        </div>
+                                        <span class="badge bg-light text-muted small border">Registry</span>
+                                    </div>
+                                    <div class="fs-5 fw-bold mt-1">
+                                        @if (Model.BloodProfile?.IsAvailableDonor == true)
+                                        {
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1">Active Donor</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill px-3 py-1">Inactive</span>
+                                        }
+                                    </div>
+                                    <div class="text-muted small fw-semibold mt-1">Donor Registry Status</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section Heading -->
+                        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                            <div>
+                                <h5 class="fw-bold text-dark mb-0">
+                                    <i class="fa-solid fa-timeline text-emerald me-2"></i>Medical History Timeline
+                                </h5>
+                                <p class="text-muted small mb-0">Chronological history of your medical diagnoses, clinical advice, and prescribed medicines.</p>
+                            </div>
+                            <a asp-controller="Home" asp-action="Camps" class="btn btn-sm btn-emerald-solid rounded-pill text-white px-3 py-1 fw-bold shadow-sm">
+                                <i class="fa-solid fa-plus me-1"></i> Register for Camp
+                            </a>
+                        </div>
+
+                        <!-- Medical History Timeline List -->
+                        @if (!Model.Visits.Any())
                         {
-                            <span class="badge bg-success rounded-pill px-2">Active Donor</span>
+                            <div class="glass-card text-center py-5 shadow-sm border-0">
+                                <div class="avatar-capsule mx-auto mb-3" style="width: 56px; height: 56px; background: #ecfdf5; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #10b981;">
+                                    <i class="fa-solid fa-folder-open"></i>
+                                </div>
+                                <h5 class="fw-bold text-dark">No Medical Records Yet</h5>
+                                <p class="text-muted small mb-3">You haven't attended any MediCamp outreach consultations yet. Find an upcoming camp near you to get free consultations and medicines!</p>
+                                <a asp-controller="Home" asp-action="Camps" class="btn btn-emerald-solid rounded-pill text-white px-4 py-2 fw-bold shadow-sm">
+                                    <i class="fa-solid fa-tent me-1"></i> Browse Upcoming Camps
+                                </a>
+                            </div>
                         }
                         else
                         {
-                            <span class="badge bg-secondary rounded-pill px-2">Inactive</span>
-                        }
-                    </div>
-                    <div class="text-muted small fw-bold">Donor Status</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Section Heading -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h4 class="fw-bold text-dark mb-0">
-                <i class="fa-solid fa-notes-medical text-primary me-2"></i>Longitudinal Medical History
-            </h4>
-            <p class="text-muted small mb-0">Chronological timeline of all your visits, diagnoses, and digital prescriptions.</p>
-        </div>
-    </div>
-
-    <!-- Visits Timeline -->
-    @if (!Model.Visits.Any())
-    {
-        <div class="glass-card text-center py-5">
-            <i class="fa-solid fa-folder-open text-muted fs-1 mb-3 opacity-50"></i>
-            <h5 class="fw-bold text-secondary">No Consultation Records Yet</h5>
-            <p class="text-muted small mb-3">You have not attended any MediCamp outreach consultations yet.</p>
-            <a asp-controller="Home" asp-action="Camps" class="btn btn-sapphire rounded-pill px-4">
-                <i class="fa-solid fa-tent me-1"></i> Browse Upcoming Camps
-            </a>
-        </div>
-    }
-    else
-    {
-        <div class="timeline-container">
-            @foreach (var visit in Model.Visits)
-            {
-                <div class="timeline-node">
-                    <div class="timeline-dot">
-                        <i class="fa-solid fa-stethoscope"></i>
-                    </div>
-
-                    <div class="glass-card p-4">
-                        <!-- Camp Header -->
-                        <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
-                            <div>
-                                <div class="d-flex align-items-center gap-2 mb-1">
-                                    <span class="badge bg-primary rounded-pill">Token #@visit.TokenNumber</span>
-                                    <span class="badge @(visit.UrgencyLevel == "Emergency" ? "bg-danger" : (visit.UrgencyLevel == "Urgent" ? "bg-warning text-dark" : "bg-success")) rounded-pill">
-                                        @visit.UrgencyLevel Urgency
-                                    </span>
-                                    <span class="text-muted small">
-                                        <i class="fa-solid fa-calendar me-1"></i> @visit.VisitDate.ToString("dd MMMM yyyy, hh:mm tt")
-                                    </span>
-                                </div>
-                                <h5 class="fw-bold text-dark mb-0">@visit.CampTitle</h5>
-                                <div class="text-muted small">
-                                    <i class="fa-solid fa-location-dot text-danger me-1"></i> @visit.Location — @visit.Venue
-                                </div>
-                            </div>
-
-                            @if (visit.PrescriptionId.HasValue)
-                            {
-                                <a asp-action="DigitalPrescription" asp-route-id="@visit.PrescriptionId.Value"
-                                   target="_blank"
-                                   class="btn btn-sm btn-outline-primary rounded-pill fw-bold shadow-sm">
-                                    <i class="fa-solid fa-print me-1"></i> View Digital Rx
-                                </a>
-                            }
-                        </div>
-
-                        <!-- Vitals Grid -->
-                        <div class="d-flex flex-wrap gap-2 mb-3">
-                            @if (!string.IsNullOrWhiteSpace(visit.BloodPressure))
-                            {
-                                <div class="vital-pill">
-                                    <div class="lbl">Blood Pressure</div>
-                                    <div class="val text-danger">@visit.BloodPressure</div>
-                                </div>
-                            }
-                            @if (visit.TemperatureF.HasValue)
-                            {
-                                <div class="vital-pill">
-                                    <div class="lbl">Temp (°F)</div>
-                                    <div class="val text-warning">@visit.TemperatureF.Value.ToString("F1")°</div>
-                                </div>
-                            }
-                            @if (visit.WeightKg.HasValue)
-                            {
-                                <div class="vital-pill">
-                                    <div class="lbl">Weight</div>
-                                    <div class="val">@visit.WeightKg.Value.ToString("F1") kg</div>
-                                </div>
-                            }
-                            @if (visit.HeightCm.HasValue)
-                            {
-                                <div class="vital-pill">
-                                    <div class="lbl">Height</div>
-                                    <div class="val">@visit.HeightCm.Value.ToString("F0") cm</div>
-                                </div>
-                            }
-                            @if (visit.BMI.HasValue)
-                            {
-                                <div class="vital-pill">
-                                    <div class="lbl">BMI</div>
-                                    <div class="val text-info">@visit.BMI.Value.ToString("F1")</div>
-                                </div>
-                            }
-                        </div>
-
-                        @if (!string.IsNullOrWhiteSpace(visit.PresentingSymptoms))
-                        {
-                            <div class="mb-3 bg-light p-2 rounded small">
-                                <strong><i class="fa-solid fa-notes-medical text-primary me-1"></i> Presenting Symptoms:</strong>
-                                @visit.PresentingSymptoms
-                            </div>
-                        }
-
-                        <!-- Doctor Consultation & Diagnosis -->
-                        @if (!string.IsNullOrWhiteSpace(visit.Diagnosis) || !string.IsNullOrWhiteSpace(visit.DoctorName))
-                        {
-                            <div class="border-top pt-3 mt-3">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <h6 class="fw-bold text-dark mb-0">
-                                        <i class="fa-solid fa-user-doctor text-primary me-1"></i> Consultation by @(visit.DoctorName ?? "Medical Doctor")
-                                    </h6>
-                                    @if (visit.ConsultedAt.HasValue)
-                                    {
-                                        <span class="small text-muted">@visit.ConsultedAt.Value.ToString("MMM dd, yyyy")</span>
-                                    }
-                                </div>
-
-                                @if (!string.IsNullOrWhiteSpace(visit.Diagnosis))
+                            <div class="patient-timeline-wrapper">
+                                @foreach (var visit in Model.Visits)
                                 {
-                                    <div class="p-2 mb-2 rounded bg-white border border-primary-subtle">
-                                        <span class="badge bg-primary-subtle text-primary fw-bold mb-1">Diagnosis</span>
-                                        <div class="fw-bold text-dark">@visit.Diagnosis</div>
-                                    </div>
-                                }
+                                    <div class="patient-timeline-card-node">
+                                        <div class="patient-timeline-icon-dot">
+                                            <i class="fa-solid fa-stethoscope"></i>
+                                        </div>
 
-                                @if (!string.IsNullOrWhiteSpace(visit.Advice))
-                                {
-                                    <div class="small text-secondary mb-2">
-                                        <strong>Advice:</strong> @visit.Advice
-                                    </div>
-                                }
-                            </div>
-                        }
+                                        <div class="glass-card p-4 border-0 shadow-sm rounded-4">
+                                            <!-- Camp Visit Header -->
+                                            <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+                                                <div>
+                                                    <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                                                        <span class="badge bg-dark rounded-pill font-monospace px-2 py-1">Token #@visit.TokenNumber</span>
+                                                        <span class="badge @(visit.UrgencyLevel == "Emergency" ? "bg-danger" : (visit.UrgencyLevel == "Urgent" ? "bg-warning text-dark" : "bg-success")) rounded-pill px-3 py-1 fw-bold">
+                                                            @visit.UrgencyLevel Urgency
+                                                        </span>
+                                                        <span class="text-muted small">
+                                                            <i class="fa-regular fa-calendar me-1"></i> @visit.VisitDate.ToString("dd MMMM yyyy, hh:mm tt")
+                                                        </span>
+                                                    </div>
+                                                    <h5 class="fw-bold text-dark mb-0">@visit.CampTitle</h5>
+                                                    <div class="text-muted small">
+                                                        <i class="fa-solid fa-location-dot text-danger me-1"></i> @visit.Location &bull; @visit.Venue
+                                                    </div>
+                                                </div>
 
-                        <!-- Prescribed Medicines -->
-                        @if (visit.PrescriptionItems.Any())
-                        {
-                            <div class="border-top pt-3 mt-3">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <h6 class="fw-bold text-dark mb-0">
-                                        <i class="fa-solid fa-pills text-success me-1"></i> Prescribed Medicines
-                                    </h6>
-                                    @if (visit.IsPrescriptionDispensed)
-                                    {
-                                        <span class="badge bg-success"><i class="fa-solid fa-check-double me-1"></i>Dispensed at Camp Pharmacy</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-warning text-dark"><i class="fa-solid fa-clock me-1"></i>Dispensing Pending</span>
-                                    }
-                                </div>
+                                                @if (visit.PrescriptionId.HasValue)
+                                                {
+                                                    <a asp-action="DigitalPrescription" asp-route-id="@visit.PrescriptionId.Value"
+                                                       target="_blank"
+                                                       class="btn btn-sm btn-outline-emerald rounded-pill fw-bold shadow-sm px-3 py-1">
+                                                        <i class="fa-solid fa-file-prescription me-1"></i> View Digital Rx
+                                                    </a>
+                                                }
+                                            </div>
 
-                                <div class="table-responsive">
-                                    <table class="table table-sm table-bordered bg-white small mb-0 align-middle">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th>Medicine</th>
-                                                <th>Dosage</th>
-                                                <th>Duration</th>
-                                                <th>Instructions</th>
-                                                <th class="text-center">Dispensed</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach (var med in visit.PrescriptionItems)
+                                            <!-- Vitals Measurements (Clean Chips) -->
+                                            <div class="d-flex flex-wrap gap-2 mb-3">
+                                                @if (!string.IsNullOrWhiteSpace(visit.BloodPressure))
+                                                {
+                                                    <div class="patient-vital-chip">
+                                                        <div class="v-num text-danger">@visit.BloodPressure</div>
+                                                        <div class="v-tag">BP</div>
+                                                    </div>
+                                                }
+                                                @if (visit.TemperatureF.HasValue)
+                                                {
+                                                    <div class="patient-vital-chip">
+                                                        <div class="v-num text-warning">@visit.TemperatureF.Value.ToString("F1")°F</div>
+                                                        <div class="v-tag">Temp</div>
+                                                    </div>
+                                                }
+                                                @if (visit.WeightKg.HasValue)
+                                                {
+                                                    <div class="patient-vital-chip">
+                                                        <div class="v-num text-dark">@visit.WeightKg.Value.ToString("F1") kg</div>
+                                                        <div class="v-tag">Weight</div>
+                                                    </div>
+                                                }
+                                                @if (visit.HeightCm.HasValue)
+                                                {
+                                                    <div class="patient-vital-chip">
+                                                        <div class="v-num text-dark">@visit.HeightCm.Value.ToString("F0") cm</div>
+                                                        <div class="v-tag">Height</div>
+                                                    </div>
+                                                }
+                                                @if (visit.BMI.HasValue)
+                                                {
+                                                    <div class="patient-vital-chip">
+                                                        <div class="v-num text-emerald">@visit.BMI.Value.ToString("F1")</div>
+                                                        <div class="v-tag">BMI</div>
+                                                    </div>
+                                                }
+                                            </div>
+
+                                            @if (!string.IsNullOrWhiteSpace(visit.PresentingSymptoms))
                                             {
-                                                <tr>
-                                                    <td class="fw-bold text-dark">@med.MedicineName</td>
-                                                    <td><span class="badge bg-light text-dark border">@med.Dosage</span></td>
-                                                    <td>@med.DurationDays day(s)</td>
-                                                    <td>@(string.IsNullOrWhiteSpace(med.Instructions) ? "—" : med.Instructions)</td>
-                                                    <td class="text-center">
-                                                        @if (med.QuantityDispensed > 0)
+                                                <div class="mb-3 bg-light p-2 px-3 rounded-3 small border">
+                                                    <strong><i class="fa-solid fa-clipboard-question text-emerald me-1"></i> Presenting Symptoms:</strong>
+                                                    <span class="text-dark">@visit.PresentingSymptoms</span>
+                                                </div>
+                                            }
+
+                                            <!-- Doctor Consultation & Diagnosis -->
+                                            @if (!string.IsNullOrWhiteSpace(visit.Diagnosis) || !string.IsNullOrWhiteSpace(visit.DoctorName))
+                                            {
+                                                <div class="border-top pt-3 mt-3">
+                                                    <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                                                        <h6 class="fw-bold text-dark mb-0">
+                                                            <i class="fa-solid fa-user-doctor text-emerald me-1"></i> Consultation by @(visit.DoctorName ?? "Medical Doctor")
+                                                        </h6>
+                                                        @if (visit.ConsultedAt.HasValue)
                                                         {
-                                                            <span class="text-success fw-bold">@med.QuantityDispensed / @med.QuantityPrescribed</span>
+                                                            <span class="small text-muted">@visit.ConsultedAt.Value.ToString("MMM dd, yyyy")</span>
+                                                        }
+                                                    </div>
+
+                                                    @if (!string.IsNullOrWhiteSpace(visit.Diagnosis))
+                                                    {
+                                                        <div class="p-3 mb-2 rounded-3 bg-white border border-success-subtle">
+                                                            <span class="badge bg-success-subtle text-success fw-bold mb-1">Diagnosis</span>
+                                                            <div class="fw-bold text-dark">@visit.Diagnosis</div>
+                                                        </div>
+                                                    }
+
+                                                    @if (!string.IsNullOrWhiteSpace(visit.Advice))
+                                                    {
+                                                        <div class="small text-secondary mb-2">
+                                                            <strong>Doctor's Advice:</strong> @visit.Advice
+                                                        </div>
+                                                    }
+                                                </div>
+                                            }
+
+                                            <!-- Prescribed Medicines -->
+                                            @if (visit.PrescriptionItems.Any())
+                                            {
+                                                <div class="border-top pt-3 mt-3">
+                                                    <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                                                        <h6 class="fw-bold text-dark mb-0">
+                                                            <i class="fa-solid fa-pills text-emerald me-1"></i> Prescribed Medicines
+                                                        </h6>
+                                                        @if (visit.IsPrescriptionDispensed)
+                                                        {
+                                                            <span class="badge bg-success"><i class="fa-solid fa-check-double me-1"></i>Dispensed at Pharmacy</span>
                                                         }
                                                         else
                                                         {
-                                                            <span class="text-muted">@med.QuantityPrescribed</span>
+                                                            <span class="badge bg-warning text-dark"><i class="fa-solid fa-clock me-1"></i>Dispensing Pending</span>
                                                         }
-                                                    </td>
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        }
+                                                    </div>
 
-                        <!-- Referral & Follow-up Badges -->
-                        @if (!string.IsNullOrWhiteSpace(visit.ReferredHospital) || !string.IsNullOrWhiteSpace(visit.FollowUpReason))
-                        {
-                            <div class="border-top pt-3 mt-3 d-flex flex-wrap gap-2">
-                                @if (!string.IsNullOrWhiteSpace(visit.ReferredHospital))
-                                {
-                                    <div class="alert alert-danger mb-0 py-2 px-3 small d-flex align-items-center gap-2">
-                                        <i class="fa-solid fa-hospital fs-5"></i>
-                                        <div>
-                                            <strong>Hospital Referral (@visit.ReferralUrgency):</strong> @visit.ReferredHospital
-                                            @if (!string.IsNullOrWhiteSpace(visit.ReferralReason))
+                                                    <div class="table-responsive">
+                                                        <table class="table table-sm table-bordered bg-white small mb-0 align-middle">
+                                                            <thead class="table-light">
+                                                                <tr>
+                                                                    <th>Medicine</th>
+                                                                    <th>Dosage</th>
+                                                                    <th>Duration</th>
+                                                                    <th>Instructions</th>
+                                                                    <th class="text-center">Dispensed</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach (var med in visit.PrescriptionItems)
+                                                                {
+                                                                    <tr>
+                                                                        <td class="fw-bold text-dark">@med.MedicineName</td>
+                                                                        <td><span class="badge bg-light text-dark border">@med.Dosage</span></td>
+                                                                        <td>@med.DurationDays day(s)</td>
+                                                                        <td>@(string.IsNullOrWhiteSpace(med.Instructions) ? "—" : med.Instructions)</td>
+                                                                        <td class="text-center">
+                                                                            @if (med.QuantityDispensed > 0)
+                                                                            {
+                                                                                <span class="text-success fw-bold">@med.QuantityDispensed / @med.QuantityPrescribed</span>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <span class="text-muted">@med.QuantityPrescribed</span>
+                                                                            }
+                                                                        </td>
+                                                                    </tr>
+                                                                }
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            }
+
+                                            <!-- Referral & Follow-up Badges -->
+                                            @if (!string.IsNullOrWhiteSpace(visit.ReferredHospital) || !string.IsNullOrWhiteSpace(visit.FollowUpReason))
                                             {
-                                                <div class="text-muted">Reason: @visit.ReferralReason</div>
-                                            }
-                                        </div>
-                                    </div>
-                                }
+                                                <div class="border-top pt-3 mt-3 d-flex flex-wrap gap-2">
+                                                    @if (!string.IsNullOrWhiteSpace(visit.ReferredHospital))
+                                                    {
+                                                        <div class="alert alert-danger mb-0 py-2 px-3 small d-flex align-items-center gap-2 rounded-3">
+                                                            <i class="fa-solid fa-hospital fs-5"></i>
+                                                            <div>
+                                                                <strong>Hospital Referral (@visit.ReferralUrgency):</strong> @visit.ReferredHospital
+                                                                @if (!string.IsNullOrWhiteSpace(visit.ReferralReason))
+                                                                {
+                                                                    <div class="text-muted">Reason: @visit.ReferralReason</div>
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    }
 
-                                @if (!string.IsNullOrWhiteSpace(visit.FollowUpReason))
-                                {
-                                    <div class="alert alert-info mb-0 py-2 px-3 small d-flex align-items-center gap-2">
-                                        <i class="fa-solid fa-headset fs-5"></i>
-                                        <div>
-                                            <strong>Follow-up Scheduled:</strong> @(visit.FollowUpScheduledDate?.ToString("MMM dd, yyyy") ?? "Soon")
-                                            <span class="badge bg-info text-white ms-1">@visit.FollowUpStatus</span>
-                                            <div class="text-muted">@visit.FollowUpReason</div>
+                                                    @if (!string.IsNullOrWhiteSpace(visit.FollowUpReason))
+                                                    {
+                                                        <div class="alert alert-info mb-0 py-2 px-3 small d-flex align-items-center gap-2 rounded-3">
+                                                            <i class="fa-solid fa-headset fs-5"></i>
+                                                            <div>
+                                                                <strong>Follow-up Scheduled:</strong> @(visit.FollowUpScheduledDate?.ToString("MMM dd, yyyy") ?? "Soon")
+                                                                <span class="badge bg-info text-white ms-1">@visit.FollowUpStatus</span>
+                                                                <div class="text-muted">@visit.FollowUpReason</div>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            }
                                         </div>
                                     </div>
                                 }
                             </div>
                         }
+
                     </div>
-                </div>
-            }
+                </main>
+            </div>
         </div>
-    }
+    </div>
 </div>
 
 @section Scripts {
@@ -415,14 +524,16 @@
         function copyPatientId(id, btn) {
             navigator.clipboard.writeText(id).then(function() {
                 const originalHtml = btn.innerHTML;
-                btn.innerHTML = '<i class="fa-solid fa-check me-1"></i> Copied!';
-                btn.classList.remove('btn-outline-warning');
-                btn.classList.add('btn-warning', 'text-dark');
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> <span>Copied!</span>';
+                btn.style.background = '#10b981';
+                btn.style.borderColor = '#10b981';
+                btn.style.color = '#ffffff';
                 setTimeout(() => {
                     btn.innerHTML = originalHtml;
-                    btn.classList.remove('btn-warning', 'text-dark');
-                    btn.classList.add('btn-outline-warning');
-                }, 2500);
+                    btn.style.background = '';
+                    btn.style.borderColor = '';
+                    btn.style.color = '';
+                }, 2000);
             }).catch(function(err) {
                 console.error('Could not copy text: ', err);
             });

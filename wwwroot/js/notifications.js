@@ -4,6 +4,25 @@
 (function () {
     let notifCache = null;
     let isLoading = false;
+    const STORAGE_KEY = 'medicamp_read_notif_ids';
+
+    function getReadIds() {
+        try {
+            return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function saveReadIds(ids) {
+        try {
+            // Keep at most last 150 items to avoid storage overflow
+            const trimmed = ids.slice(-150);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed));
+        } catch (e) {
+            console.warn('Could not save read notifications to localStorage:', e);
+        }
+    }
 
     function getAntiForgeryToken() {
         const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
@@ -17,8 +36,22 @@
             const response = await fetch('/Notification/GetNotifications');
             if (response.ok) {
                 const data = await response.json();
+                const readIds = getReadIds();
+
+                // Compute real unread count respecting user-acknowledged items
+                let effectiveUnread = 0;
+                if (data.notifications && data.notifications.length > 0) {
+                    data.notifications.forEach(item => {
+                        if (readIds.includes(item.id)) {
+                            item.isRead = true;
+                        } else if (!item.isRead) {
+                            effectiveUnread++;
+                        }
+                    });
+                }
+
                 notifCache = data;
-                updateBadge(data.unreadCount);
+                updateBadge(effectiveUnread);
                 renderNotificationList(data.notifications);
             }
         } catch (e) {
@@ -34,9 +67,53 @@
                 badge.textContent = count > 99 ? '99+' : count;
                 badge.style.display = 'inline-block';
             } else {
+                badge.textContent = '0';
                 badge.style.display = 'none';
             }
         });
+    }
+
+    function markAllAsRead() {
+        if (!notifCache || !notifCache.notifications) return;
+        const readIds = getReadIds();
+        notifCache.notifications.forEach(item => {
+            if (!readIds.includes(item.id)) {
+                readIds.push(item.id);
+            }
+            item.isRead = true;
+        });
+        saveReadIds(readIds);
+        updateBadge(0);
+
+        // Update UI
+        document.querySelectorAll('.notification-item.unread').forEach(el => {
+            el.classList.remove('unread');
+        });
+
+        // Notify server
+        try {
+            const token = getAntiForgeryToken();
+            fetch('/Notification/MarkAllAsRead', {
+                method: 'POST',
+                headers: { 'RequestVerificationToken': token }
+            }).catch(() => {});
+        } catch (e) {}
+    }
+
+    function markSingleAsRead(id) {
+        const readIds = getReadIds();
+        if (!readIds.includes(id)) {
+            readIds.push(id);
+            saveReadIds(readIds);
+        }
+        if (notifCache && notifCache.notifications) {
+            const item = notifCache.notifications.find(n => n.id === id);
+            if (item) item.isRead = true;
+            const remainingUnread = notifCache.notifications.filter(n => !n.isRead && !readIds.includes(n.id)).length;
+            updateBadge(remainingUnread);
+        }
+        const itemEl = document.getElementById(`notif-item-${id}`);
+        if (itemEl) itemEl.classList.remove('unread');
     }
 
     function renderNotificationList(items) {
@@ -46,14 +123,13 @@
                     <li class="text-center py-4 px-3 text-muted">
                         <i class="fa-regular fa-bell-slash fs-2 d-block mb-2 text-secondary opacity-50"></i>
                         <span class="small fw-semibold">No notifications right now</span>
-                        <p class="text-muted mb-0" style="font-size: 0.72rem;">You're all caught up with recent camp activities!</p>
+                        <p class="text-muted mb-0" style="font-size: 0.72rem;">You're all caught up with recent activities!</p>
                     </li>
                 `;
                 return;
             }
 
             list.innerHTML = items.map(item => {
-                const isPending = item.status === 'Pending';
                 let actionButtonsHtml = '';
 
                 if (item.canApproveReject) {
@@ -73,7 +149,7 @@
                 }
 
                 return `
-                    <li class="notification-item ${item.isRead ? '' : 'unread'}" id="notif-item-${item.id}">
+                    <li class="notification-item ${item.isRead ? '' : 'unread'}" id="notif-item-${item.id}" data-id="${item.id}" data-url="${item.actionUrl || ''}">
                         <div class="notification-icon-box ${item.badgeColor} text-white">
                             <i class="${item.iconClass}"></i>
                         </div>
@@ -88,6 +164,17 @@
                     </li>
                 `;
             }).join('');
+
+            // Clicking an item marks it as read
+            list.querySelectorAll('.notification-item').forEach(itemEl => {
+                itemEl.addEventListener('click', (e) => {
+                    if (e.target.closest('button') || e.target.closest('a')) return;
+                    const id = itemEl.dataset.id;
+                    const url = itemEl.dataset.url;
+                    if (id) markSingleAsRead(id);
+                    if (url) window.location.href = url;
+                });
+            });
 
             // Attach Approve / Deny click handlers
             list.querySelectorAll('.btn-approve-notif').forEach(btn => {
@@ -144,7 +231,6 @@
                         <i class="fa-solid ${status === 'Approved' ? 'fa-circle-check' : 'fa-circle-xmark'} me-1"></i> ${status}
                     </span>
                 `;
-                // Refresh list in background
                 setTimeout(fetchNotifications, 1200);
             } else {
                 containerElement.innerHTML = `<span class="badge bg-warning text-dark small">${resData.message || 'Action failed'}</span>`;
@@ -157,21 +243,22 @@
 
     function toggleNotificationDropdown(panel) {
         const isOpen = panel.classList.contains('show');
-        // Close all open panels first
         document.querySelectorAll('.notification-dropdown-panel.show').forEach(p => p.classList.remove('show'));
 
         if (!isOpen) {
             panel.classList.add('show');
+            // When opened, mark items as seen/read and refresh
+            markAllAsRead();
             fetchNotifications();
         }
     }
 
     // Global document ready listener
     document.addEventListener('DOMContentLoaded', () => {
-        // Initial fetch to populate badge count
+        // Initial fetch
         fetchNotifications();
 
-        // Attach click triggers to all bell buttons
+        // Attach click triggers to bell buttons
         document.querySelectorAll('.notification-bell-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -183,8 +270,18 @@
             });
         });
 
-        // Auto-refresh notifications every 15 seconds in background
-        setInterval(fetchNotifications, 15000);
+        // Attach Mark All As Read button clicks
+        document.addEventListener('click', (e) => {
+            const markBtn = e.target.closest('.btn-mark-all-read');
+            if (markBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                markAllAsRead();
+            }
+        });
+
+        // Auto-refresh notifications every 30 seconds
+        setInterval(fetchNotifications, 30000);
 
         // Refresh when window gains focus or tab becomes visible
         window.addEventListener('focus', fetchNotifications);
@@ -204,4 +301,3 @@
         });
     });
 })();
-

@@ -122,13 +122,8 @@
                             @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Patient"))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link nav-link-custom @(ViewContext.RouteData.Values["Action"]?.ToString() == "History" && ViewContext.RouteData.Values["Controller"]?.ToString() == "Patient" ? "active" : "")" asp-controller="Patient" asp-action="History">
-                                        <i class="fa-solid fa-notes-medical me-1 text-champagne"></i> My Medical History
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link nav-link-custom @(ViewContext.RouteData.Values["Action"]?.ToString() == "BloodDonation" && ViewContext.RouteData.Values["Controller"]?.ToString() == "Patient" ? "active" : "")" asp-controller="Patient" asp-action="BloodDonation">
-                                        <i class="fa-solid fa-droplet me-1 text-champagne"></i> Blood Donation Hub
+                                    <a class="nav-link nav-link-custom @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Patient" ? "active" : "")" asp-controller="Patient" asp-action="History">
+                                        <i class="fa-solid fa-gauge me-1 text-champagne"></i> Patient Dashboard
                                     </a>
                                 </li>
                             }
@@ -171,7 +166,12 @@
                                                 <i class="fa-solid fa-bell text-champagne"></i>
                                                 <span class="fw-bold">Notifications</span>
                                             </div>
-                                            <span class="badge bg-white text-dark rounded-pill small" style="font-size: 0.72rem;">@userRole Portal</span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <button type="button" class="btn btn-sm btn-link text-white-50 text-decoration-none p-0 btn-mark-all-read" style="font-size: 0.72rem;" title="Mark all notifications as read">
+                                                    <i class="fa-solid fa-check-double me-1"></i>Mark Read
+                                                </button>
+                                                <span class="badge bg-white text-dark rounded-pill small" style="font-size: 0.72rem;">@userRole</span>
+                                            </div>
                                         </div>
                                         <ul class="notification-list">
                                             <li class="text-center py-4 text-muted">
@@ -323,12 +323,8 @@
                         </div>
                     </div>
 
-                    <div class="pt-3 border-top border-secondary border-opacity-25 d-flex flex-wrap justify-content-between align-items-center gap-2 small text-secondary">
+                    <div class="pt-3 border-top border-secondary border-opacity-25 text-center small text-secondary">
                         <div>&copy; 2026 MediCamp Bangladesh. All rights reserved. Department of CSE.</div>
-                        <div class="d-flex gap-3">
-                            <a asp-controller="Home" asp-action="About">About Architecture</a>
-                            <a asp-controller="Home" asp-action="Camps">Public Camps Directory</a>
-                        </div>
                     </div>
                 </div>
             </footer>
