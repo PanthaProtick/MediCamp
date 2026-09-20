@@ -72,23 +72,12 @@
                         </button>
                     </form>
 
-                    <!-- Registration Options if user has not registered yet -->
+                    <!-- Registration Option if user has not registered yet -->
                     <div class="text-center pt-4 border-top" style="border-color: rgba(6, 78, 59, 0.1) !important;">
                         <span class="text-secondary small d-block mb-2 fw-semibold">Haven't registered an account yet?</span>
-                        <div class="dropdown">
-                            <button class="btn btn-outline-sapphire btn-sm w-100 dropdown-toggle py-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fa-solid fa-user-plus me-1"></i> Register New Account First
-                            </button>
-                            <ul class="dropdown-menu w-100 shadow-lg border-0 p-2 text-start" style="border-radius: 16px; background: #ffffff;">
-                                <li class="dropdown-header text-uppercase fw-bold" style="font-size: 0.7rem; color: #064e3b;">Select Role to Register</li>
-                                <li><a class="dropdown-item rounded py-2" asp-controller="Account" asp-action="RegisterPatient"><i class="fa-solid fa-user text-danger me-2"></i>Patient Registration</a></li>
-                                <li><a class="dropdown-item rounded py-2" asp-controller="Account" asp-action="RegisterDoctor"><i class="fa-solid fa-user-doctor text-teal me-2"></i>Doctor Registration</a></li>
-                                <li><a class="dropdown-item rounded py-2" asp-controller="Account" asp-action="RegisterVolunteer"><i class="fa-solid fa-hand-holding-heart text-warning me-2"></i>Volunteer Registration</a></li>
-                                <li><a class="dropdown-item rounded py-2" asp-controller="Account" asp-action="RegisterPharmacist"><i class="fa-solid fa-prescription-bottle-medical text-info me-2"></i>Pharmacist Registration</a></li>
-                                <li><hr class="dropdown-divider my-1"></li>
-                                <li><a class="dropdown-item rounded py-2" asp-controller="Account" asp-action="RegisterHost"><i class="fa-solid fa-building-ngo text-success me-2"></i>Organizing NGO Host</a></li>
-                            </ul>
-                        </div>
+                        <a asp-controller="Account" asp-action="Register" class="btn btn-outline-sapphire btn-sm w-100 py-2 rounded-pill fw-semibold">
+                            <i class="fa-solid fa-user-plus me-1"></i> Register New Account
+                        </a>
                     </div>
                 </div>
             </div>

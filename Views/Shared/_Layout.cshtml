@@ -255,20 +255,9 @@
                                     <i class="fa-solid fa-arrow-right-to-bracket me-1"></i> Sign In
                                 </a>
 
-                                <div class="dropdown">
-                                    <button class="btn btn-champagne btn-pill btn-sm-custom dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fa-solid fa-user-plus me-1"></i> Register Account
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-2" style="border-radius: 16px; min-width: 220px; background: #ffffff;">
-                                        <li class="dropdown-header text-uppercase fw-bold" style="font-size: 0.7rem; color: #064e3b;">Select Role to Register</li>
-                                        <li><a class="dropdown-item rounded py-2" asp-controller="Account" asp-action="RegisterPatient"><i class="fa-solid fa-user text-danger me-2"></i>Patient Registration</a></li>
-                                        <li><a class="dropdown-item rounded py-2" asp-controller="Account" asp-action="RegisterDoctor"><i class="fa-solid fa-user-doctor text-teal me-2"></i>Doctor Registration</a></li>
-                                        <li><a class="dropdown-item rounded py-2" asp-controller="Account" asp-action="RegisterVolunteer"><i class="fa-solid fa-hand-holding-heart text-warning me-2"></i>Volunteer Registration</a></li>
-                                        <li><a class="dropdown-item rounded py-2" asp-controller="Account" asp-action="RegisterPharmacist"><i class="fa-solid fa-prescription-bottle-medical text-info me-2"></i>Pharmacist Registration</a></li>
-                                        <li><hr class="dropdown-divider my-1"></li>
-                                        <li><a class="dropdown-item rounded py-2" asp-controller="Account" asp-action="RegisterHost"><i class="fa-solid fa-building-ngo text-success me-2"></i>Organizing NGO Host</a></li>
-                                    </ul>
-                                </div>
+                                <a class="btn btn-champagne btn-pill btn-sm-custom" asp-controller="Account" asp-action="Register">
+                                    <i class="fa-solid fa-user-plus me-1"></i> Register
+                                </a>
                             }
                         </div>
                     </div>

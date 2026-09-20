@@ -83,6 +83,9 @@ namespace MediCamp.Models.ViewModels
         [Display(Name = "Registration / License No. (Optional)")]
         public string? OrganizationRegNo { get; set; }
 
+        [Display(Name = "Focal Person Contact Number")]
+        public string? FocalPersonContact { get; set; }
+
         [Display(Name = "Opt-in as Voluntary Blood Donor in MediCamp Network")]
         public bool IsBloodDonor { get; set; } = true;
 

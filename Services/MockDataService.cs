@@ -171,23 +171,52 @@ namespace MediCamp.Services
         public (bool Success, string Message, ApplicationUser? User) RegisterUser(RegisterViewModel model)
         {
             if (_dbContext.Users.Any(u => u.Email.ToLower() == model.Email.ToLower()))
-                return (false, "Email already registered.", null);
+                return (false, "Email address is already registered.", null);
 
-            string role = model.Role ?? SystemRoles.Patient;
+            string role = !string.IsNullOrWhiteSpace(model.Role) ? model.Role : SystemRoles.Patient;
             var newUser = new ApplicationUser
             {
-                Id = $"usr-gen-{Guid.NewGuid().ToString()[..8]}",
+                Id = $"usr-{role.ToLower()}-{Guid.NewGuid().ToString()[..8]}",
                 FullName = model.FullName.Trim(),
                 Email = model.Email.Trim().ToLowerInvariant(),
                 PhoneNumber = model.PhoneNumber.Trim(),
+                NID = model.NID?.Trim(),
+                DateOfBirth = model.DateOfBirth,
+                Gender = model.Gender ?? "Male",
+                BloodGroup = model.BloodGroup ?? "O+",
+                District = model.District ?? "Dhaka",
+                Upazila = model.Upazila ?? "Dhanmondi",
+                Address = model.Address?.Trim() ?? string.Empty,
                 Role = role,
                 PatientUniqueId = role == SystemRoles.Patient ? GenerateUniquePatientId(_dbContext) : null,
+                MedicalSpecialization = role == SystemRoles.Doctor ? model.MedicalSpecialization?.Trim() : null,
+                BMDCRegNo = role == SystemRoles.Doctor ? model.BMDCRegNo?.Trim() : null,
+                OrganizationName = role == SystemRoles.Host ? (!string.IsNullOrWhiteSpace(model.OrganizationName) ? model.OrganizationName.Trim() : model.FullName.Trim()) : null,
+                OrganizationType = role == SystemRoles.Host ? (model.OrganizationType ?? "NGO") : null,
+                OrganizationRegNo = role == SystemRoles.Host ? model.OrganizationRegNo?.Trim() : null,
+                FocalPersonContact = role == SystemRoles.Host ? (model.FocalPersonContact?.Trim() ?? model.PhoneNumber.Trim()) : null,
+                HostApprovalStatus = role == SystemRoles.Host ? "Pending" : "Approved",
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
                 PasswordHash = model.Password
             };
 
             _dbContext.Users.Add(newUser);
+
+            if (role == SystemRoles.Patient && model.IsBloodDonor && !string.IsNullOrEmpty(newUser.BloodGroup))
+            {
+                var donorProfile = new BloodDonationProfile
+                {
+                    UserId = newUser.Id,
+                    BloodGroup = newUser.BloodGroup,
+                    District = newUser.District ?? "Dhaka",
+                    Upazila = newUser.Upazila ?? "Dhanmondi",
+                    IsAvailableDonor = true,
+                    TotalDonationsCount = 0
+                };
+                _dbContext.BloodDonationProfiles.Add(donorProfile);
+            }
+
             _dbContext.SaveChanges();
             return (true, "User registration successful.", newUser);
         }
