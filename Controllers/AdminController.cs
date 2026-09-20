@@ -4,6 +4,7 @@ using MediCamp.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace MediCamp.Controllers
 {
@@ -362,12 +363,37 @@ namespace MediCamp.Controllers
             return RedirectToAction(nameof(CampApprovals), new { tab = "Pending" });
         }
 
+        private ApplicationUser? GetCurrentAdminUser()
+        {
+            var userEmail = User.FindFirstValue(System.Security.Claims.ClaimTypes.Email);
+            var userId = User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
+
+            ApplicationUser? admin = null;
+            if (!string.IsNullOrEmpty(userEmail))
+            {
+                admin = _dbContext.Users.FirstOrDefault(u => u.Email.ToLower() == userEmail.ToLower());
+            }
+
+            if (admin == null && !string.IsNullOrEmpty(userId))
+            {
+                admin = _dbContext.Users.FirstOrDefault(u => u.Id == userId);
+            }
+
+            if (admin == null)
+            {
+                admin = _dbContext.Users.FirstOrDefault(u => u.Role == SystemRoles.Admin) ?? new ApplicationUser { FullName = "System Administrator", Email = "admin@medicamp.org", Role = SystemRoles.Admin };
+            }
+
+            return admin;
+        }
+
         // =========================================================================
         // ADMIN EXECUTIVE OVERVIEW DASHBOARD (/Admin/Dashboard)
         // =========================================================================
         [HttpGet]
         public IActionResult Dashboard()
         {
+            var currentAdmin = GetCurrentAdminUser();
             var allCamps = _dbContext.Camps.Include(c => c.Host).ToList();
             var allUsers = _dbContext.Users.ToList();
             var allConsultations = _dbContext.Consultations
@@ -380,9 +406,11 @@ namespace MediCamp.Controllers
             var totalPrescriptions = _dbContext.Prescriptions.Count(p => p.IsDispensed);
             var totalMedicineUnits = _dbContext.PrescriptionItems.Sum(pi => (int?)pi.QuantityDispensed) ?? (totalPrescriptions * 14);
             var totalExpenses = _dbContext.CampExpenses.Sum(e => (decimal?)e.Amount) ?? allCamps.Sum(c => c.UtilizedBudget);
+            var urgentBloodCount = _dbContext.BloodRequests.Count(b => b.Status == "Urgent" || b.Status == "Open");
 
             var model = new AdminDashboardViewModel
             {
+                AdminUser = currentAdmin,
                 TotalCampsCount = allCamps.Count,
                 ActiveCampsCount = allCamps.Count(c => c.Status == "Ongoing"),
                 ScheduledCampsCount = allCamps.Count(c => c.Status == "Scheduled"),
@@ -402,6 +430,7 @@ namespace MediCamp.Controllers
                 TotalPatientsCount = allUsers.Count(u => u.Role == SystemRoles.Patient),
 
                 PendingHostApprovalsCount = allUsers.Count(u => u.Role == SystemRoles.Host && u.HostApprovalStatus == "Pending"),
+                UrgentBloodRequestsCount = urgentBloodCount,
 
                 TotalConsultationsCount = allConsultations.Count,
                 TotalPrescriptionsDispensed = totalPrescriptions > 0 ? totalPrescriptions : allConsultations.Count,
@@ -411,11 +440,13 @@ namespace MediCamp.Controllers
 
                 ActiveAndUpcomingCamps = allCamps.Where(c => c.Status == "Ongoing" || c.Status == "Scheduled").Take(5).ToList(),
                 RecentPendingHosts = allUsers.Where(u => u.Role == SystemRoles.Host && u.HostApprovalStatus == "Pending").Take(5).ToList(),
-                RecentConsultations = allConsultations.Take(6).ToList()
+                RecentConsultations = allConsultations.Take(6).ToList(),
+                AllCamps = allCamps
             };
 
             return View(model);
         }
+
 
         // =========================================================================
         // ADMIN GLOBAL REPORTS & ANALYTICS (/Admin/Reports)

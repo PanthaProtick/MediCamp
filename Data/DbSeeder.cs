@@ -286,15 +286,18 @@ namespace MediCamp.Data
                 }
                 else
                 {
+                    // Update credentials to ensure demo login always works without resetting admin approval state
                     existing.PasswordHash = u.PasswordHash;
-                    existing.IsActive = true;
-                    existing.Role = u.Role;
-                    existing.FullName = u.FullName;
-                    existing.PhoneNumber = u.PhoneNumber;
-                    existing.NID = u.NID;
-                    if (!string.IsNullOrEmpty(u.PatientUniqueId)) existing.PatientUniqueId = u.PatientUniqueId;
-                    if (u.Role == SystemRoles.Host) existing.HostApprovalStatus = u.HostApprovalStatus;
-                    if (u.Role == SystemRoles.Doctor)
+
+                    if (string.IsNullOrEmpty(existing.HostApprovalStatus) && u.Role == SystemRoles.Host)
+                    {
+                        existing.HostApprovalStatus = u.HostApprovalStatus;
+                    }
+                    if (string.IsNullOrEmpty(existing.PatientUniqueId) && !string.IsNullOrEmpty(u.PatientUniqueId))
+                    {
+                        existing.PatientUniqueId = u.PatientUniqueId;
+                    }
+                    if (u.Role == SystemRoles.Doctor && string.IsNullOrEmpty(existing.BMDCRegNo))
                     {
                         existing.MedicalSpecialization = u.MedicalSpecialization;
                         existing.BMDCRegNo = u.BMDCRegNo;
