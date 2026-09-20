@@ -5,216 +5,336 @@
 
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="glass-card">
-                <div class="glass-card-header d-flex justify-content-between align-items-center">
-                    <div>
-                        <span class="badge badge-role-patient mb-2"><i class="fa-solid fa-user-plus"></i> Account Registration</span>
-                        <h3 class="fw-bold mb-1 text-dark">Register for MediCamp System</h3>
-                        <p class="text-secondary small mb-0">If you haven't registered yet, select your role and create your portal account below.</p>
-                    </div>
-                    <div class="stat-icon stat-icon-sapphire d-none d-sm-flex">
-                        <i class="fa-solid fa-id-card"></i>
+        <div class="col-lg-9 col-xl-8">
+            <div class="glass-card shadow-lg border-0 rounded-4 overflow-hidden">
+                <!-- Header Banner -->
+                <div class="glass-card-header p-4 p-md-5 text-white" style="background: linear-gradient(135deg, #064e3b 0%, #0f766e 100%);">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="badge px-3 py-2 rounded-pill mb-2 fw-semibold text-white" style="background: rgba(255,255,255,0.2); backdrop-filter: blur(8px);">
+                                <i class="fa-solid fa-user-plus me-1"></i> New Account Registration
+                            </span>
+                            <h2 class="fw-bold mb-1 text-white">Join the MediCamp Network</h2>
+                            <p class="text-white-50 small mb-0">Select your role below and complete your account setup to get started.</p>
+                        </div>
+                        <div class="d-none d-sm-flex align-items-center justify-content-center rounded-circle bg-white bg-opacity-20" style="width: 60px; height: 60px;">
+                            <i class="fa-solid fa-notes-medical fs-3 text-white"></i>
+                        </div>
                     </div>
                 </div>
 
-                <div class="glass-card-body p-4 p-md-5">
-                    <form asp-controller="Account" asp-action="Register" method="post">
+                <div class="glass-card-body p-4 p-md-5 bg-white">
+                    <form asp-controller="Account" asp-action="Register" method="post" id="registerForm">
                         @Html.AntiForgeryToken()
 
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 px-3 small rounded-3 mb-4"></div>
-
-                        <!-- Role Selection Tabs / Selector -->
-                        <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">
-                            <i class="fa-solid fa-user-tag text-primary me-2"></i>1. Select Account Role
-                        </h5>
-
-                        <div class="row g-2 mb-4">
-                            <div class="col-md-4 col-6">
-                                <input type="radio" class="btn-check" name="Role" id="rolePatient" value="Patient" @(Model.Role == "Patient" ? "checked" : "") onchange="onRoleChange('Patient')">
-                                <label class="btn btn-outline-danger w-100 p-3 text-start rounded-3" for="rolePatient">
-                                    <i class="fa-solid fa-user d-block fs-4 mb-1"></i>
-                                    <span class="fw-bold d-block">Patient</span>
-                                    <span class="small opacity-75">Community Member</span>
-                                </label>
+                        @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
+                        {
+                            <div class="alert alert-danger alert-dismissible fade show rounded-3 p-3 mb-4 d-flex align-items-start gap-2" role="alert">
+                                <i class="fa-solid fa-circle-exclamation fs-5 text-danger mt-1"></i>
+                                <div class="flex-grow-1 small">
+                                    <div asp-validation-summary="All" class="mb-0 text-danger fw-semibold"></div>
+                                </div>
+                                <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>
+                        }
 
-                            <div class="col-md-4 col-6">
-                                <input type="radio" class="btn-check" name="Role" id="roleDoctor" value="Doctor" @(Model.Role == "Doctor" ? "checked" : "") onchange="onRoleChange('Doctor')">
-                                <label class="btn btn-outline-teal w-100 p-3 text-start rounded-3" for="roleDoctor" style="border-color: #0f766e; color: #0f766e;">
-                                    <i class="fa-solid fa-user-doctor d-block fs-4 mb-1"></i>
-                                    <span class="fw-bold d-block">Doctor</span>
-                                    <span class="small opacity-75">Volunteer Clinician</span>
-                                </label>
+                        <!-- ========================================================================= -->
+                        <!-- STEP 1: INTERACTIVE ROLE SELECTOR CARDS -->
+                        <!-- ========================================================================= -->
+                        <div class="mb-4">
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <span class="badge rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center" style="width: 26px; height: 26px;">1</span>
+                                <h5 class="fw-bold text-dark mb-0">Select Your Account Role</h5>
                             </div>
+                            <p class="text-muted small mb-3">Choose the role that represents how you will participate in medical outreach camps.</p>
 
-                            <div class="col-md-4 col-6">
-                                <input type="radio" class="btn-check" name="Role" id="roleVolunteer" value="Volunteer" @(Model.Role == "Volunteer" ? "checked" : "") onchange="onRoleChange('Volunteer')">
-                                <label class="btn btn-outline-warning w-100 p-3 text-start rounded-3" for="roleVolunteer">
-                                    <i class="fa-solid fa-hand-holding-heart d-block fs-4 mb-1"></i>
-                                    <span class="fw-bold d-block">Volunteer</span>
-                                    <span class="small opacity-75">Field Screening</span>
-                                </label>
-                            </div>
+                            <input type="hidden" asp-for="Role" id="selectedRoleInput" value="@(Model.Role ?? "Patient")" />
 
-                            <div class="col-md-4 col-6">
-                                <input type="radio" class="btn-check" name="Role" id="rolePharmacist" value="Pharmacist" @(Model.Role == "Pharmacist" ? "checked" : "") onchange="onRoleChange('Pharmacist')">
-                                <label class="btn btn-outline-info w-100 p-3 text-start rounded-3" for="rolePharmacist">
-                                    <i class="fa-solid fa-prescription-bottle-medical d-block fs-4 mb-1"></i>
-                                    <span class="fw-bold d-block">Pharmacist</span>
-                                    <span class="small opacity-75">Camp Dispensary</span>
-                                </label>
-                            </div>
+                            <div class="row g-2 g-md-3" id="roleCardsGrid">
+                                <!-- 1. Patient -->
+                                <div class="col-6 col-md-4">
+                                    <div class="role-selection-card p-3 rounded-4 border text-center h-100 cursor-pointer @(Model.Role == "Patient" ? "active-role patient-active" : "")" data-role="Patient" onclick="selectRole('Patient')">
+                                        <div class="role-icon-box mx-auto mb-2 rounded-circle d-flex align-items-center justify-content-center text-danger bg-danger-subtle" style="width: 44px; height: 44px;">
+                                            <i class="fa-solid fa-user fs-5"></i>
+                                        </div>
+                                        <h6 class="fw-bold mb-1 text-dark">Patient / Recipient</h6>
+                                        <span class="small text-muted d-block" style="font-size: 0.72rem;">Free checkups & donor hub</span>
+                                    </div>
+                                </div>
 
-                            <div class="col-md-8 col-12">
-                                <input type="radio" class="btn-check" name="Role" id="roleHost" value="Host" @(Model.Role == "Host" ? "checked" : "") onchange="onRoleChange('Host')">
-                                <label class="btn btn-outline-primary w-100 p-3 text-start rounded-3" for="roleHost">
-                                    <i class="fa-solid fa-building-ngo d-block fs-4 mb-1"></i>
-                                    <span class="fw-bold d-block">Organizing Host (NGO)</span>
-                                    <span class="small opacity-75">Camp Planning & Budgeting</span>
-                                </label>
-                            </div>
-                        </div>
+                                <!-- 2. Doctor -->
+                                <div class="col-6 col-md-4">
+                                    <div class="role-selection-card p-3 rounded-4 border text-center h-100 cursor-pointer @(Model.Role == "Doctor" ? "active-role doctor-active" : "")" data-role="Doctor" onclick="selectRole('Doctor')">
+                                        <div class="role-icon-box mx-auto mb-2 rounded-circle d-flex align-items-center justify-content-center text-teal bg-teal-subtle" style="width: 44px; height: 44px; color: #0f766e; background-color: rgba(15, 118, 110, 0.12);">
+                                            <i class="fa-solid fa-user-doctor fs-5"></i>
+                                        </div>
+                                        <h6 class="fw-bold mb-1 text-dark">Medical Doctor</h6>
+                                        <span class="small text-muted d-block" style="font-size: 0.72rem;">Consultation & prescriptions</span>
+                                    </div>
+                                </div>
 
-                        <!-- Personal & Identity Information -->
-                        <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">
-                            <i class="fa-solid fa-id-card text-primary me-2"></i>2. Personal & Account Credentials
-                        </h5>
+                                <!-- 3. Volunteer -->
+                                <div class="col-6 col-md-4">
+                                    <div class="role-selection-card p-3 rounded-4 border text-center h-100 cursor-pointer @(Model.Role == "Volunteer" ? "active-role volunteer-active" : "")" data-role="Volunteer" onclick="selectRole('Volunteer')">
+                                        <div class="role-icon-box mx-auto mb-2 rounded-circle d-flex align-items-center justify-content-center text-warning bg-warning-subtle" style="width: 44px; height: 44px;">
+                                            <i class="fa-solid fa-hand-holding-heart fs-5"></i>
+                                        </div>
+                                        <h6 class="fw-bold mb-1 text-dark">Field Volunteer</h6>
+                                        <span class="small text-muted d-block" style="font-size: 0.72rem;">Patient triage & crowd logistics</span>
+                                    </div>
+                                </div>
 
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-6">
-                                <label asp-for="FullName" class="form-label-custom">Full Name *</label>
-                                <input asp-for="FullName" class="form-control form-control-custom" placeholder="e.g. Dr. Rafiqul Islam / Karim Ahmed" required />
-                                <span asp-validation-for="FullName" class="text-danger small"></span>
-                            </div>
+                                <!-- 4. Pharmacist -->
+                                <div class="col-6 col-md-6 col-lg-4">
+                                    <div class="role-selection-card p-3 rounded-4 border text-center h-100 cursor-pointer @(Model.Role == "Pharmacist" ? "active-role pharmacist-active" : "")" data-role="Pharmacist" onclick="selectRole('Pharmacist')">
+                                        <div class="role-icon-box mx-auto mb-2 rounded-circle d-flex align-items-center justify-content-center text-info bg-info-subtle" style="width: 44px; height: 44px;">
+                                            <i class="fa-solid fa-prescription-bottle-medical fs-5"></i>
+                                        </div>
+                                        <h6 class="fw-bold mb-1 text-dark">Pharmacist</h6>
+                                        <span class="small text-muted d-block" style="font-size: 0.72rem;">Dispensary & inventory</span>
+                                    </div>
+                                </div>
 
-                            <div class="col-md-6">
-                                <label asp-for="Email" class="form-label-custom">Official Email Address *</label>
-                                <input asp-for="Email" type="email" class="form-control form-control-custom" placeholder="e.g. user@domain.com" required />
-                                <span asp-validation-for="Email" class="text-danger small"></span>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label asp-for="PhoneNumber" class="form-label-custom">Mobile Number *</label>
-                                <input asp-for="PhoneNumber" class="form-control form-control-custom" placeholder="e.g. 017xxxxxxxx" required />
-                                <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label asp-for="NID" class="form-label-custom">National ID (NID) Number</label>
-                                <input asp-for="NID" class="form-control form-control-custom" placeholder="e.g. 19852691234567890" />
-                                <span asp-validation-for="NID" class="text-danger small"></span>
+                                <!-- 5. Organizing Host (NGO) -->
+                                <div class="col-12 col-md-6 col-lg-8">
+                                    <div class="role-selection-card p-3 rounded-4 border text-center text-md-start d-md-flex align-items-center gap-3 h-100 cursor-pointer @(Model.Role == "Host" ? "active-role host-active" : "")" data-role="Host" onclick="selectRole('Host')">
+                                        <div class="role-icon-box mx-auto mx-md-0 mb-2 mb-md-0 rounded-circle d-flex align-items-center justify-content-center text-success bg-success-subtle flex-shrink-0" style="width: 44px; height: 44px;">
+                                            <i class="fa-solid fa-building-ngo fs-5"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="fw-bold mb-1 text-dark">Organizing Host / NGO</h6>
+                                            <span class="small text-muted d-block" style="font-size: 0.72rem;">Create and host healthcare camps, manage field budgets & staff</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Role-Specific Fields Container -->
-                        <div id="doctorSec" class="p-3 rounded-4 bg-white border mb-4" style="display: @(Model.Role == "Doctor" ? "block" : "none");">
-                            <h6 class="fw-bold text-teal mb-2"><i class="fa-solid fa-user-doctor me-1"></i>Doctor Qualifications</h6>
+                        <!-- ========================================================================= -->
+                        <!-- STEP 2: DYNAMIC ROLE-SPECIFIC VERIFICATION SECTION -->
+                        <!-- ========================================================================= -->
+                        <div id="roleDetailsSection" class="mb-4">
+                            <!-- DOCTOR SECTION -->
+                            <div id="doctorFields" class="p-3 p-md-4 rounded-4 bg-teal-subtle border mb-3" style="display: @(Model.Role == "Doctor" ? "block" : "none"); background: rgba(15, 118, 110, 0.05); border-color: rgba(15, 118, 110, 0.2) !important;">
+                                <div class="d-flex align-items-center gap-2 mb-3">
+                                    <i class="fa-solid fa-certificate text-teal fs-5" style="color: #0f766e;"></i>
+                                    <h6 class="fw-bold mb-0" style="color: #0f766e;">Medical Clinician Credentials</h6>
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label asp-for="BMDCRegNo" class="form-label-custom small fw-semibold">BMDC Registration No *</label>
+                                        <input asp-for="BMDCRegNo" class="form-control form-control-custom rounded-pill" placeholder="e.g. BMDC-A-48291" />
+                                        <span asp-validation-for="BMDCRegNo" class="text-danger small"></span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label asp-for="MedicalSpecialization" class="form-label-custom small fw-semibold">Medical Degree & Specialization</label>
+                                        <input asp-for="MedicalSpecialization" class="form-control form-control-custom rounded-pill" placeholder="e.g. MBBS, FCPS (Medicine), General Physician" />
+                                        <span asp-validation-for="MedicalSpecialization" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- HOST NGO SECTION -->
+                            <div id="hostFields" class="p-3 p-md-4 rounded-4 bg-primary-subtle border mb-3" style="display: @(Model.Role == "Host" ? "block" : "none"); background: rgba(6, 78, 59, 0.05); border-color: rgba(6, 78, 59, 0.2) !important;">
+                                <div class="d-flex align-items-center gap-2 mb-3">
+                                    <i class="fa-solid fa-building-shield text-primary fs-5"></i>
+                                    <h6 class="fw-bold mb-0 text-primary">NGO / Organization Profile</h6>
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label asp-for="OrganizationName" class="form-label-custom small fw-semibold">Organization / NGO Legal Name *</label>
+                                        <input asp-for="OrganizationName" class="form-control form-control-custom rounded-pill" placeholder="e.g. Green Crescent Relief Foundation" />
+                                        <span asp-validation-for="OrganizationName" class="text-danger small"></span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label asp-for="OrganizationType" class="form-label-custom small fw-semibold">Organization Type</label>
+                                        <select asp-for="OrganizationType" class="form-select form-select-custom rounded-pill">
+                                            <option value="NGO">Non-Governmental Organization (NGO)</option>
+                                            <option value="Foundation">Philanthropic Foundation</option>
+                                            <option value="Hospital">Hospital / Healthcare Group</option>
+                                            <option value="Corporate">Corporate CSR Wing</option>
+                                            <option value="Community Group">Community Welfare Association</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label asp-for="OrganizationRegNo" class="form-label-custom small fw-semibold">NGOAB / License Reg Number</label>
+                                        <input asp-for="OrganizationRegNo" class="form-control form-control-custom rounded-pill" placeholder="e.g. NGOAB-2024-819" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label asp-for="FocalPersonContact" class="form-label-custom small fw-semibold">Focal Person Mobile Number</label>
+                                        <input asp-for="FocalPersonContact" class="form-control form-control-custom rounded-pill" placeholder="e.g. 017xxxxxxxx" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- PATIENT / DONOR SECTION -->
+                            <div id="patientFields" class="p-3 p-md-4 rounded-4 border mb-3" style="display: @(Model.Role == "Patient" ? "block" : "none"); background: rgba(239, 68, 68, 0.05); border-color: rgba(239, 68, 68, 0.2) !important;">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="fa-solid fa-heart-pulse text-danger fs-5"></i>
+                                        <div>
+                                            <h6 class="fw-bold mb-0 text-danger">Voluntary Blood Donor Network</h6>
+                                            <span class="small text-muted">Opt-in to be notified when emergency blood is needed in your district.</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-check form-switch fs-4">
+                                        <input asp-for="IsBloodDonor" class="form-check-input" type="checkbox" id="donorSwitch">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ========================================================================= -->
+                        <!-- STEP 3: PERSONAL & CONTACT INFORMATION -->
+                        <!-- ========================================================================= -->
+                        <div class="mb-4">
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <span class="badge rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center" style="width: 26px; height: 26px;">2</span>
+                                <h5 class="fw-bold text-dark mb-0">Personal & Contact Information</h5>
+                            </div>
+
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label asp-for="MedicalSpecialization" class="form-label-custom">Medical Specialization / Degrees *</label>
-                                    <input asp-for="MedicalSpecialization" class="form-control form-control-custom" placeholder="e.g. MBBS, FCPS Internal Medicine" />
+                                    <label asp-for="FullName" class="form-label-custom small fw-semibold">Full Name *</label>
+                                    <input asp-for="FullName" class="form-control form-control-custom rounded-pill" placeholder="e.g. Dr. Mahmudul Hasan / Fatema Begum" required />
+                                    <span asp-validation-for="FullName" class="text-danger small"></span>
                                 </div>
+
                                 <div class="col-md-6">
-                                    <label asp-for="BMDCRegNo" class="form-label-custom">BMDC Registration Number *</label>
-                                    <input asp-for="BMDCRegNo" class="form-control form-control-custom" placeholder="e.g. BMDC-A-48291" />
+                                    <label asp-for="Email" class="form-label-custom small fw-semibold">Email Address *</label>
+                                    <input asp-for="Email" type="email" class="form-control form-control-custom rounded-pill" placeholder="e.g. user@example.com" required />
+                                    <span asp-validation-for="Email" class="text-danger small"></span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label asp-for="PhoneNumber" class="form-label-custom small fw-semibold">Phone / Mobile Number *</label>
+                                    <input asp-for="PhoneNumber" class="form-control form-control-custom rounded-pill" placeholder="e.g. 017xxxxxxxx" required />
+                                    <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label asp-for="NID" class="form-label-custom small fw-semibold">National ID (NID) (Optional)</label>
+                                    <input asp-for="NID" class="form-control form-control-custom rounded-pill" placeholder="e.g. 1985269123456789" />
+                                    <span asp-validation-for="NID" class="text-danger small"></span>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label asp-for="DateOfBirth" class="form-label-custom small fw-semibold">Date of Birth</label>
+                                    <input asp-for="DateOfBirth" type="date" class="form-control form-control-custom rounded-pill" />
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label asp-for="Gender" class="form-label-custom small fw-semibold">Gender</label>
+                                    <select asp-for="Gender" class="form-select form-select-custom rounded-pill">
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label asp-for="BloodGroup" class="form-label-custom small fw-semibold">Blood Group</label>
+                                    <select asp-for="BloodGroup" class="form-select form-select-custom rounded-pill">
+                                        <option value="A+">A+</option>
+                                        <option value="A-">A-</option>
+                                        <option value="B+">B+</option>
+                                        <option value="B-">B-</option>
+                                        <option value="AB+">AB+</option>
+                                        <option value="AB-">AB-</option>
+                                        <option value="O+">O+</option>
+                                        <option value="O-">O-</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
 
-                        <div id="hostSec" class="p-3 rounded-4 bg-white border mb-4" style="display: @(Model.Role == "Host" ? "block" : "none");">
-                            <h6 class="fw-bold text-primary mb-2"><i class="fa-solid fa-building-ngo me-1"></i>NGO Organization Details</h6>
+                        <!-- ========================================================================= -->
+                        <!-- STEP 4: GEOGRAPHIC LOCATION -->
+                        <!-- ========================================================================= -->
+                        <div class="mb-4">
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <span class="badge rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center" style="width: 26px; height: 26px;">3</span>
+                                <h5 class="fw-bold text-dark mb-0">Location & Area</h5>
+                            </div>
+
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label asp-for="OrganizationName" class="form-label-custom">Organization / NGO Legal Name *</label>
-                                    <input asp-for="OrganizationName" class="form-control form-control-custom" placeholder="e.g. BRAC Community Health Program" />
+                                    <label asp-for="District" class="form-label-custom small fw-semibold">District *</label>
+                                    <select asp-for="District" class="form-select form-select-custom rounded-pill" id="regDistrictSelect">
+                                        <option value="Dhaka">Dhaka</option>
+                                        <option value="Chittagong">Chittagong</option>
+                                        <option value="Sylhet">Sylhet</option>
+                                        <option value="Rajshahi">Rajshahi</option>
+                                        <option value="Khulna">Khulna</option>
+                                        <option value="Barisal">Barisal</option>
+                                        <option value="Rangpur">Rangpur</option>
+                                        <option value="Mymensingh">Mymensingh</option>
+                                        <option value="Kurigram">Kurigram</option>
+                                        <option value="Sunamganj">Sunamganj</option>
+                                        <option value="Bandarban">Bandarban</option>
+                                        <option value="Satkhira">Satkhira</option>
+                                        <option value="Cox's Bazar">Cox's Bazar</option>
+                                        <option value="Bogra">Bogra</option>
+                                        <option value="Comilla">Comilla</option>
+                                    </select>
                                 </div>
+
                                 <div class="col-md-6">
-                                    <label asp-for="OrganizationRegNo" class="form-label-custom">NGOAB License / Registration No *</label>
-                                    <input asp-for="OrganizationRegNo" class="form-control form-control-custom" placeholder="e.g. NGOAB-2024-0492" />
+                                    <label asp-for="Upazila" class="form-label-custom small fw-semibold">Upazila / Thana *</label>
+                                    <input asp-for="Upazila" class="form-control form-control-custom rounded-pill" placeholder="e.g. Dhanmondi, Chilmari, Tahirpur" required />
+                                    <span asp-validation-for="Upazila" class="text-danger small"></span>
+                                </div>
+
+                                <div class="col-12">
+                                    <label asp-for="Address" class="form-label-custom small fw-semibold">Detailed Street / Village Address *</label>
+                                    <input asp-for="Address" class="form-control form-control-custom rounded-pill" placeholder="e.g. House 14, Road 5, Dhanmondi / Ward 3, Union Sadar" required />
+                                    <span asp-validation-for="Address" class="text-danger small"></span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Location & Demographics -->
-                        <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">
-                            <i class="fa-solid fa-location-dot text-primary me-2"></i>3. Location & Demographics
-                        </h5>
-
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-6">
-                                <label asp-for="District" class="form-label-custom">District *</label>
-                                <select asp-for="District" class="form-select form-select-custom">
-                                    <option value="Kurigram">Kurigram</option>
-                                    <option value="Sunamganj">Sunamganj</option>
-                                    <option value="Bandarban">Bandarban</option>
-                                    <option value="Satkhira">Satkhira</option>
-                                    <option value="Rangpur">Rangpur</option>
-                                    <option value="Dhaka">Dhaka</option>
-                                    <option value="Chittagong">Chittagong</option>
-                                    <option value="Sylhet">Sylhet</option>
-                                </select>
+                        <!-- ========================================================================= -->
+                        <!-- STEP 5: SECURITY PASSWORD -->
+                        <!-- ========================================================================= -->
+                        <div class="mb-4">
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <span class="badge rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center" style="width: 26px; height: 26px;">4</span>
+                                <h5 class="fw-bold text-dark mb-0">Portal Security Credentials</h5>
                             </div>
 
-                            <div class="col-md-6">
-                                <label asp-for="Upazila" class="form-label-custom">Upazila *</label>
-                                <input asp-for="Upazila" class="form-control form-control-custom" placeholder="e.g. Chilmari, Tahirpur, Ruma, Dhanmondi" required />
-                            </div>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label asp-for="Password" class="form-label-custom small fw-semibold">Password *</label>
+                                    <div class="input-group">
+                                        <input asp-for="Password" type="password" id="regPassword" class="form-control form-control-custom rounded-start-pill" placeholder="Minimum 6 characters" required />
+                                        <button type="button" class="btn btn-outline-secondary rounded-end-pill px-3" onclick="togglePass('regPassword', 'toggleIcon1')">
+                                            <i class="fa-solid fa-eye" id="toggleIcon1"></i>
+                                        </button>
+                                    </div>
+                                    <span asp-validation-for="Password" class="text-danger small"></span>
+                                </div>
 
-                            <div class="col-12">
-                                <label asp-for="Address" class="form-label-custom">Full Address *</label>
-                                <input asp-for="Address" class="form-control form-control-custom" placeholder="e.g. Ward 3, Chilmari Bazar Road, Kurigram" required />
-                            </div>
-
-                            <div class="col-md-6">
-                                <label asp-for="BloodGroup" class="form-label-custom">Blood Group</label>
-                                <select asp-for="BloodGroup" class="form-select form-select-custom">
-                                    <option value="A+">A+</option>
-                                    <option value="A-">A-</option>
-                                    <option value="B+">B+</option>
-                                    <option value="B-">B-</option>
-                                    <option value="AB+">AB+</option>
-                                    <option value="AB-">AB-</option>
-                                    <option value="O+">O+</option>
-                                    <option value="O-">O-</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label asp-for="Gender" class="form-label-custom">Gender</label>
-                                <select asp-for="Gender" class="form-select form-select-custom">
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                    <option value="Other">Other</option>
-                                </select>
+                                <div class="col-md-6">
+                                    <label asp-for="ConfirmPassword" class="form-label-custom small fw-semibold">Confirm Password *</label>
+                                    <div class="input-group">
+                                        <input asp-for="ConfirmPassword" type="password" id="regConfirmPassword" class="form-control form-control-custom rounded-start-pill" placeholder="Repeat your password" required />
+                                        <button type="button" class="btn btn-outline-secondary rounded-end-pill px-3" onclick="togglePass('regConfirmPassword', 'toggleIcon2')">
+                                            <i class="fa-solid fa-eye" id="toggleIcon2"></i>
+                                        </button>
+                                    </div>
+                                    <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Security Credentials -->
-                        <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">
-                            <i class="fa-solid fa-lock text-primary me-2"></i>4. Security Credentials
-                        </h5>
-
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-6">
-                                <label asp-for="Password" class="form-label-custom">Account Password *</label>
-                                <input asp-for="Password" type="password" class="form-control form-control-custom" placeholder="Min. 6 characters" required />
-                                <span asp-validation-for="Password" class="text-danger small"></span>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label asp-for="ConfirmPassword" class="form-label-custom">Confirm Password *</label>
-                                <input asp-for="ConfirmPassword" type="password" class="form-control form-control-custom" placeholder="Repeat password" required />
-                                <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
-                            </div>
-                        </div>
-
-                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pt-3 border-top">
-                            <a asp-controller="Account" asp-action="Login" class="text-secondary small text-decoration-none">
-                                <i class="fa-solid fa-arrow-left me-1"></i> Already registered? Sign In
+                        <!-- Submit Bar -->
+                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pt-4 border-top mt-4">
+                            <a asp-controller="Account" asp-action="Login" class="text-muted small text-decoration-none fw-semibold">
+                                <i class="fa-solid fa-arrow-left me-1"></i> Already have an account? Sign In
                             </a>
-                            <button type="submit" class="btn btn-sapphire btn-lg px-4 shadow">
-                                <i class="fa-solid fa-user-plus me-2"></i> Create Portal Account
+
+                            <button type="submit" class="btn btn-champagne btn-pill px-4 py-2 fw-bold shadow-sm d-flex align-items-center gap-2">
+                                <i class="fa-solid fa-circle-check"></i> Complete Registration
                             </button>
                         </div>
                     </form>
@@ -224,22 +344,99 @@
     </div>
 </div>
 
-@section Scripts {
-    <script>
-        function onRoleChange(role) {
-            const docSec = document.getElementById('doctorSec');
-            const hostSec = document.getElementById('hostSec');
+<style>
+    .role-selection-card {
+        transition: all 0.25s ease-in-out;
+        background: #ffffff;
+        border-color: #e2e8f0 !important;
+        position: relative;
+    }
 
-            if (role === 'Doctor') {
-                docSec.style.display = 'block';
-                hostSec.style.display = 'none';
-            } else if (role === 'Host') {
-                docSec.style.display = 'none';
-                hostSec.style.display = 'block';
-            } else {
-                docSec.style.display = 'none';
-                hostSec.style.display = 'none';
+    .role-selection-card:hover {
+        transform: translateY(-2px);
+        border-color: #064e3b !important;
+        box-shadow: 0 8px 18px rgba(6, 78, 59, 0.08);
+    }
+
+    .role-selection-card.active-role {
+        border-width: 2px !important;
+        box-shadow: 0 8px 20px rgba(6, 78, 59, 0.12);
+    }
+
+    .role-selection-card.patient-active {
+        border-color: #ef4444 !important;
+        background: rgba(239, 68, 68, 0.03);
+    }
+
+    .role-selection-card.doctor-active {
+        border-color: #0f766e !important;
+        background: rgba(15, 118, 110, 0.03);
+    }
+
+    .role-selection-card.volunteer-active {
+        border-color: #f59e0b !important;
+        background: rgba(245, 158, 11, 0.03);
+    }
+
+    .role-selection-card.pharmacist-active {
+        border-color: #0284c7 !important;
+        background: rgba(2, 132, 199, 0.03);
+    }
+
+    .role-selection-card.host-active {
+        border-color: #10b981 !important;
+        background: rgba(16, 185, 129, 0.03);
+    }
+
+    .cursor-pointer {
+        cursor: pointer;
+    }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function selectRole(role) {
+            document.getElementById('selectedRoleInput').value = role;
+
+            // Update card UI classes
+            document.querySelectorAll('.role-selection-card').forEach(card => {
+                card.classList.remove('active-role', 'patient-active', 'doctor-active', 'volunteer-active', 'pharmacist-active', 'host-active');
+                if (card.dataset.role === role) {
+                    card.classList.add('active-role');
+                    if (role === 'Patient') card.classList.add('patient-active');
+                    if (role === 'Doctor') card.classList.add('doctor-active');
+                    if (role === 'Volunteer') card.classList.add('volunteer-active');
+                    if (role === 'Pharmacist') card.classList.add('pharmacist-active');
+                    if (role === 'Host') card.classList.add('host-active');
+                }
+            });
+
+            // Toggle dynamic fields
+            const docFields = document.getElementById('doctorFields');
+            const hostFields = document.getElementById('hostFields');
+            const patientFields = document.getElementById('patientFields');
+
+            if (docFields) docFields.style.display = (role === 'Doctor') ? 'block' : 'none';
+            if (hostFields) hostFields.style.display = (role === 'Host') ? 'block' : 'none';
+            if (patientFields) patientFields.style.display = (role === 'Patient') ? 'block' : 'none';
+        }
+
+        function togglePass(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (input && icon) {
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
             }
         }
     </script>
 }
+

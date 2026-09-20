@@ -207,20 +207,90 @@ namespace MediCamp.Controllers
         }
 
         // =========================================================================
-        // DEDICATED ROLE-SPECIFIC REGISTRATION ROUTES
+        // UNIFIED MULTI-ROLE REGISTRATION
         // =========================================================================
 
         [HttpGet]
         public IActionResult Register(string? role = null)
         {
-            return role switch
+            if (User.Identity != null && User.Identity.IsAuthenticated)
             {
-                SystemRoles.Doctor => RedirectToAction(nameof(RegisterDoctor)),
-                SystemRoles.Host => RedirectToAction(nameof(RegisterHost)),
-                SystemRoles.Volunteer => RedirectToAction(nameof(RegisterVolunteer)),
-                SystemRoles.Pharmacist => RedirectToAction(nameof(RegisterPharmacist)),
-                _ => RedirectToAction(nameof(RegisterPatient))
+                return RedirectToAction("Index", "Home");
+            }
+
+            var selectedRole = SystemRoles.Patient;
+            if (!string.IsNullOrEmpty(role) && SystemRoles.AllRoles.Contains(role))
+            {
+                selectedRole = role;
+            }
+
+            var model = new RegisterViewModel
+            {
+                Role = selectedRole,
+                IsBloodDonor = true,
+                District = "Dhaka",
+                Upazila = "Dhanmondi",
+                Gender = "Male",
+                BloodGroup = "O+"
             };
+
+            return View("Register", model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(RegisterViewModel model)
+        {
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            if (string.IsNullOrWhiteSpace(model.Role))
+            {
+                model.Role = SystemRoles.Patient;
+            }
+
+            // Role-specific validation rules
+            if (model.Role == SystemRoles.Doctor && string.IsNullOrWhiteSpace(model.BMDCRegNo))
+            {
+                ModelState.AddModelError("BMDCRegNo", "BMDC Registration Number is required for doctor accounts.");
+            }
+            if (model.Role == SystemRoles.Host && string.IsNullOrWhiteSpace(model.OrganizationName))
+            {
+                ModelState.AddModelError("OrganizationName", "Organization / NGO Name is required for host accounts.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View("Register", model);
+            }
+
+            var (success, message, user) = _dataService.RegisterUser(model);
+            if (!success || user == null)
+            {
+                ModelState.AddModelError(string.Empty, message);
+                return View("Register", model);
+            }
+
+            if (model.Role == SystemRoles.Host)
+            {
+                TempData["SuccessMessage"] = "Host Organization registration submitted successfully! Pending Administrator verification.";
+                return View("HostRegistrationPending", user);
+            }
+
+            await SignInUserAsync(user, false);
+
+            string welcomeMsg = model.Role switch
+            {
+                SystemRoles.Doctor => "Doctor registration completed! Welcome to the MediCamp Clinical Portal.",
+                SystemRoles.Volunteer => "Field Volunteer registration completed! Welcome to MediCamp Triage.",
+                SystemRoles.Pharmacist => "Pharmacist registration completed! Welcome to MediCamp Dispensary.",
+                _ => "Patient registration completed successfully! Welcome to MediCamp."
+            };
+
+            TempData["SuccessMessage"] = welcomeMsg;
+            return RedirectToAction("Index", "Home");
         }
 
         // 1. Patient Registration
