@@ -81,13 +81,34 @@ namespace MediCamp.Controllers
                     .ToList();
             }
 
+            var volunteerUser = _dbContext.Users.FirstOrDefault(u => u.Id == userId);
+            var pendingRequestsCount = _mockDataService.GetRequestsForVolunteer(userId).Count(r => r.Status == "Pending");
+            var totalTriagedCount = _dbContext.TriageRecords.Count(t => t.VolunteerId == userId);
+            var todayCheckedInCount = activeCamp != null 
+                ? _dbContext.TriageRecords.Count(t => t.CampId == activeCamp.Id && t.RecordedAt.Date == today) 
+                : 0;
+
+            var recentTriageRecords = activeCamp != null
+                ? _dbContext.TriageRecords
+                    .Include(t => t.Patient)
+                    .Where(t => t.CampId == activeCamp.Id)
+                    .OrderByDescending(t => t.RecordedAt)
+                    .Take(8)
+                    .ToList()
+                : new List<TriageRecord>();
+
             var model = new VolunteerDashboardViewModel
             {
+                VolunteerUser = volunteerUser,
                 OngoingCamps = ongoingCamps,
                 ApprovedCamps = approvedCamps!,
                 ActiveCamp = activeCamp,
                 SearchResults = searchResults,
-                SearchQuery = searchQuery
+                SearchQuery = searchQuery,
+                PendingRequestsCount = pendingRequestsCount,
+                TotalTriagedCount = totalTriagedCount,
+                TodayCheckedInCount = todayCheckedInCount,
+                RecentTriageRecords = recentTriageRecords
             };
 
             return View(model);

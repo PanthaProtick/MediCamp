@@ -488,11 +488,16 @@ namespace MediCamp.Models.ViewModels
 
     public class VolunteerDashboardViewModel
     {
+        public ApplicationUser? VolunteerUser { get; set; }
         public List<MediCamp.Models.Domain.Camp> OngoingCamps { get; set; } = new();
         public List<MediCamp.Models.Domain.Camp> ApprovedCamps { get; set; } = new();
         public MediCamp.Models.Domain.Camp? ActiveCamp { get; set; }
         public List<ApplicationUser> SearchResults { get; set; } = new();
         public string? SearchQuery { get; set; }
+        public int PendingRequestsCount { get; set; }
+        public int TotalTriagedCount { get; set; }
+        public int TodayCheckedInCount { get; set; }
+        public List<MediCamp.Models.Domain.TriageRecord> RecentTriageRecords { get; set; } = new();
     }
 
     public class TriageFormViewModel
