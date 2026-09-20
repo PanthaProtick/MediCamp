@@ -358,6 +358,24 @@ namespace MediCamp.Models.ViewModels
         public int OngoingCount => MyCamps.Count(c => c.Status == "Ongoing");
         public int CompletedCount => MyCamps.Count(c => c.Status == "Completed");
         
+        public int TotalExpectedPatients => MyCamps.Sum(c => c.ExpectedPatients);
+        public int TotalServedPatients => MyCamps.Sum(c => c.ServedPatientsCount);
+        public int TotalRegisteredPatients => MyCamps.Sum(c => c.RegisteredPatientsCount);
+        public decimal TotalBudget => MyCamps.Sum(c => c.TotalBudget);
+        public decimal TotalUtilizedBudget => MyCamps.Sum(c => c.UtilizedBudget);
+
+        public int PatientServedPercentage => TotalExpectedPatients > 0 
+            ? (int)Math.Min(100, Math.Round((double)TotalServedPatients / TotalExpectedPatients * 100)) 
+            : (TotalServedPatients > 0 ? 100 : 0);
+
+        public int BudgetUtilizationPercentage => TotalBudget > 0 
+            ? (int)Math.Min(100, Math.Round((double)TotalUtilizedBudget / (double)TotalBudget * 100)) 
+            : 0;
+
+        public int CampCompletionRate => TotalCampsCount > 0 
+            ? (int)Math.Round((double)CompletedCount / TotalCampsCount * 100) 
+            : 0;
+
         public bool IsApproved => HostUser.HostApprovalStatus == "Approved";
     }
     public class AdminCampApprovalsViewModel
@@ -1144,5 +1162,33 @@ namespace MediCamp.Models.ViewModels
         public AdminMedicineUsageReportViewModel MedicineReport { get; set; } = new();
         public AdminAreaReportViewModel AreaReport { get; set; } = new();
     }
+
+    public class NotificationItemViewModel
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Type { get; set; } = "General"; // StaffRequest, VolunteerRequest, PharmacistRequest, PatientRegistration, HostApproval, CampApproval, BloodRequest, System
+        public string Title { get; set; } = string.Empty;
+        public string Message { get; set; } = string.Empty;
+        public string SenderName { get; set; } = string.Empty;
+        public string SenderRole { get; set; } = string.Empty;
+        public string? CampTitle { get; set; }
+        public int? CampId { get; set; }
+        public int? RequestId { get; set; }
+        public DateTime Timestamp { get; set; } = DateTime.UtcNow;
+        public string TimeAgo { get; set; } = "Just now";
+        public string Status { get; set; } = "Pending";
+        public string ActionUrl { get; set; } = "#";
+        public bool CanApproveReject { get; set; } = false;
+        public string IconClass { get; set; } = "fa-solid fa-bell";
+        public string BadgeColor { get; set; } = "bg-primary";
+        public bool IsRead { get; set; } = false;
+    }
+
+    public class NotificationSummaryViewModel
+    {
+        public int UnreadCount { get; set; }
+        public List<NotificationItemViewModel> Notifications { get; set; } = new();
+    }
 }
+
 

@@ -231,6 +231,29 @@ namespace MediCamp.Controllers
             return View(myCamps);
         }
 
+        // =========================================================================
+        // 5b. CAMP DETAILS ROUTING (/Host/Details/{id})
+        // =========================================================================
+        [HttpGet]
+        public IActionResult Details(int id)
+        {
+            var currentHost = GetCurrentHostUser();
+            if (currentHost == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var camp = _dbContext.Camps.FirstOrDefault(c => c.Id == id);
+            if (camp == null)
+            {
+                TempData["ErrorMessage"] = "Camp not found.";
+                return RedirectToAction(nameof(MyCamps));
+            }
+
+            return RedirectToAction(nameof(ManageStaff), new { id = id });
+        }
+
+
         // Helper method to populate dynamic location and camp type dropdown lists
         private void PopulateDropdowns(CreateCampViewModel model)
         {
