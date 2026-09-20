@@ -77,13 +77,8 @@
                                 var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                                 var doctorPendingCount = currentUserId != null ? MockDataService.GetRequestsForDoctor(currentUserId).Count(r => r.Status == "Pending") : 0;
                                 <li class="nav-item">
-                                    <a class="nav-link nav-link-custom @(ViewContext.RouteData.Values["Action"]?.ToString() == "Queue" && ViewContext.RouteData.Values["Controller"]?.ToString() == "Doctor" ? "active" : "")" asp-controller="Doctor" asp-action="Queue">
-                                        <i class="fa-solid fa-stethoscope me-1 text-champagne"></i> Patient Queue
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link nav-link-custom @(ViewContext.RouteData.Values["Action"]?.ToString() == "Requests" && ViewContext.RouteData.Values["Controller"]?.ToString() == "Doctor" ? "active" : "")" asp-controller="Doctor" asp-action="Requests">
-                                        <i class="fa-solid fa-envelope-open-text me-1 text-champagne"></i> Camp Invitations
+                                    <a class="nav-link nav-link-custom @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Doctor" ? "active" : "")" asp-controller="Doctor" asp-action="Queue">
+                                        <i class="fa-solid fa-gauge me-1 text-champagne"></i> Doctor Dashboard
                                         @if (doctorPendingCount > 0)
                                         {
                                             <span class="badge bg-danger rounded-pill ms-1">@doctorPendingCount</span>

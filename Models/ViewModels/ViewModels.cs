@@ -564,6 +564,8 @@ namespace MediCamp.Models.ViewModels
 
     public class DoctorQueueViewModel
     {
+        public ApplicationUser? DoctorUser { get; set; }
+
         /// <summary>All active camps currently ongoing in the system.</summary>
         public List<MediCamp.Models.Domain.Camp> OngoingCamps { get; set; } = new();
 
@@ -579,6 +581,11 @@ namespace MediCamp.Models.ViewModels
         public int EmergencyCount => Queue.Count(t => t.UrgencyLevel == "Emergency");
         public int UrgentCount    => Queue.Count(t => t.UrgencyLevel == "Urgent");
         public int NormalCount    => Queue.Count(t => t.UrgencyLevel == "Normal");
+
+        public int PendingRequestsCount { get; set; }
+        public int TotalConsultationsCount { get; set; }
+        public int TodayConsultationsCount { get; set; }
+        public List<MediCamp.Models.Domain.Consultation> RecentConsultations { get; set; } = new();
     }
 
     public class ConsultationPrescriptionItemInput
