@@ -175,12 +175,34 @@ namespace MediCamp.Controllers
                     .ToList();
             }
 
+            var doctorUser = _dbContext.Users.FirstOrDefault(u => u.Id == doctorId);
+            var pendingRequestsCount = _mockDataService.GetRequestsForDoctor(doctorId).Count(r => r.Status == "Pending");
+            var totalConsultationsCount = _dbContext.Consultations.Count(c => c.DoctorId == doctorId);
+            var todayConsultationsCount = activeCamp != null
+                ? _dbContext.Consultations.Count(c => c.TriageRecord != null && c.TriageRecord.CampId == activeCamp.Id && c.ConsultedAt.Date == today)
+                : 0;
+
+            var recentConsultations = activeCamp != null
+                ? _dbContext.Consultations
+                    .Include(c => c.TriageRecord)
+                        .ThenInclude(t => t.Patient)
+                    .Where(c => c.TriageRecord != null && c.TriageRecord.CampId == activeCamp.Id)
+                    .OrderByDescending(c => c.ConsultedAt)
+                    .Take(8)
+                    .ToList()
+                : new List<Consultation>();
+
             var model = new DoctorQueueViewModel
             {
+                DoctorUser = doctorUser,
                 OngoingCamps = ongoingCamps,
                 ApprovedCamps = approvedCamps!,
                 ActiveCamp = activeCamp,
-                Queue = queue
+                Queue = queue,
+                PendingRequestsCount = pendingRequestsCount,
+                TotalConsultationsCount = totalConsultationsCount,
+                TodayConsultationsCount = todayConsultationsCount,
+                RecentConsultations = recentConsultations
             };
 
             return View("Queue", model);

@@ -1,124 +1,269 @@
 @model MediCamp.Models.ViewModels.DoctorRequestsViewModel
-
 @{
-    ViewData["Title"] = "Camp Participation Requests";
+    ViewData["Title"] = "Camp Invitations - Doctor Portal";
     Layout = "_Layout";
 }
 
-<div class="container mt-4">
-    <div class="mb-4">
-        <h2>Camp Participation Requests</h2>
-        <p class="text-muted">Review and respond to invitations from NGOs to participate in their medical camps.</p>
-    </div>
+<div class="container-fluid px-lg-4 py-4">
 
+    <!-- Flash Notifications -->
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            @TempData["SuccessMessage"]
+        <div class="alert alert-success alert-dismissible fade show shadow-sm mb-4 rounded-4" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i> @TempData["SuccessMessage"]
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
-
     @if (TempData["ErrorMessage"] != null)
     {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            @TempData["ErrorMessage"]
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm mb-4 rounded-4" role="alert">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i> @TempData["ErrorMessage"]
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
-    <div class="row">
-        <div class="col-12 mb-5">
-            <h4 class="mb-3">Pending Invitations</h4>
-            @if (Model.PendingRequests.Any())
-            {
-                <div class="row">
-                    @foreach (var req in Model.PendingRequests)
-                    {
-                        <div class="col-md-6 col-lg-4 mb-4">
-                            <div class="card shadow-sm h-100 border-warning border-start border-4">
-                                <div class="card-body">
-                                    <h5 class="card-title">@req.Camp?.Title</h5>
-                                    <h6 class="card-subtitle mb-2 text-muted">@req.Camp?.Host?.OrganizationName</h6>
-                                    
-                                    <ul class="list-unstyled mt-3 mb-4">
-                                        <li><i class="bi bi-geo-alt me-2"></i>@req.Camp?.District, @req.Camp?.Upazila</li>
-                                        <li><i class="bi bi-calendar-event me-2"></i>@req.Camp?.StartDate.ToString("MMM dd, yyyy") - @req.Camp?.EndDate.ToString("MMM dd, yyyy")</li>
-                                        <li><i class="bi bi-tags me-2"></i>@req.Camp?.CampType</li>
-                                    </ul>
+    <!-- Doctor Dashboard Main Container with Rounded Card Frame -->
+    <div class="host-layout-card">
+        <div class="row g-0">
 
-                                    <div class="d-flex gap-2 mt-auto">
-                                        <form asp-action="RespondToRequest" method="post" class="flex-grow-1">
-                                            <input type="hidden" name="requestId" value="@req.Id" />
-                                            <input type="hidden" name="status" value="Approved" />
-                                            <button type="submit" class="btn btn-success w-100"><i class="bi bi-check-circle me-1"></i> Accept</button>
-                                        </form>
-                                        <form asp-action="RespondToRequest" method="post" class="flex-grow-1">
-                                            <input type="hidden" name="requestId" value="@req.Id" />
-                                            <input type="hidden" name="status" value="Denied" />
-                                            <button type="submit" class="btn btn-outline-danger w-100"><i class="bi bi-x-circle me-1"></i> Decline</button>
-                                        </form>
+            <!-- Left Emerald Sidebar (Matching Doctor Navbar Details) -->
+            <div class="col-lg-3 col-xl-auto" style="min-width: 250px;">
+                <aside class="host-sidebar h-100">
+                    <div>
+                        <!-- Sidebar Brand / Doctor Info -->
+                        <div class="host-sidebar-brand">
+                            <div class="host-sidebar-brand-icon" style="background: linear-gradient(135deg, #10b981 0%, #047857 100%);">
+                                <i class="fa-solid fa-user-doctor text-white"></i>
+                            </div>
+                            <div class="d-flex flex-column text-truncate">
+                                <span class="fw-bold text-white fs-5 lh-1 text-truncate">Doctor Portal</span>
+                                <span class="text-champagne opacity-75 small text-uppercase mt-1" style="font-size: 0.68rem; letter-spacing: 0.06em;">Clinical Practice</span>
+                            </div>
+                        </div>
+
+                        <!-- Sidebar Navigation Menu (Only Doctor Scope) -->
+                        <nav class="d-flex flex-column">
+                            <a asp-controller="Doctor" asp-action="Queue" class="host-nav-item">
+                                <i class="fa-solid fa-stethoscope fs-6"></i>
+                                <span>Patient Queue</span>
+                            </a>
+                            <a asp-controller="Doctor" asp-action="Requests" class="host-nav-item active">
+                                <i class="fa-solid fa-envelope-open-text fs-6"></i>
+                                <span>Camp Invitations</span>
+                                @if (Model.PendingRequests.Count > 0)
+                                {
+                                    <span class="badge bg-danger rounded-pill ms-auto small fw-bold" style="font-size: 0.7rem;">@Model.PendingRequests.Count</span>
+                                }
+                            </a>
+                        </nav>
+                    </div>
+
+                    <!-- Sidebar Bottom: Logout Button in White Rounded Pill -->
+                    <div class="pt-4 mt-auto">
+                        <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+                            <button type="submit" class="host-logout-btn">
+                                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                                <span>Logout</span>
+                            </button>
+                        </form>
+                    </div>
+                </aside>
+            </div>
+
+            <!-- Right Details & Operations Panel -->
+            <div class="col-lg-9 col-xl">
+                <main class="host-main-panel h-100">
+
+                    <!-- Top Bar -->
+                    <div class="host-topbar">
+                        <div class="d-flex align-items-center gap-2">
+                            <a asp-action="Queue" class="btn btn-outline-secondary btn-sm rounded-pill px-3 fw-bold">
+                                <i class="fa-solid fa-arrow-left me-1"></i> Back to Patient Queue
+                            </a>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-3">
+                            <!-- Interactive Notification Bell Dropdown -->
+                            <div class="notification-bell-wrapper">
+                                <button type="button" class="notification-bell-btn shadow-sm" title="Doctor Notifications" aria-label="Notifications">
+                                    <i class="fa-regular fa-bell"></i>
+                                    <span class="notification-badge-pulse" style="display: none;">0</span>
+                                </button>
+                                <div class="notification-dropdown-panel shadow-lg">
+                                    <div class="notification-header">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i class="fa-solid fa-bell text-champagne"></i>
+                                            <span class="fw-bold">Clinical Notifications</span>
+                                        </div>
+                                        <span class="badge bg-white text-dark rounded-pill small" style="font-size: 0.72rem;">Live Queue</span>
                                     </div>
-                                </div>
-                                <div class="card-footer text-muted small">
-                                    Requested: @req.RequestedAt.ToLocalTime().ToString("MMM dd, yyyy")
+                                    <ul class="notification-list">
+                                        <li class="text-center py-4 text-muted">
+                                            <span class="spinner-border spinner-border-sm text-secondary"></span> Loading...
+                                        </li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
-                    }
-                </div>
-            }
-            else
-            {
-                <div class="alert alert-light border text-center p-4">
-                    <p class="mb-0 text-muted">You have no pending camp invitations at the moment.</p>
-                </div>
-            }
-        </div>
+                    </div>
 
-        <div class="col-12">
-            <h4 class="mb-3">Previous Responses</h4>
-            @if (Model.RespondedRequests.Any())
-            {
-                <div class="table-responsive">
-                    <table class="table table-hover table-striped">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Camp Title</th>
-                                <th>NGO / Host</th>
-                                <th>Dates</th>
-                                <th>Status</th>
-                                <th>Responded On</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var req in Model.RespondedRequests)
-                            {
-                                <tr>
-                                    <td>@req.Camp?.Title</td>
-                                    <td>@req.Camp?.Host?.OrganizationName</td>
-                                    <td>@req.Camp?.StartDate.ToString("MMM dd") - @req.Camp?.EndDate.ToString("MMM dd")</td>
-                                    <td>
-                                        @if (req.Status == "Approved")
+                    <!-- Main Content Body -->
+                    <div class="p-3 p-lg-4">
+
+                        <!-- Header -->
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4 pb-3 border-bottom">
+                            <div>
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    <span class="badge px-3 py-1 fw-bold text-uppercase" style="background: rgba(16, 185, 129, 0.15); color: #047857; border: 1px solid rgba(16, 185, 129, 0.3); font-size: 0.75rem;">
+                                        <i class="fa-solid fa-envelope-open-text me-1"></i> Clinical Recruitment
+                                    </span>
+                                </div>
+                                <h3 class="fw-bold text-dark mb-1">Healthcare Camp Invitations</h3>
+                                <p class="text-muted small mb-0">Review and respond to invitations from NGO Hosts to conduct medical consultations.</p>
+                            </div>
+                        </div>
+
+                        <ul class="nav nav-pills mb-4" id="requestsTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active fw-bold rounded-pill px-4" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab" aria-controls="pending" aria-selected="true">
+                                    Pending Invitations (@Model.PendingRequests.Count)
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link fw-bold rounded-pill px-4" id="responded-tab" data-bs-toggle="tab" data-bs-target="#responded" type="button" role="tab" aria-controls="responded" aria-selected="false">
+                                    Past Responses (@Model.RespondedRequests.Count)
+                                </button>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content" id="requestsTabContent">
+                            <!-- Pending Tab -->
+                            <div class="tab-pane fade show active" id="pending" role="tabpanel" aria-labelledby="pending-tab">
+                                @if (Model.PendingRequests.Any())
+                                {
+                                    <div class="row g-3">
+                                        @foreach (var req in Model.PendingRequests)
                                         {
-                                            <span class="badge bg-success"><i class="bi bi-check me-1"></i>Approved</span>
+                                            <div class="col-md-6">
+                                                <div class="card rounded-4 border-0 shadow-sm overflow-hidden h-100" style="border: 1px solid rgba(16, 185, 129, 0.2) !important;">
+                                                    <div class="card-body p-4 d-flex flex-column justify-content-between">
+                                                        <div>
+                                                            <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                                                                <span class="badge bg-warning-subtle text-dark border border-warning-subtle rounded-pill px-2 py-1 small">
+                                                                    <i class="fa-solid fa-hourglass-half me-1 text-warning"></i> Pending Response
+                                                                </span>
+                                                                <span class="badge bg-light text-muted rounded-pill small">
+                                                                    <i class="fa-solid fa-users me-1"></i> ~@req.Camp?.ExpectedPatients Expected
+                                                                </span>
+                                                            </div>
+                                                            <h5 class="fw-bold text-dark mb-1">@req.Camp?.Title</h5>
+                                                            <div class="small fw-semibold text-success mb-3"><i class="fa-solid fa-building-ngo me-1"></i> @(req.Camp?.Host?.OrganizationName ?? "NGO Host")</div>
+                                                            
+                                                            <div class="mb-3">
+                                                                <div class="small text-muted mb-1"><i class="fa-solid fa-location-dot text-danger me-2"></i><strong>Location:</strong> @req.Camp?.Venue, @req.Camp?.Upazila, @req.Camp?.District</div>
+                                                                <div class="small text-muted mb-1"><i class="fa-solid fa-calendar-days text-primary me-2"></i><strong>Dates:</strong> @req.Camp?.StartDate.ToString("MMM dd, yyyy") to @req.Camp?.EndDate.ToString("MMM dd, yyyy")</div>
+                                                                <div class="small text-muted mb-1"><i class="fa-solid fa-tag text-info me-2"></i><strong>Type:</strong> @req.Camp?.CampType</div>
+                                                            </div>
+                                                            
+                                                            <p class="small text-muted mb-3"><i class="fa-regular fa-clock me-1"></i>Requested: @req.RequestedAt.ToLocalTime().ToString("MMM dd, yyyy hh:mm tt")</p>
+                                                        </div>
+
+                                                        <div class="d-flex gap-2 pt-3 border-top">
+                                                            <form asp-action="RespondToRequest" method="post" class="flex-grow-1">
+                                                                <input type="hidden" name="requestId" value="@req.Id" />
+                                                                <input type="hidden" name="status" value="Approved" />
+                                                                <button type="submit" class="btn btn-success w-100 fw-bold rounded-pill shadow-sm">
+                                                                    <i class="fa-solid fa-check me-1"></i> Accept Invitation
+                                                                </button>
+                                                            </form>
+                                                            
+                                                            <form asp-action="RespondToRequest" method="post" class="flex-grow-1">
+                                                                <input type="hidden" name="requestId" value="@req.Id" />
+                                                                <input type="hidden" name="status" value="Denied" />
+                                                                <button type="submit" class="btn btn-outline-danger w-100 fw-bold rounded-pill">
+                                                                    <i class="fa-solid fa-xmark me-1"></i> Decline
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         }
-                                        else
-                                        {
-                                            <span class="badge bg-danger"><i class="bi bi-x me-1"></i>Declined</span>
-                                        }
-                                    </td>
-                                    <td>@(req.RespondedAt?.ToLocalTime().ToString("MMM dd, yyyy") ?? "N/A")</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            }
-            else
-            {
-                <p class="text-muted">No past request history found.</p>
-            }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="glass-card text-center py-5 rounded-4 border-0 shadow-sm">
+                                        <i class="fa-solid fa-envelope-open text-muted fs-1 mb-3 opacity-50"></i>
+                                        <h5 class="text-secondary fw-bold">No pending invitations</h5>
+                                        <p class="text-muted small mb-0">When an NGO Host invites you to participate as a physician in a health camp, it will appear here.</p>
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Responded Tab -->
+                            <div class="tab-pane fade" id="responded" role="tabpanel" aria-labelledby="responded-tab">
+                                @if (Model.RespondedRequests.Any())
+                                {
+                                    <div class="glass-card rounded-4 border-0 shadow-sm overflow-hidden">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover align-middle mb-0">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th class="ps-4">Camp Title</th>
+                                                        <th>Host NGO</th>
+                                                        <th>Dates</th>
+                                                        <th>Status</th>
+                                                        <th class="text-end pe-4">Responded At</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var req in Model.RespondedRequests)
+                                                    {
+                                                        <tr>
+                                                            <td class="ps-4">
+                                                                <div class="fw-bold text-dark">@req.Camp?.Title</div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="small text-muted">@(req.Camp?.Host?.OrganizationName ?? "NGO Host")</div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="small">@req.Camp?.StartDate.ToString("MMM dd") – @req.Camp?.EndDate.ToString("MMM dd, yyyy")</div>
+                                                            </td>
+                                                            <td>
+                                                                @if (req.Status == "Approved")
+                                                                {
+                                                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1 fw-bold small"><i class="fa-solid fa-check me-1"></i>Accepted</span>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-1 fw-bold small"><i class="fa-solid fa-xmark me-1"></i>Declined</span>
+                                                                }
+                                                            </td>
+                                                            <td class="text-end pe-4">
+                                                                <div class="small text-muted">@(req.RespondedAt?.ToLocalTime().ToString("MMM dd, yyyy hh:mm tt") ?? "N/A")</div>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="glass-card text-center py-5 rounded-4 border-0 shadow-sm">
+                                        <i class="fa-solid fa-clock-rotate-left text-muted fs-1 mb-3 opacity-50"></i>
+                                        <h5 class="text-secondary fw-bold">No history found</h5>
+                                        <p class="text-muted small mb-0">You haven't responded to any invitations yet.</p>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                    </div>
+                </main>
+            </div>
         </div>
     </div>
 </div>
