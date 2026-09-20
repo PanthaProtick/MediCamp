@@ -113,6 +113,12 @@ namespace MediCamp.Controllers
         // ==========================================
 
         [HttpGet]
+        public IActionResult Dashboard()
+        {
+            return RedirectToAction(nameof(History));
+        }
+
+        [HttpGet]
         public IActionResult History(string? patientId = null)
         {
             var currentUser = GetCurrentUser();
@@ -198,7 +204,11 @@ namespace MediCamp.Controllers
                     HeightCm                = triage.HeightCm,
                     BMI                     = triage.BMI,
                     PresentingSymptoms      = triage.PresentingSymptoms,
-                    DoctorName              = consultation?.Doctor != null ? $"Dr. {consultation.Doctor.FullName}" : null,
+                    DoctorName              = consultation?.Doctor != null 
+                        ? (consultation.Doctor.FullName.StartsWith("Dr.", StringComparison.OrdinalIgnoreCase) || consultation.Doctor.FullName.StartsWith("Dr ", StringComparison.OrdinalIgnoreCase) 
+                            ? consultation.Doctor.FullName 
+                            : $"Dr. {consultation.Doctor.FullName}") 
+                        : null,
                     Diagnosis               = consultation?.Diagnosis,
                     ClinicalNotes           = consultation?.ClinicalNotes,
                     Advice                  = consultation?.Advice,

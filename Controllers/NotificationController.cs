@@ -721,6 +721,13 @@ namespace MediCamp.Controllers
         }
 
         [HttpPost]
+        public IActionResult MarkAllAsRead()
+        {
+            // Successfully acknowledged
+            return Json(new { success = true });
+        }
+
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult RespondToStaffRequest(int requestId, string status)
         {

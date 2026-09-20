@@ -24,21 +24,6 @@
         </div>
     </div>
 
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm mb-4" role="alert">
-            <i class="fa-solid fa-circle-check me-2"></i> @TempData["SuccessMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    }
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm mb-4" role="alert">
-            <i class="fa-solid fa-triangle-exclamation me-2"></i> @TempData["ErrorMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    }
-
     @if (!Model.FollowUps.Any())
     {
         <div class="glass-card p-5 text-center my-4">

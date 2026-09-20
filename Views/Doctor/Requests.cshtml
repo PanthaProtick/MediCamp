@@ -6,21 +6,6 @@
 
 <div class="container-fluid px-lg-4 py-4">
 
-    <!-- Flash Notifications -->
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show shadow-sm mb-4 rounded-4" role="alert">
-            <i class="fa-solid fa-circle-check me-2"></i> @TempData["SuccessMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    }
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="alert alert-danger alert-dismissible fade show shadow-sm mb-4 rounded-4" role="alert">
-            <i class="fa-solid fa-triangle-exclamation me-2"></i> @TempData["ErrorMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    }
 
     <!-- Doctor Dashboard Main Container with Rounded Card Frame -->
     <div class="host-layout-card">
