@@ -282,7 +282,7 @@
                             }
                             else if (User.IsInRole(SystemRoles.Host) || User.IsInRole(SystemRoles.Admin))
                             {
-                                <a asp-controller="Host" asp-action="Details" asp-route-id="@camp.Id" class="btn btn-outline-primary btn-sm-custom">
+                                <a asp-controller="Host" asp-action="ManageStaff" asp-route-id="@camp.Id" class="btn btn-outline-primary btn-sm-custom">
                                     <i class="fa-solid fa-gear me-1"></i> Manage Camp
                                 </a>
                             }
