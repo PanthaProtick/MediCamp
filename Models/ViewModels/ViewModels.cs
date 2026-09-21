@@ -271,6 +271,39 @@ namespace MediCamp.Models.ViewModels
         public int FreeMedicinesDispensed { get; set; }
         public int DistrictsReached { get; set; }
         public List<CampOverviewItem> UpcomingCamps { get; set; } = new();
+        public LiveCampStatusViewModel? LiveCampStatus { get; set; }
+    }
+
+    public class LiveCampStatusViewModel
+    {
+        public int CampId { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string CampType { get; set; } = string.Empty;
+        public string Status { get; set; } = "Ongoing"; // Ongoing, Scheduled, Completed
+        public string StatusBadgeText { get; set; } = "LIVE SYSTEM STATUS";
+        public string HostOrganization { get; set; } = string.Empty;
+        public string Venue { get; set; } = string.Empty;
+        public string District { get; set; } = string.Empty;
+        public string Upazila { get; set; } = string.Empty;
+
+        public int ExpectedPatients { get; set; }
+        public int ServedPatientsCount { get; set; }
+        public int RegisteredPatientsCount { get; set; }
+        public int ProgressPercentage { get; set; }
+
+        public string QueueLabel { get; set; } = "Today's Patient Queue";
+        public string QueueFractionText { get; set; } = "0 / 0 Served";
+
+        public string AvgWaitTime { get; set; } = "20 mins";
+        public int StockOutagesCount { get; set; } = 0;
+
+        public int TotalBloodDonors { get; set; }
+        public string BloodDonorsText { get; set; } = "18,400+";
+        public string TriageIntakeSpeed { get; set; } = "< 45s";
+
+        public string ReferralAlertTitle { get; set; } = "Hospital Referral";
+        public string ReferralAlertMessage { get; set; } = string.Empty;
+        public bool HasActiveCamp { get; set; } = true;
     }
 
     public class CampOverviewItem
