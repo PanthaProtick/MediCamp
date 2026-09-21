@@ -1,12 +1,141 @@
 @model AdminGlobalReportsViewModel
 @{
     ViewData["Title"] = "Global Epidemiological Analytics - MediCamp Admin";
+    var activeTabName = Model.ActiveTab switch
+    {
+        "medicine" => "Central Medicine Usage & Stock Telemetry",
+        "area" => "Multi-Tier Regional Healthcare Coverage",
+        _ => "Disease & Seasonal Epidemiology Analytics"
+    };
 }
+
+<style>
+    /* Print & A4 PDF Sizing Rules */
+    .report-print-header {
+        display: none;
+    }
+
+    .pdf-avoid-break {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    .pdf-page-break {
+        page-break-before: always !important;
+        break-before: page !important;
+    }
+
+    /* Temporary styling applied during html2pdf rasterization */
+    .exporting-pdf {
+        background: #ffffff !important;
+        color: #0f172a !important;
+        padding: 12px !important;
+        width: 100% !important;
+        max-width: 820px !important;
+        margin: 0 auto !important;
+    }
+
+    .exporting-pdf .glass-card {
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+    }
+
+    .exporting-pdf .no-print,
+    .exporting-pdf .input-group,
+    .exporting-pdf input,
+    .exporting-pdf form {
+        display: none !important;
+    }
+
+    .exporting-pdf .report-print-header {
+        display: block !important;
+    }
+
+    .exporting-pdf .table {
+        font-size: 0.82rem !important;
+    }
+
+    @@media print {
+        .no-print,
+        nav,
+        .glass-nav,
+        footer,
+        .aura-layer-1,
+        .aura-layer-2,
+        .aura-bg,
+        .btn,
+        .input-group,
+        input,
+        form {
+            display: none !important;
+        }
+
+        body {
+            background: #ffffff !important;
+            color: #0f172a !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        .container-fluid {
+            padding: 0 !important;
+            max-width: 100% !important;
+        }
+
+        #reportExportArea {
+            width: 100% !important;
+            padding: 0 !important;
+            background: #ffffff !important;
+        }
+
+        .report-print-header {
+            display: block !important;
+        }
+
+        .glass-card {
+            background: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: none !important;
+            backdrop-filter: none !important;
+            margin-bottom: 1.25rem !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+        }
+
+        .pdf-avoid-break,
+        .row,
+        .card,
+        tr,
+        .col-md-4,
+        .col-md-3,
+        .col-sm-6 {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+        }
+
+        table {
+            page-break-inside: auto !important;
+        }
+
+        tr {
+            page-break-inside: avoid !important;
+            page-break-after: auto !important;
+        }
+
+        thead {
+            display: table-header-group !important;
+        }
+    }
+</style>
 
 <div class="container-fluid px-lg-4 py-4">
 
     <!-- Top Navigation Breadcrumb & Header -->
-    <div class="glass-card p-4 p-md-4 mb-4">
+    <div class="glass-card p-4 p-md-4 mb-4 no-print">
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
             <div>
                 <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
@@ -32,7 +161,7 @@
     </div>
 
     <!-- Analytics Navigation Tabs -->
-    <div class="d-flex gap-2 border-bottom mb-4 pb-3 flex-wrap">
+    <div class="d-flex gap-2 border-bottom mb-4 pb-3 flex-wrap no-print">
         <a asp-controller="Admin" asp-action="Reports" asp-route-tab="disease"
            class="btn @(Model.ActiveTab == "disease" ? "btn-sapphire shadow-sm" : "btn-light text-secondary border") rounded-pill px-4 py-2 fw-bold">
             <i class="fa-solid fa-virus me-2"></i> 1. Disease & Seasonal Epidemiology
@@ -47,8 +176,25 @@
         </a>
     </div>
 
-    <!-- Printable & Exportable Report Container -->
+    <!-- Printable & Exportable Report Container (A4 Formatted) -->
     <div id="reportExportArea">
+
+        <!-- Official Report Header (Printed on PDF and Paper) -->
+        <div class="report-print-header p-3 mb-4 bg-white border rounded-3 pdf-avoid-break">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div class="d-flex align-items-center gap-3">
+                    <img src="~/images/logo.png" alt="MediCamp Logo" style="width: 44px; height: 44px; object-fit: contain; border-radius: 8px;" />
+                    <div>
+                        <h4 class="fw-bold text-dark mb-0 lh-1">Medi<span class="text-success">Camp</span> Healthcare Telemetry</h4>
+                        <div class="text-secondary small mt-1 fw-semibold">@activeTabName &bull; Bangladesh Operations</div>
+                    </div>
+                </div>
+                <div class="text-end">
+                    <span class="badge bg-dark text-white px-2.5 py-1 fw-semibold">Official Executive Report</span>
+                    <div class="small text-muted mt-1" style="font-size: 0.75rem;">Generated: @DateTime.UtcNow.ToString("dd MMM yyyy, hh:mm tt") UTC</div>
+                </div>
+            </div>
+        </div>
 
         <!-- ========================================================================= -->
         <!-- TAB 1: DISEASE & SEASONAL REPORT -->
@@ -56,45 +202,48 @@
         @if (Model.ActiveTab == "disease")
         {
             <!-- Disease Summary KPI Cards -->
-            <div class="row g-4 mb-4">
+            <div class="row g-3 mb-4 pdf-avoid-break">
                 <div class="col-md-4">
-                    <div class="p-4 bg-white rounded-4 border shadow-sm border-start border-4 border-success h-100 d-flex flex-column justify-content-between">
+                    <div class="p-3.5 bg-white rounded-3 border shadow-xs border-start border-4 border-success h-100 d-flex flex-column justify-content-between">
                         <div>
-                            <span class="text-secondary small fw-bold text-uppercase d-block mb-2" style="font-size: 0.72rem; letter-spacing: 0.05em;">Total Diagnoses Recorded</span>
-                            <h3 class="fw-bold text-success mb-2 fs-2">@Model.DiseaseReport.TotalDiagnosesLogged.ToString("N0")</h3>
+                            <span class="text-secondary small fw-bold text-uppercase d-block mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">Total Diagnoses Recorded</span>
+                            <h3 class="fw-bold text-success mb-1 fs-2">@Model.DiseaseReport.TotalDiagnosesLogged.ToString("N0")</h3>
                         </div>
-                        <span class="text-muted small" style="font-size: 0.8rem; line-height: 1.4;">Aggregated from all camp doctor consultations nationwide.</span>
+                        <span class="text-muted small" style="font-size: 0.78rem; line-height: 1.4;">Aggregated from doctor consultations nationwide.</span>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="p-4 bg-white rounded-4 border shadow-sm border-start border-4 border-danger h-100 d-flex flex-column justify-content-between">
+                    <div class="p-3.5 bg-white rounded-3 border shadow-xs border-start border-4 border-danger h-100 d-flex flex-column justify-content-between">
                         <div>
-                            <span class="text-secondary small fw-bold text-uppercase d-block mb-2" style="font-size: 0.72rem; letter-spacing: 0.05em;">Most Prevalent Condition</span>
-                            <h3 class="fw-bold text-danger mb-2 fs-4 text-truncate" title="@(Model.DiseaseReport.TopDiseases.FirstOrDefault()?.DiseaseName ?? "Hypertension")">
+                            <span class="text-secondary small fw-bold text-uppercase d-block mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">Most Prevalent Condition</span>
+                            <h3 class="fw-bold text-danger mb-1 fs-4 text-truncate" title="@(Model.DiseaseReport.TopDiseases.FirstOrDefault()?.DiseaseName ?? "Hypertension")">
                                 @(Model.DiseaseReport.TopDiseases.FirstOrDefault()?.DiseaseName.Split('&')[0] ?? "Hypertension")
                             </h3>
                         </div>
-                        <span class="text-muted small" style="font-size: 0.8rem; line-height: 1.4;">@(Model.DiseaseReport.TopDiseases.FirstOrDefault()?.Percentage ?? 0)% of all nationwide clinical visits.</span>
+                        <span class="text-muted small" style="font-size: 0.78rem; line-height: 1.4;">@(Model.DiseaseReport.TopDiseases.FirstOrDefault()?.Percentage ?? 0)% of all nationwide clinical visits.</span>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="p-4 bg-white rounded-4 border shadow-sm border-start border-4 border-primary h-100 d-flex flex-column justify-content-between">
+                    <div class="p-3.5 bg-white rounded-3 border shadow-xs border-start border-4 border-primary h-100 d-flex flex-column justify-content-between">
                         <div>
-                            <span class="text-secondary small fw-bold text-uppercase d-block mb-2" style="font-size: 0.72rem; letter-spacing: 0.05em;">Highest Clinical Burden</span>
-                            <h3 class="fw-bold text-primary mb-2 fs-3">@(Model.DiseaseReport.DistrictDiseaseBreakdown.FirstOrDefault()?.Label ?? "Kurigram")</h3>
+                            <span class="text-secondary small fw-bold text-uppercase d-block mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">Highest Clinical Burden</span>
+                            <h3 class="fw-bold text-primary mb-1 fs-3">@(Model.DiseaseReport.DistrictDiseaseBreakdown.FirstOrDefault()?.Label ?? "Kurigram")</h3>
                         </div>
-                        <span class="text-muted small" style="font-size: 0.8rem; line-height: 1.4;">@(Model.DiseaseReport.DistrictDiseaseBreakdown.FirstOrDefault()?.Count ?? 0) Reported clinical patient cases.</span>
+                        <span class="text-muted small" style="font-size: 0.78rem; line-height: 1.4;">@(Model.DiseaseReport.DistrictDiseaseBreakdown.FirstOrDefault()?.Count ?? 0) Reported clinical patient cases.</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Disease Prevalence Ranking & Chart -->
-            <div class="row g-4 mb-4">
-                <div class="col-lg-7">
-                    <div class="glass-card p-4 h-100">
+            <!-- Disease Prevalence Ranking Table (Full-Width A4 Layout) -->
+            <div class="row g-4 mb-4 pdf-avoid-break">
+                <div class="col-12">
+                    <div class="glass-card p-4">
                         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                            <h5 class="fw-bold text-dark mb-0"><i class="fa-solid fa-stethoscope me-2 text-teal"></i> Disease-wise Case Counts & Demographics</h5>
-                            <div class="input-group input-group-sm" style="max-width: 220px;">
+                            <div>
+                                <h5 class="fw-bold text-dark mb-0"><i class="fa-solid fa-stethoscope me-2 text-teal"></i> Disease-wise Case Counts & Demographics</h5>
+                                <span class="text-muted small">Prevalence ranking, patient cohort demographics, and risk stratifications.</span>
+                            </div>
+                            <div class="input-group input-group-sm no-print" style="max-width: 220px;">
                                 <span class="input-group-text bg-light border-end-0 text-muted"><i class="fa-solid fa-magnifying-glass"></i></span>
                                 <input type="text" id="diseaseFilterInput" class="form-control border-start-0" placeholder="Filter conditions..." />
                             </div>
@@ -103,11 +252,11 @@
                             <table class="table table-hover align-middle mb-0" id="diseaseTable">
                                 <thead class="table-light">
                                     <tr class="small text-uppercase text-secondary">
-                                        <th class="ps-3 py-3">Diagnosis / Condition</th>
-                                        <th class="text-center py-3">Cases</th>
-                                        <th class="text-center py-3">Share</th>
-                                        <th class="py-3">Top Affected District</th>
-                                        <th class="text-end pe-3 py-3">Risk Level</th>
+                                        <th class="ps-3 py-3" style="width: 38%;">Diagnosis / Condition</th>
+                                        <th class="text-center py-3" style="width: 14%;">Cases</th>
+                                        <th class="text-center py-3" style="width: 14%;">Share</th>
+                                        <th class="py-3" style="width: 20%;">Top Affected District</th>
+                                        <th class="text-end pe-3 py-3" style="width: 14%;">Risk Level</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -135,19 +284,10 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="col-lg-5">
-                    <div class="glass-card p-4 h-100 d-flex flex-column">
-                        <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-chart-pie me-2 text-teal"></i> Disease Prevalence Distribution</h5>
-                        <div class="flex-grow-1 d-flex align-items-center justify-content-center p-3" style="min-height: 260px;">
-                            <canvas id="diseaseDonutChart" style="max-height: 260px;"></canvas>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <!-- Seasonal Epidemiology Insights -->
-            <div class="glass-card p-4 p-md-4">
+            <div class="glass-card p-4 p-md-4 pdf-avoid-break">
                 <div class="mb-3">
                     <h5 class="fw-bold text-dark mb-1"><i class="fa-solid fa-cloud-sun-rain me-2 text-teal"></i> Seasonal Epidemiology & Disease Surge Patterns</h5>
                     <p class="text-secondary small mb-0">Macro clinical insights across Bangladesh's three major meteorological cycles.</p>
@@ -156,9 +296,9 @@
                     @foreach (var s in Model.DiseaseReport.SeasonalTrends)
                     {
                         <div class="col-md-4">
-                            <div class="p-4 bg-white rounded-4 border h-100 shadow-sm d-flex flex-column justify-content-between">
+                            <div class="p-3.5 bg-white rounded-3 border h-100 shadow-xs d-flex flex-column justify-content-between pdf-avoid-break">
                                 <div>
-                                    <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                                    <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
                                         <span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-semibold px-2.5 py-1">@s.Season</span>
                                         <span class="badge bg-danger-subtle text-danger border border-danger-subtle fw-bold px-2.5 py-1">@s.ReportedCases Cases</span>
                                     </div>
@@ -180,56 +320,56 @@
         @if (Model.ActiveTab == "medicine")
         {
             <!-- Medicine Summary KPI Cards -->
-            <div class="row g-4 mb-4">
+            <div class="row g-3 mb-4 pdf-avoid-break">
                 <div class="col-md-3 col-sm-6">
-                    <div class="p-4 bg-white rounded-4 border shadow-sm border-start border-4 border-primary h-100 d-flex flex-column justify-content-between">
+                    <div class="p-3.5 bg-white rounded-3 border shadow-xs border-start border-4 border-primary h-100 d-flex flex-column justify-content-between">
                         <div>
-                            <span class="text-secondary small fw-bold text-uppercase d-block mb-2" style="font-size: 0.72rem; letter-spacing: 0.05em;">Total Stock Allocated</span>
-                            <h3 class="fw-bold text-primary mb-2 fs-2">@Model.MedicineReport.TotalMedicinesAllocated.ToString("N0")</h3>
+                            <span class="text-secondary small fw-bold text-uppercase d-block mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">Total Stock Allocated</span>
+                            <h3 class="fw-bold text-primary mb-1 fs-2">@Model.MedicineReport.TotalMedicinesAllocated.ToString("N0")</h3>
                         </div>
-                        <span class="text-muted small" style="font-size: 0.8rem;">Units across all medical camps</span>
+                        <span class="text-muted small" style="font-size: 0.78rem;">Units across all medical camps</span>
                     </div>
                 </div>
                 <div class="col-md-3 col-sm-6">
-                    <div class="p-4 bg-white rounded-4 border shadow-sm border-start border-4 border-success h-100 d-flex flex-column justify-content-between">
+                    <div class="p-3.5 bg-white rounded-3 border shadow-xs border-start border-4 border-success h-100 d-flex flex-column justify-content-between">
                         <div>
-                            <span class="text-secondary small fw-bold text-uppercase d-block mb-2" style="font-size: 0.72rem; letter-spacing: 0.05em;">Free Dispensed</span>
-                            <h3 class="fw-bold text-success mb-2 fs-2">@Model.MedicineReport.TotalMedicinesDispensed.ToString("N0")</h3>
+                            <span class="text-secondary small fw-bold text-uppercase d-block mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">Free Dispensed</span>
+                            <h3 class="fw-bold text-success mb-1 fs-2">@Model.MedicineReport.TotalMedicinesDispensed.ToString("N0")</h3>
                         </div>
-                        <span class="text-muted small" style="font-size: 0.8rem;">Units dispensed free to patients</span>
+                        <span class="text-muted small" style="font-size: 0.78rem;">Units dispensed free to patients</span>
                     </div>
                 </div>
                 <div class="col-md-3 col-sm-6">
-                    <div class="p-4 bg-white rounded-4 border shadow-sm border-start border-4 border-teal h-100 d-flex flex-column justify-content-between">
+                    <div class="p-3.5 bg-white rounded-3 border shadow-xs border-start border-4 border-teal h-100 d-flex flex-column justify-content-between">
                         <div>
-                            <span class="text-secondary small fw-bold text-uppercase d-block mb-2" style="font-size: 0.72rem; letter-spacing: 0.05em;">Dispensary Stock</span>
-                            <h3 class="fw-bold text-teal mb-2 fs-2">@Model.MedicineReport.TotalRemainingStock.ToString("N0")</h3>
+                            <span class="text-secondary small fw-bold text-uppercase d-block mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">Dispensary Stock</span>
+                            <h3 class="fw-bold text-teal mb-1 fs-2">@Model.MedicineReport.TotalRemainingStock.ToString("N0")</h3>
                         </div>
-                        <span class="text-muted small" style="font-size: 0.8rem;">Units active in field stock</span>
+                        <span class="text-muted small" style="font-size: 0.78rem;">Units active in field stock</span>
                     </div>
                 </div>
                 <div class="col-md-3 col-sm-6">
-                    <div class="p-4 bg-white rounded-4 border shadow-sm border-start border-4 border-danger h-100 d-flex flex-column justify-content-between">
+                    <div class="p-3.5 bg-white rounded-3 border shadow-xs border-start border-4 border-danger h-100 d-flex flex-column justify-content-between">
                         <div>
-                            <span class="text-secondary small fw-bold text-uppercase d-block mb-2" style="font-size: 0.72rem; letter-spacing: 0.05em;">Critical Stock Alerts</span>
-                            <div class="d-flex align-items-center gap-2 mb-2">
-                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2.5 py-1.5 fw-bold">@Model.MedicineReport.OutOfStockCount Out</span>
-                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2.5 py-1.5 fw-bold">@Model.MedicineReport.LowStockCount Low</span>
+                            <span class="text-secondary small fw-bold text-uppercase d-block mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">Critical Stock Alerts</span>
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 fw-bold">@Model.MedicineReport.OutOfStockCount Out</span>
+                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 fw-bold">@Model.MedicineReport.LowStockCount Low</span>
                             </div>
                         </div>
-                        <span class="text-muted small" style="font-size: 0.8rem;">Inventory requiring re-stocking</span>
+                        <span class="text-muted small" style="font-size: 0.78rem;">Inventory requiring re-stocking</span>
                     </div>
                 </div>
             </div>
 
             <!-- Medicine Usage Table -->
-            <div class="glass-card p-4 mb-4">
+            <div class="glass-card p-4 mb-4 pdf-avoid-break">
                 <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                     <div>
                         <h5 class="fw-bold text-dark mb-0"><i class="fa-solid fa-boxes-stacked me-2 text-teal"></i> Central Medicine Usage & Stock Status</h5>
                         <p class="text-secondary small mb-0">Live dispensation tracking and remaining inventory per medicine.</p>
                     </div>
-                    <div class="input-group input-group-sm" style="max-width: 250px;">
+                    <div class="input-group input-group-sm no-print" style="max-width: 250px;">
                         <span class="input-group-text bg-light border-end-0 text-muted"><i class="fa-solid fa-magnifying-glass"></i></span>
                         <input type="text" id="medicineFilterInput" class="form-control border-start-0" placeholder="Search brand, generic, category..." />
                     </div>
@@ -292,13 +432,13 @@
             </div>
 
             <!-- Category Usage Breakdown -->
-            <div class="glass-card p-4">
+            <div class="glass-card p-4 pdf-avoid-break">
                 <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-tablets me-2 text-teal"></i> Therapeutic Category Consumption</h5>
                 <div class="row g-3">
                     @foreach (var cat in Model.MedicineReport.CategoryUsageList)
                     {
                         <div class="col-md-4">
-                            <div class="p-3.5 bg-white rounded-3 border shadow-xs">
+                            <div class="p-3 bg-white rounded-3 border shadow-xs pdf-avoid-break">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <span class="fw-bold text-dark">@cat.Category</span>
                                     <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1">@cat.UtilizationRate.ToString("F0")% Utilized</span>
@@ -319,8 +459,8 @@
         <!-- ========================================================================= -->
         @if (Model.ActiveTab == "area")
         {
-            <!-- Geographical Filter Bar -->
-            <div class="glass-card p-4 mb-4">
+            <!-- Geographical Filter Bar (No Print) -->
+            <div class="glass-card p-4 mb-4 no-print">
                 <form method="get" asp-controller="Admin" asp-action="Reports" class="row g-3 align-items-center">
                     <input type="hidden" name="tab" value="area" />
                     <div class="col-md-4">
@@ -352,14 +492,14 @@
             </div>
 
             <!-- Multi-tier Area Aggregation Table -->
-            <div class="glass-card p-4">
+            <div class="glass-card p-4 pdf-avoid-break">
                 <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                     <div>
                         <h5 class="fw-bold text-dark mb-1"><i class="fa-solid fa-sitemap me-2 text-teal"></i> Multi-tier Regional Coverage & Clinical Reach</h5>
                         <p class="text-secondary small mb-0">Division &rarr; District &rarr; Upazila &rarr; Union &rarr; Village</p>
                     </div>
                     <div class="d-flex align-items-center gap-2">
-                        <div class="input-group input-group-sm" style="max-width: 200px;">
+                        <div class="input-group input-group-sm no-print" style="max-width: 200px;">
                             <span class="input-group-text bg-light border-end-0 text-muted"><i class="fa-solid fa-magnifying-glass"></i></span>
                             <input type="text" id="areaFilterInput" class="form-control border-start-0" placeholder="Filter locations..." />
                         </div>
@@ -429,7 +569,6 @@
 </div>
 
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script>
         function downloadReportPdf() {
@@ -439,26 +578,45 @@
             const btn = document.getElementById('downloadPdfBtn');
             const origHtml = btn ? btn.innerHTML : '';
             if (btn) {
-                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Generating PDF...';
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Generating A4 PDF...';
                 btn.disabled = true;
             }
 
+            // Temporarily apply clean A4 PDF container styles
+            element.classList.add('exporting-pdf');
+
             const opt = {
-                margin: [8, 8, 8, 8],
+                margin: [10, 10, 10, 10],
                 filename: 'MediCamp_Global_Analytics_Report.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, letterRendering: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    letterRendering: true,
+                    logging: false,
+                    scrollY: 0
+                },
+                jsPDF: {
+                    unit: 'mm',
+                    format: 'a4',
+                    orientation: 'portrait'
+                },
+                pagebreak: {
+                    mode: ['avoid-all', 'css', 'legacy'],
+                    avoid: ['.pdf-avoid-break', '.glass-card', '.card', '.row', 'tr']
+                }
             };
 
             if (typeof html2pdf !== 'undefined') {
                 html2pdf().set(opt).from(element).save().then(() => {
+                    element.classList.remove('exporting-pdf');
                     if (btn) {
                         btn.innerHTML = origHtml;
                         btn.disabled = false;
                     }
                 }).catch(err => {
                     console.error('PDF export error:', err);
+                    element.classList.remove('exporting-pdf');
                     if (btn) {
                         btn.innerHTML = origHtml;
                         btn.disabled = false;
@@ -466,6 +624,7 @@
                     window.print();
                 });
             } else {
+                element.classList.remove('exporting-pdf');
                 window.print();
                 if (btn) {
                     btn.innerHTML = origHtml;
@@ -475,75 +634,38 @@
         }
 
         document.addEventListener("DOMContentLoaded", function () {
-            @if (Model.ActiveTab == "disease")
-            {
-                <text>
-                const diseaseCtx = document.getElementById('diseaseDonutChart');
-                if (diseaseCtx) {
-                    new Chart(diseaseCtx, {
-                        type: 'doughnut',
-                        data: {
-                            labels: [@Html.Raw(string.Join(",", Model.DiseaseReport.TopDiseases.Take(6).Select(d => $"'{d.DiseaseName.Split('&')[0].Trim()}'")))],
-                            datasets: [{
-                                data: [@string.Join(",", Model.DiseaseReport.TopDiseases.Take(6).Select(d => d.CaseCount))],
-                                backgroundColor: ['#ef4444', '#3b82f6', '#f59e0b', '#10b981', '#06b6d4', '#8b5cf6'],
-                                borderWidth: 2,
-                                borderColor: '#ffffff'
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } }
-                            }
-                        }
-                    });
-                }
-
-                // Instant disease filter
-                document.getElementById('diseaseFilterInput')?.addEventListener('keyup', function () {
-                    const query = this.value.toLowerCase().trim();
-                    const rows = document.querySelectorAll('.disease-row-item');
-                    rows.forEach(row => {
-                        const text = row.innerText.toLowerCase();
-                        row.style.display = text.includes(query) ? '' : 'none';
-                    });
+            // Instant disease filter
+            document.getElementById('diseaseFilterInput')?.addEventListener('keyup', function () {
+                const query = this.value.toLowerCase().trim();
+                const rows = document.querySelectorAll('.disease-row-item');
+                rows.forEach(row => {
+                    const text = row.innerText.toLowerCase();
+                    row.style.display = text.includes(query) ? '' : 'none';
                 });
-                </text>
-            }
+            });
 
-            @if (Model.ActiveTab == "medicine")
-            {
-                <text>
-                // Instant medicine filter
-                document.getElementById('medicineFilterInput')?.addEventListener('keyup', function () {
-                    const query = this.value.toLowerCase().trim();
-                    const rows = document.querySelectorAll('.medicine-row-item');
-                    rows.forEach(row => {
-                        const text = row.innerText.toLowerCase();
-                        row.style.display = text.includes(query) ? '' : 'none';
-                    });
+            // Instant medicine filter
+            document.getElementById('medicineFilterInput')?.addEventListener('keyup', function () {
+                const query = this.value.toLowerCase().trim();
+                const rows = document.querySelectorAll('.medicine-row-item');
+                rows.forEach(row => {
+                    const text = row.innerText.toLowerCase();
+                    row.style.display = text.includes(query) ? '' : 'none';
                 });
-                </text>
-            }
+            });
 
-            @if (Model.ActiveTab == "area")
-            {
-                <text>
-                // Instant area filter
-                document.getElementById('areaFilterInput')?.addEventListener('keyup', function () {
-                    const query = this.value.toLowerCase().trim();
-                    const rows = document.querySelectorAll('.area-row-item');
-                    rows.forEach(row => {
-                        const text = row.innerText.toLowerCase();
-                        row.style.display = text.includes(query) ? '' : 'none';
-                    });
+            // Instant area filter
+            document.getElementById('areaFilterInput')?.addEventListener('keyup', function () {
+                const query = this.value.toLowerCase().trim();
+                const rows = document.querySelectorAll('.area-row-item');
+                rows.forEach(row => {
+                    const text = row.innerText.toLowerCase();
+                    row.style.display = text.includes(query) ? '' : 'none';
                 });
-                </text>
-            }
+            });
         });
     </script>
 }
+
 
 
