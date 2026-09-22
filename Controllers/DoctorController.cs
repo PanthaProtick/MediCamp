@@ -276,6 +276,13 @@ namespace MediCamp.Controllers
             };
 
             _dbContext.TriageRecords.Add(newTriage);
+
+            var camp = _dbContext.Camps.FirstOrDefault(c => c.Id == campId);
+            if (camp != null)
+            {
+                camp.RegisteredPatientsCount += 1;
+            }
+
             _dbContext.SaveChanges();
 
             return RedirectToAction(nameof(Consult), new { triageId = newTriage.Id });
