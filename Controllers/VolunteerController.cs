@@ -467,7 +467,23 @@ namespace MediCamp.Controllers
             }
 
             var patientWasSeenAtCamp = _dbContext.TriageRecords.Any(t => t.CampId == campId && t.PatientId == patientId);
-            if (!patientWasSeenAtCamp || scheduledDate.Date < DateTime.UtcNow.Date)
+
+            // Determine local Bangladesh operating date (UTC+6) to avoid UTC midnight boundary mismatches (BUG-04)
+            DateTime localOperatingDate;
+            try
+            {
+                var bdTimeZone = TimeZoneInfo.FindSystemTimeZoneById(
+                    OperatingSystem.IsWindows() ? "Bangladesh Standard Time" : "Asia/Dhaka");
+                localOperatingDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, bdTimeZone).Date;
+            }
+            catch
+            {
+                localOperatingDate = DateTime.UtcNow.AddHours(6).Date;
+            }
+
+            var minAllowedDate = localOperatingDate < DateTime.UtcNow.Date ? localOperatingDate : DateTime.UtcNow.Date;
+
+            if (!patientWasSeenAtCamp || scheduledDate.Date < minAllowedDate)
             {
                 TempData["ErrorMessage"] = "Select a patient from this camp and choose today or a future date.";
                 return RedirectToAction(nameof(FollowUps), new { campId });
