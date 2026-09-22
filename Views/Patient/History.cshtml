@@ -420,8 +420,8 @@
                                                 </div>
                                             }
 
-                                            <!-- Prescribed Medicines -->
-                                            @if (visit.PrescriptionItems.Any())
+                                            <!-- Prescribed Medicines or Advice Only (BUG-06) -->
+                                            @if (visit.HasPrescription)
                                             {
                                                 <div class="border-top pt-3 mt-3">
                                                     <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
@@ -472,6 +472,14 @@
                                                             </tbody>
                                                         </table>
                                                     </div>
+                                                </div>
+                                            }
+                                            else if (visit.ConsultedAt.HasValue)
+                                            {
+                                                <div class="border-top pt-3 mt-3">
+                                                    <span class="badge bg-light text-secondary border px-2.5 py-1.5 rounded-pill fw-semibold">
+                                                        <i class="fa-solid fa-clipboard-check me-1 text-primary"></i>Advice Only &bull; No Medicines Prescribed
+                                                    </span>
                                                 </div>
                                             }
 

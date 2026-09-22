@@ -214,6 +214,7 @@ namespace MediCamp.Controllers
                     Advice                  = consultation?.Advice,
                     ConsultedAt             = consultation?.ConsultedAt,
                     PrescriptionId          = prescription?.Id,
+                    HasPrescription         = prescription != null && rxItems.Any(),
                     IsPrescriptionDispensed = prescription?.IsDispensed ?? false,
                     DispensedAt             = prescription?.DispensedAt,
                     PrescriptionItems       = rxItems,

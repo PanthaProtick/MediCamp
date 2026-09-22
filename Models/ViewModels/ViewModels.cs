@@ -807,6 +807,7 @@ namespace MediCamp.Models.ViewModels
 
         // Prescription
         public int? PrescriptionId { get; set; }
+        public bool HasPrescription { get; set; }
         public bool IsPrescriptionDispensed { get; set; }
         public DateTime? DispensedAt { get; set; }
         public List<PrescriptionItemDetail> PrescriptionItems { get; set; } = new();
@@ -838,7 +839,7 @@ namespace MediCamp.Models.ViewModels
         public MediCamp.Models.Domain.BloodDonationProfile? BloodProfile { get; set; }
         public List<PatientVisitTimelineItem> Visits { get; set; } = new();
         public int TotalVisitsCount => Visits.Count;
-        public int TotalPrescriptionsCount => Visits.Count(v => v.PrescriptionId.HasValue);
+        public int TotalPrescriptionsCount => Visits.Count(v => v.HasPrescription);
     }
 
     public class DigitalPrescriptionViewModel
