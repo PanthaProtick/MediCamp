@@ -266,7 +266,34 @@ namespace MediCamp.Controllers
                 return View("Register", model);
             }
 
-            var (success, message, user) = _dataService.RegisterUser(model);
+            (bool success, string message, ApplicationUser? user) regResult;
+            if (model.Role == SystemRoles.Patient)
+            {
+                var patientModel = new RegisterPatientViewModel
+                {
+                    FullName = model.FullName,
+                    Email = model.Email,
+                    PhoneNumber = model.PhoneNumber,
+                    Password = model.Password,
+                    ConfirmPassword = model.ConfirmPassword,
+                    NID = model.NID,
+                    DateOfBirth = model.DateOfBirth,
+                    Gender = model.Gender,
+                    BloodGroup = model.BloodGroup,
+                    District = model.District,
+                    Upazila = model.Upazila,
+                    Address = model.Address,
+                    IsBloodDonor = model.IsBloodDonor,
+                    Role = SystemRoles.Patient
+                };
+                regResult = _dataService.RegisterPatient(patientModel);
+            }
+            else
+            {
+                regResult = _dataService.RegisterUser(model);
+            }
+
+            var (success, message, user) = regResult;
             if (!success || user == null)
             {
                 ModelState.AddModelError(string.Empty, message);
@@ -309,7 +336,7 @@ namespace MediCamp.Controllers
             model.Role = SystemRoles.Patient;
             if (!ModelState.IsValid) return View("RegisterPatient", model);
 
-            var (success, message, user) = _dataService.RegisterUser(model);
+            var (success, message, user) = _dataService.RegisterPatient(model);
             if (!success || user == null)
             {
                 ModelState.AddModelError(string.Empty, message);

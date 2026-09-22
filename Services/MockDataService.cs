@@ -124,6 +124,7 @@ namespace MediCamp.Services
                 BloodGroup = model.BloodGroup,
                 District = model.District,
                 Upazila = model.Upazila,
+                Address = model.Address?.Trim() ?? string.Empty,
                 Role = SystemRoles.Patient,
                 PatientUniqueId = GenerateUniquePatientId(_dbContext),
                 IsActive = true,
@@ -132,6 +133,21 @@ namespace MediCamp.Services
             };
 
             _dbContext.Users.Add(newUser);
+
+            if (model.IsBloodDonor && !string.IsNullOrEmpty(newUser.BloodGroup))
+            {
+                var donorProfile = new BloodDonationProfile
+                {
+                    UserId = newUser.Id,
+                    BloodGroup = newUser.BloodGroup,
+                    District = newUser.District ?? "Dhaka",
+                    Upazila = newUser.Upazila ?? "Dhanmondi",
+                    IsAvailableDonor = true,
+                    TotalDonationsCount = 0
+                };
+                _dbContext.BloodDonationProfiles.Add(donorProfile);
+            }
+
             _dbContext.SaveChanges();
             return (true, "Patient registration successful.", newUser);
         }
