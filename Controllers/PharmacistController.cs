@@ -424,7 +424,9 @@ namespace MediCamp.Controllers
                 return RedirectToAction(nameof(PrescriptionQueue), new { campId });
             }
 
-            // 1. Stock check: Prevent dispensing if stock is insufficient
+            // 1. Stock check: Group and aggregate requested quantities by effective medicine ID to prevent multi-row stock underflow (BUG-03)
+            var requiredQuantitiesByMed = new Dictionary<int, (int TotalRequested, string MedicineName)>();
+
             for (int i = 0; i < itemIds.Length; i++)
             {
                 int qty = (i < quantities.Length) ? quantities[i] : 0;
@@ -439,15 +441,38 @@ namespace MediCamp.Controllers
                     ? substituteMedicineIds[i]
                     : prescriptionItem.MasterMedicineId;
 
+                string medName = prescriptionItem.MasterMedicine?.BrandName ?? "Medicine";
+                if (effectiveMedicineId != prescriptionItem.MasterMedicineId)
+                {
+                    var sub = _dbContext.MasterMedicines.FirstOrDefault(m => m.Id == effectiveMedicineId);
+                    if (sub != null) medName = sub.BrandName;
+                }
+
+                if (requiredQuantitiesByMed.TryGetValue(effectiveMedicineId, out var existing))
+                {
+                    requiredQuantitiesByMed[effectiveMedicineId] = (existing.TotalRequested + qty, existing.MedicineName);
+                }
+                else
+                {
+                    requiredQuantitiesByMed[effectiveMedicineId] = (qty, medName);
+                }
+            }
+
+            foreach (var kvp in requiredQuantitiesByMed)
+            {
+                int medId = kvp.Key;
+                int totalRequested = kvp.Value.TotalRequested;
+                string medName = kvp.Value.MedicineName;
+
                 var invEntry = _dbContext.CampInventories
                     .Include(ci => ci.MasterMedicine)
-                    .FirstOrDefault(ci => ci.CampId == campId && ci.MasterMedicineId == effectiveMedicineId);
+                    .FirstOrDefault(ci => ci.CampId == campId && ci.MasterMedicineId == medId);
 
                 int availableStock = invEntry != null ? invEntry.QuantityAllocated - invEntry.QuantityDispensed : 0;
-                if (availableStock < qty)
+                if (availableStock < totalRequested)
                 {
-                    string medName = invEntry?.MasterMedicine?.BrandName ?? prescriptionItem.MasterMedicine?.BrandName ?? "Medicine";
-                    TempData["ErrorMessage"] = $"Stock Warning: Insufficient inventory for \"{medName}\". Available stock: {availableStock} units, Requested: {qty} units. Dispensing blocked.";
+                    string displayName = invEntry?.MasterMedicine?.BrandName ?? medName;
+                    TempData["ErrorMessage"] = $"Stock Warning: Insufficient inventory for \"{displayName}\". Available stock: {availableStock} units, Requested: {totalRequested} units. Dispensing blocked.";
                     return RedirectToAction(nameof(Dispense), new { prescriptionId });
                 }
             }
