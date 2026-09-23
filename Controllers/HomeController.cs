@@ -79,25 +79,33 @@ namespace MediCamp.Controllers
                 {
                     ViewBag.UserCampStatus = _dbContext.CampPharmacistRequests
                         .Where(r => r.PharmacistId == userId)
-                        .ToDictionary(r => r.CampId, r => r.Status);
+                        .AsEnumerable()
+                        .GroupBy(r => r.CampId)
+                        .ToDictionary(g => g.Key, g => g.First().Status);
                 }
                 else if (User.IsInRole(SystemRoles.Doctor))
                 {
                     ViewBag.UserCampStatus = _dbContext.CampStaffRequests
                         .Where(r => r.DoctorId == userId)
-                        .ToDictionary(r => r.CampId, r => r.Status);
+                        .AsEnumerable()
+                        .GroupBy(r => r.CampId)
+                        .ToDictionary(g => g.Key, g => g.First().Status);
                 }
                 else if (User.IsInRole(SystemRoles.Volunteer))
                 {
                     ViewBag.UserCampStatus = _dbContext.CampVolunteerRequests
                         .Where(r => r.VolunteerId == userId)
-                        .ToDictionary(r => r.CampId, r => r.Status);
+                        .AsEnumerable()
+                        .GroupBy(r => r.CampId)
+                        .ToDictionary(g => g.Key, g => g.First().Status);
                 }
                 else if (User.IsInRole(SystemRoles.Patient))
                 {
                     ViewBag.UserCampStatus = _dbContext.CampPatientRegistrations
                         .Where(r => r.PatientId == userId && r.Status == "Registered")
-                        .ToDictionary(r => r.CampId, r => r.Status);
+                        .AsEnumerable()
+                        .GroupBy(r => r.CampId)
+                        .ToDictionary(g => g.Key, g => g.First().Status);
                 }
             }
 

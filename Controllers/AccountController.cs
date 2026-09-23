@@ -513,12 +513,7 @@ namespace MediCamp.Controllers
 
         private IActionResult RedirectBasedOnRole(string? role)
         {
-            return role switch
-            {
-                SystemRoles.Admin => RedirectToAction("UserManagement", "Admin"),
-                SystemRoles.Host => RedirectToAction("Dashboard", "Host"),
-                _ => RedirectToAction("Index", "Home")
-            };
+            return RedirectToAction("Index", "Home");
         }
     }
 }

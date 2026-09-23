@@ -387,6 +387,10 @@ namespace MediCamp.Controllers
                 AvailableVolunteers = volunteersQuery.Skip((volunteerPage - 1) * pageSize).Take(pageSize).ToList(),
                 CurrentPharmacistRequests = _mockDataService.GetPharmacistRequestsForCamp(id),
                 AvailablePharmacists = pharmacistsQuery.Skip((pharmacistPage - 1) * pageSize).Take(pageSize).ToList(),
+
+                DoctorAssignedCamps = _mockDataService.GetActiveDoctorAssignments(),
+                VolunteerAssignedCamps = _mockDataService.GetActiveVolunteerAssignments(),
+                PharmacistAssignedCamps = _mockDataService.GetActivePharmacistAssignments(),
                 
                 CurrentDoctorPage = doctorPage,
                 TotalDoctorPages = (int)Math.Ceiling(totalDoctors / (double)pageSize),

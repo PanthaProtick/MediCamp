@@ -559,6 +559,23 @@ namespace MediCamp.Services
 
         public (bool Success, string Message) SendCampStaffRequest(int campId, string doctorId)
         {
+            var camp = _dbContext.Camps.FirstOrDefault(c => c.Id == campId);
+            if (camp == null) return (false, "Camp not found.");
+
+            // Check if doctor is already approved in another active camp
+            var activeAssignment = _dbContext.CampStaffRequests
+                .Include(r => r.Camp)
+                .FirstOrDefault(r => r.DoctorId == doctorId && r.Status == "Approved" && r.Camp != null && r.Camp.Status != "Completed" && r.Camp.Status != "Cancelled" && r.Camp.Status != "Rejected");
+
+            if (activeAssignment != null)
+            {
+                if (activeAssignment.CampId == campId)
+                {
+                    return (false, "This doctor has already accepted the invitation for this camp.");
+                }
+                return (false, $"Doctor is currently unavailable. They have already accepted an invitation for '{activeAssignment.Camp?.Title}'.");
+            }
+
             var existingRequest = _dbContext.CampStaffRequests
                 .FirstOrDefault(r => r.CampId == campId && r.DoctorId == doctorId);
 
@@ -583,7 +600,7 @@ namespace MediCamp.Services
 
         public (bool Success, string Message) RespondToCampStaffRequest(int requestId, string doctorId, string status)
         {
-            var request = _dbContext.CampStaffRequests.FirstOrDefault(r => r.Id == requestId && r.DoctorId == doctorId);
+            var request = _dbContext.CampStaffRequests.Include(r => r.Camp).FirstOrDefault(r => r.Id == requestId && r.DoctorId == doctorId);
             if (request == null)
             {
                 return (false, "Request not found.");
@@ -597,6 +614,18 @@ namespace MediCamp.Services
             if (status != "Approved" && status != "Denied")
             {
                 return (false, "Invalid status response.");
+            }
+
+            if (status == "Approved")
+            {
+                var activeAssignment = _dbContext.CampStaffRequests
+                    .Include(r => r.Camp)
+                    .FirstOrDefault(r => r.DoctorId == doctorId && r.Status == "Approved" && r.Id != requestId && r.Camp != null && r.Camp.Status != "Completed" && r.Camp.Status != "Cancelled" && r.Camp.Status != "Rejected");
+
+                if (activeAssignment != null)
+                {
+                    return (false, $"You have already accepted an invitation for '{activeAssignment.Camp?.Title}'. You cannot accept multiple active camps simultaneously.");
+                }
             }
 
             request.Status = status;
@@ -629,6 +658,20 @@ namespace MediCamp.Services
             var camp = _dbContext.Camps.FirstOrDefault(c => c.Id == campId);
             if (camp == null) return (false, "Camp not found.");
 
+            // Check if volunteer is already approved in another active camp
+            var activeAssignment = _dbContext.CampVolunteerRequests
+                .Include(r => r.Camp)
+                .FirstOrDefault(r => r.VolunteerId == volunteerId && r.Status == "Approved" && r.Camp != null && r.Camp.Status != "Completed" && r.Camp.Status != "Cancelled" && r.Camp.Status != "Rejected");
+
+            if (activeAssignment != null)
+            {
+                if (activeAssignment.CampId == campId)
+                {
+                    return (false, "This volunteer has already accepted the invitation for this camp.");
+                }
+                return (false, $"Volunteer is currently unavailable. They have already accepted an invitation for '{activeAssignment.Camp?.Title}'.");
+            }
+
             var existingRequest = _dbContext.CampVolunteerRequests
                 .FirstOrDefault(r => r.CampId == campId && r.VolunteerId == volunteerId);
 
@@ -653,10 +696,27 @@ namespace MediCamp.Services
 
         public (bool Success, string Message) RespondToCampVolunteerRequest(int requestId, string volunteerId, string status)
         {
-            var request = _dbContext.CampVolunteerRequests.FirstOrDefault(r => r.Id == requestId && r.VolunteerId == volunteerId);
+            var request = _dbContext.CampVolunteerRequests.Include(r => r.Camp).FirstOrDefault(r => r.Id == requestId && r.VolunteerId == volunteerId);
             if (request == null) return (false, "Request not found.");
 
             if (request.Status != "Pending") return (false, "Request has already been processed.");
+
+            if (status != "Approved" && status != "Denied")
+            {
+                return (false, "Invalid status response.");
+            }
+
+            if (status == "Approved")
+            {
+                var activeAssignment = _dbContext.CampVolunteerRequests
+                    .Include(r => r.Camp)
+                    .FirstOrDefault(r => r.VolunteerId == volunteerId && r.Status == "Approved" && r.Id != requestId && r.Camp != null && r.Camp.Status != "Completed" && r.Camp.Status != "Cancelled" && r.Camp.Status != "Rejected");
+
+                if (activeAssignment != null)
+                {
+                    return (false, $"You have already accepted an invitation for '{activeAssignment.Camp?.Title}'. You cannot accept multiple active camps simultaneously.");
+                }
+            }
 
             request.Status = status;
             request.RespondedAt = DateTime.UtcNow;
@@ -689,6 +749,20 @@ namespace MediCamp.Services
             var camp = _dbContext.Camps.FirstOrDefault(c => c.Id == campId);
             if (camp == null) return (false, "Camp not found.");
 
+            // Check if pharmacist is already approved in another active camp
+            var activeAssignment = _dbContext.CampPharmacistRequests
+                .Include(r => r.Camp)
+                .FirstOrDefault(r => r.PharmacistId == pharmacistId && r.Status == "Approved" && r.Camp != null && r.Camp.Status != "Completed" && r.Camp.Status != "Cancelled" && r.Camp.Status != "Rejected");
+
+            if (activeAssignment != null)
+            {
+                if (activeAssignment.CampId == campId)
+                {
+                    return (false, "This pharmacist has already accepted the invitation for this camp.");
+                }
+                return (false, $"Pharmacist is currently unavailable. They have already accepted an invitation for '{activeAssignment.Camp?.Title}'.");
+            }
+
             var existingRequest = _dbContext.CampPharmacistRequests
                 .FirstOrDefault(r => r.CampId == campId && r.PharmacistId == pharmacistId);
 
@@ -713,10 +787,27 @@ namespace MediCamp.Services
 
         public (bool Success, string Message) RespondToCampPharmacistRequest(int requestId, string pharmacistId, string status)
         {
-            var request = _dbContext.CampPharmacistRequests.FirstOrDefault(r => r.Id == requestId && r.PharmacistId == pharmacistId);
+            var request = _dbContext.CampPharmacistRequests.Include(r => r.Camp).FirstOrDefault(r => r.Id == requestId && r.PharmacistId == pharmacistId);
             if (request == null) return (false, "Request not found.");
 
             if (request.Status != "Pending") return (false, "Request has already been processed.");
+
+            if (status != "Approved" && status != "Denied")
+            {
+                return (false, "Invalid status response.");
+            }
+
+            if (status == "Approved")
+            {
+                var activeAssignment = _dbContext.CampPharmacistRequests
+                    .Include(r => r.Camp)
+                    .FirstOrDefault(r => r.PharmacistId == pharmacistId && r.Status == "Approved" && r.Id != requestId && r.Camp != null && r.Camp.Status != "Completed" && r.Camp.Status != "Cancelled" && r.Camp.Status != "Rejected");
+
+                if (activeAssignment != null)
+                {
+                    return (false, $"You have already accepted an invitation for '{activeAssignment.Camp?.Title}'. You cannot accept multiple active camps simultaneously.");
+                }
+            }
 
             request.Status = status;
             request.RespondedAt = DateTime.UtcNow;
@@ -724,6 +815,76 @@ namespace MediCamp.Services
             _dbContext.SaveChanges();
 
             return (true, $"Request {status.ToLower()} successfully.");
+        }
+
+        // --- Active Assignments Query Methods ---
+        public Dictionary<string, StaffCampAssignmentInfo> GetActiveDoctorAssignments()
+        {
+            return _dbContext.CampStaffRequests
+                .Include(r => r.Camp)
+                .Where(r => r.Status == "Approved" && r.Camp != null && r.Camp.Status != "Completed" && r.Camp.Status != "Cancelled" && r.Camp.Status != "Rejected")
+                .OrderByDescending(r => r.RequestedAt)
+                .AsEnumerable()
+                .GroupBy(r => r.DoctorId)
+                .ToDictionary(
+                    g => g.Key,
+                    g => {
+                        var r = g.First();
+                        return new StaffCampAssignmentInfo
+                        {
+                            CampId = r.CampId,
+                            CampTitle = r.Camp!.Title,
+                            CampStatus = r.Camp.Status,
+                            StartDate = r.Camp.StartDate,
+                            EndDate = r.Camp.EndDate
+                        };
+                    });
+        }
+
+        public Dictionary<string, StaffCampAssignmentInfo> GetActiveVolunteerAssignments()
+        {
+            return _dbContext.CampVolunteerRequests
+                .Include(r => r.Camp)
+                .Where(r => r.Status == "Approved" && r.Camp != null && r.Camp.Status != "Completed" && r.Camp.Status != "Cancelled" && r.Camp.Status != "Rejected")
+                .OrderByDescending(r => r.RequestedAt)
+                .AsEnumerable()
+                .GroupBy(r => r.VolunteerId)
+                .ToDictionary(
+                    g => g.Key,
+                    g => {
+                        var r = g.First();
+                        return new StaffCampAssignmentInfo
+                        {
+                            CampId = r.CampId,
+                            CampTitle = r.Camp!.Title,
+                            CampStatus = r.Camp.Status,
+                            StartDate = r.Camp.StartDate,
+                            EndDate = r.Camp.EndDate
+                        };
+                    });
+        }
+
+        public Dictionary<string, StaffCampAssignmentInfo> GetActivePharmacistAssignments()
+        {
+            return _dbContext.CampPharmacistRequests
+                .Include(r => r.Camp)
+                .Where(r => r.Status == "Approved" && r.Camp != null && r.Camp.Status != "Completed" && r.Camp.Status != "Cancelled" && r.Camp.Status != "Rejected")
+                .OrderByDescending(r => r.RequestedAt)
+                .AsEnumerable()
+                .GroupBy(r => r.PharmacistId)
+                .ToDictionary(
+                    g => g.Key,
+                    g => {
+                        var r = g.First();
+                        return new StaffCampAssignmentInfo
+                        {
+                            CampId = r.CampId,
+                            CampTitle = r.Camp!.Title,
+                            CampStatus = r.Camp.Status,
+                            StartDate = r.Camp.StartDate,
+                            EndDate = r.Camp.EndDate
+                        };
+                    });
         }
     }
 }
