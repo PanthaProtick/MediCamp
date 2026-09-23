@@ -37,12 +37,54 @@
                     <a asp-controller="Home" asp-action="Camps" class="btn btn-champagne">
                         <i class="fa-solid fa-location-dot me-1"></i> Find Upcoming Camps
                     </a>
-                    <a asp-controller="Account" asp-action="RegisterHost" class="btn btn-outline-champagne">
-                        <i class="fa-solid fa-building-ngo me-1"></i> Register as Host NGO
-                    </a>
-                    <a asp-controller="Account" asp-action="RegisterPatient" asp-route-donor="true" class="btn btn-blood-red">
-                        <i class="fa-solid fa-droplet me-1"></i> Join Blood Donors
-                    </a>
+                    @if (User.IsInRole("Host"))
+                    {
+                        <a asp-controller="Host" asp-action="Dashboard" class="btn btn-outline-champagne">
+                            <i class="fa-solid fa-gauge me-1"></i> Host Dashboard
+                        </a>
+                    }
+                    else if (User.Identity == null || !User.Identity.IsAuthenticated)
+                    {
+                        <a asp-controller="Account" asp-action="RegisterHost" class="btn btn-outline-champagne">
+                            <i class="fa-solid fa-building-ngo me-1"></i> Register as Host NGO
+                        </a>
+                    }
+                    else if (User.IsInRole("Doctor"))
+                    {
+                        <a asp-controller="Doctor" asp-action="Queue" class="btn btn-outline-champagne">
+                            <i class="fa-solid fa-stethoscope me-1"></i> Doctor Queue
+                        </a>
+                    }
+                    else if (User.IsInRole("Volunteer"))
+                    {
+                        <a asp-controller="Volunteer" asp-action="Dashboard" class="btn btn-outline-champagne">
+                            <i class="fa-solid fa-clipboard-user me-1"></i> Volunteer Dashboard
+                        </a>
+                    }
+                    else if (User.IsInRole("Pharmacist"))
+                    {
+                        <a asp-controller="Pharmacist" asp-action="Dashboard" class="btn btn-outline-champagne">
+                            <i class="fa-solid fa-pills me-1"></i> Pharmacist Dashboard
+                        </a>
+                    }
+                    else if (User.IsInRole("Admin"))
+                    {
+                        <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-outline-champagne">
+                            <i class="fa-solid fa-shield-halved me-1"></i> Admin Portal
+                        </a>
+                    }
+                    @if (User.IsInRole("Patient"))
+                    {
+                        <a asp-controller="Patient" asp-action="History" class="btn btn-blood-red">
+                            <i class="fa-solid fa-notes-medical me-1"></i> My Health Portal
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="RegisterPatient" asp-route-donor="true" class="btn btn-blood-red">
+                            <i class="fa-solid fa-droplet me-1"></i> Join Blood Donors
+                        </a>
+                    }
                 </div>
             </div>
 
@@ -145,9 +187,18 @@
                     <p class="text-secondary small mb-3">
                         Controls global user accounts, approves NGO Host registrations, maintains master medicine lists, and generates national reports.
                     </p>
-                    <a asp-controller="Account" asp-action="Login" class="small fw-bold text-decoration-none text-purple">
-                        Sign In as Admin <i class="fa-solid fa-chevron-right ms-1"></i>
-                    </a>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a asp-controller="Admin" asp-action="Dashboard" class="small fw-bold text-decoration-none text-purple">
+                            Admin Dashboard <i class="fa-solid fa-chevron-right ms-1"></i>
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Login" class="small fw-bold text-decoration-none text-purple">
+                            Sign In as Admin <i class="fa-solid fa-chevron-right ms-1"></i>
+                        </a>
+                    }
                 </div>
             </div>
 
@@ -162,9 +213,18 @@
                     <p class="text-secondary small mb-3">
                         Plans camps with budgets, assigns doctors and volunteers, allocates medicine stock, and monitors field expenses.
                     </p>
-                    <a asp-controller="Account" asp-action="RegisterHost" class="small fw-bold text-decoration-none text-primary">
-                        Register NGO Host <i class="fa-solid fa-chevron-right ms-1"></i>
-                    </a>
+                    @if (User.IsInRole("Host"))
+                    {
+                        <a asp-controller="Host" asp-action="Dashboard" class="small fw-bold text-decoration-none text-primary">
+                            Host Dashboard <i class="fa-solid fa-chevron-right ms-1"></i>
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="RegisterHost" class="small fw-bold text-decoration-none text-primary">
+                            Register NGO Host <i class="fa-solid fa-chevron-right ms-1"></i>
+                        </a>
+                    }
                 </div>
             </div>
 
@@ -179,9 +239,18 @@
                     <p class="text-secondary small mb-3">
                         Reviews patient medical history across prior camps, inputs diagnoses, builds e-prescriptions, and creates hospital referrals.
                     </p>
-                    <a asp-controller="Account" asp-action="RegisterDoctor" class="small fw-bold text-decoration-none text-teal">
-                        Register as Doctor <i class="fa-solid fa-chevron-right ms-1"></i>
-                    </a>
+                    @if (User.IsInRole("Doctor"))
+                    {
+                        <a asp-controller="Doctor" asp-action="Queue" class="small fw-bold text-decoration-none text-teal">
+                            Doctor Queue <i class="fa-solid fa-chevron-right ms-1"></i>
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="RegisterDoctor" class="small fw-bold text-decoration-none text-teal">
+                            Register as Doctor <i class="fa-solid fa-chevron-right ms-1"></i>
+                        </a>
+                    }
                 </div>
             </div>
 
@@ -196,9 +265,18 @@
                     <p class="text-secondary small mb-3">
                         Searches or registers patients by NID, records vital signs (BP, BMI, Temp), issues queue tokens, and logs follow-up visits.
                     </p>
-                    <a asp-controller="Account" asp-action="RegisterVolunteer" class="small fw-bold text-decoration-none text-warning">
-                        Register as Volunteer <i class="fa-solid fa-chevron-right ms-1"></i>
-                    </a>
+                    @if (User.IsInRole("Volunteer"))
+                    {
+                        <a asp-controller="Volunteer" asp-action="Dashboard" class="small fw-bold text-decoration-none text-warning">
+                            Volunteer Dashboard <i class="fa-solid fa-chevron-right ms-1"></i>
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="RegisterVolunteer" class="small fw-bold text-decoration-none text-warning">
+                            Register as Volunteer <i class="fa-solid fa-chevron-right ms-1"></i>
+                        </a>
+                    }
                 </div>
             </div>
 
@@ -213,9 +291,18 @@
                     <p class="text-secondary small mb-3">
                         Receives live prescription queues from doctor workspaces, dispenses medicines with stock auto-deduction, and requests restocks.
                     </p>
-                    <a asp-controller="Account" asp-action="RegisterPharmacist" class="small fw-bold text-decoration-none text-info">
-                        Register as Pharmacist <i class="fa-solid fa-chevron-right ms-1"></i>
-                    </a>
+                    @if (User.IsInRole("Pharmacist"))
+                    {
+                        <a asp-controller="Pharmacist" asp-action="Dashboard" class="small fw-bold text-decoration-none text-info">
+                            Pharmacist Dashboard <i class="fa-solid fa-chevron-right ms-1"></i>
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="RegisterPharmacist" class="small fw-bold text-decoration-none text-info">
+                            Register as Pharmacist <i class="fa-solid fa-chevron-right ms-1"></i>
+                        </a>
+                    }
                 </div>
             </div>
 
@@ -230,9 +317,18 @@
                     <p class="text-secondary small mb-3">
                         Views upcoming camp schedules, accesses digital health records, and opts into the community Blood Donor Registry.
                     </p>
-                    <a asp-controller="Account" asp-action="RegisterPatient" class="small fw-bold text-decoration-none text-danger">
-                        Register Patient Account <i class="fa-solid fa-chevron-right ms-1"></i>
-                    </a>
+                    @if (User.IsInRole("Patient"))
+                    {
+                        <a asp-controller="Patient" asp-action="History" class="small fw-bold text-decoration-none text-danger">
+                            Patient Health Records <i class="fa-solid fa-chevron-right ms-1"></i>
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="RegisterPatient" class="small fw-bold text-decoration-none text-danger">
+                            Register Patient Account <i class="fa-solid fa-chevron-right ms-1"></i>
+                        </a>
+                    }
                 </div>
             </div>
         </div>
