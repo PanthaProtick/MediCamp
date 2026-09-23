@@ -445,6 +445,15 @@ namespace MediCamp.Models.ViewModels
         public string? CapacitySanityMessage { get; set; }
     }
 
+    public class StaffCampAssignmentInfo
+    {
+        public int CampId { get; set; }
+        public string CampTitle { get; set; } = string.Empty;
+        public string CampStatus { get; set; } = string.Empty;
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+    }
+
     public class HostManageStaffViewModel
     {
         public Camp Camp { get; set; } = new();
@@ -454,6 +463,11 @@ namespace MediCamp.Models.ViewModels
         public List<ApplicationUser> AvailableVolunteers { get; set; } = new();
         public List<CampPharmacistRequest> CurrentPharmacistRequests { get; set; } = new();
         public List<ApplicationUser> AvailablePharmacists { get; set; } = new();
+
+        // Active assignments across any camp (StaffId -> Assignment Info)
+        public Dictionary<string, StaffCampAssignmentInfo> DoctorAssignedCamps { get; set; } = new();
+        public Dictionary<string, StaffCampAssignmentInfo> VolunteerAssignedCamps { get; set; } = new();
+        public Dictionary<string, StaffCampAssignmentInfo> PharmacistAssignedCamps { get; set; } = new();
         
         // Pagination properties
         public int CurrentDoctorPage { get; set; } = 1;

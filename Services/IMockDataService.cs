@@ -47,5 +47,10 @@ namespace MediCamp.Services
         List<CampPharmacistRequest> GetRequestsForPharmacist(string pharmacistId);
         (bool Success, string Message) SendCampPharmacistRequest(int campId, string pharmacistId);
         (bool Success, string Message) RespondToCampPharmacistRequest(int requestId, string pharmacistId, string status);
+
+        // Active Staff Assignments
+        Dictionary<string, StaffCampAssignmentInfo> GetActiveDoctorAssignments();
+        Dictionary<string, StaffCampAssignmentInfo> GetActiveVolunteerAssignments();
+        Dictionary<string, StaffCampAssignmentInfo> GetActivePharmacistAssignments();
     }
 }

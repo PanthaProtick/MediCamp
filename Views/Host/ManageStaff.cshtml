@@ -83,26 +83,73 @@
                                 @foreach (var doc in Model.AvailableDoctors)
                                 {
                                     var existingRequest = Model.CurrentRequests.FirstOrDefault(r => r.DoctorId == doc.Id);
+                                    var isAssigned = Model.DoctorAssignedCamps.TryGetValue(doc.Id, out var assignInfo);
+                                    var isAssignedToThisCamp = isAssigned && assignInfo!.CampId == Model.Camp.Id;
+                                    var isAssignedToOtherCamp = isAssigned && assignInfo!.CampId != Model.Camp.Id;
+
                                     <div class="col-md-6">
-                                        <div class="card h-100 staff-card rounded-3 border-0 shadow-sm">
-                                            <div class="card-body p-3">
-                                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                                    <h6 class="fw-bold mb-0 text-dark">@doc.FullName</h6>
-                                                    <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill"><i class="fa-solid fa-stethoscope me-1"></i> @(doc.MedicalSpecialization ?? "General")</span>
-                                                </div>
-                                                <p class="small text-muted mb-3"><i class="fa-solid fa-location-dot me-1"></i> @(doc.District ?? "Unknown District")</p>
-                                                
-                                                <div class="d-flex justify-content-end mt-auto">
-                                                    @if (existingRequest != null)
+                                        <div class="card h-100 staff-card rounded-3 border-0 shadow-sm @(isAssignedToOtherCamp ? "bg-white border-start border-danger border-3" : "")">
+                                            <div class="card-body p-3 d-flex flex-column justify-content-between">
+                                                <div>
+                                                    <div class="d-flex justify-content-between align-items-start mb-2 gap-1">
+                                                        <div>
+                                                            <h6 class="fw-bold mb-0 text-dark">@doc.FullName</h6>
+                                                            <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill mt-1"><i class="fa-solid fa-stethoscope me-1"></i> @(doc.MedicalSpecialization ?? "General")</span>
+                                                        </div>
+                                                        @if (isAssignedToThisCamp || (existingRequest != null && existingRequest.Status == "Approved"))
+                                                        {
+                                                            <span class="badge bg-success bg-opacity-10 text-success border border-success-subtle rounded-pill px-2 py-1"><i class="fa-solid fa-circle-check me-1"></i> Confirmed</span>
+                                                        }
+                                                        else if (isAssignedToOtherCamp)
+                                                        {
+                                                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger-subtle rounded-pill px-2 py-1"><i class="fa-solid fa-circle-xmark me-1"></i> Unavailable</span>
+                                                        }
+                                                        else if (existingRequest != null && existingRequest.Status == "Pending")
+                                                        {
+                                                            <span class="badge bg-warning bg-opacity-10 text-warning-emphasis border border-warning-subtle rounded-pill px-2 py-1"><i class="fa-solid fa-clock me-1"></i> Invited</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="badge bg-success bg-opacity-10 text-success border border-success-subtle rounded-pill px-2 py-1"><i class="fa-solid fa-circle-check me-1"></i> Available</span>
+                                                        }
+                                                    </div>
+                                                    <p class="small text-muted mb-2"><i class="fa-solid fa-location-dot me-1"></i> @(doc.District ?? "Unknown District")</p>
+                                                    
+                                                    @if (isAssignedToOtherCamp)
                                                     {
-                                                        <button class="btn btn-sm btn-light text-muted fw-bold w-100 rounded-pill" disabled><i class="fa-solid fa-check me-1"></i> Invited</button>
+                                                        <div class="alert alert-danger py-1 px-2 mb-2 rounded-2 small d-flex align-items-center gap-1" style="font-size: 0.78rem;">
+                                                            <i class="fa-solid fa-user-lock me-1"></i>
+                                                            <span class="text-truncate">Assigned to: <strong>@assignInfo!.CampTitle</strong></span>
+                                                        </div>
+                                                    }
+                                                </div>
+                                                
+                                                <div class="d-flex justify-content-end mt-auto pt-2">
+                                                    @if (isAssignedToThisCamp || (existingRequest != null && existingRequest.Status == "Approved"))
+                                                    {
+                                                        <button class="btn btn-sm btn-success fw-bold w-100 rounded-pill" disabled><i class="fa-solid fa-user-check me-1"></i> Confirmed Staff</button>
+                                                    }
+                                                    else if (isAssignedToOtherCamp)
+                                                    {
+                                                        <button class="btn btn-sm btn-light text-danger border border-danger-subtle fw-bold w-100 rounded-pill" disabled title="Currently unavailable: accepted invitation for '@assignInfo!.CampTitle'"><i class="fa-solid fa-ban me-1"></i> Currently Unavailable</button>
+                                                    }
+                                                    else if (existingRequest != null)
+                                                    {
+                                                        @if (existingRequest.Status == "Pending")
+                                                        {
+                                                            <button class="btn btn-sm btn-light text-muted fw-bold w-100 rounded-pill" disabled><i class="fa-solid fa-hourglass-half me-1"></i> Invitation Pending</button>
+                                                        }
+                                                        else if (existingRequest.Status == "Denied")
+                                                        {
+                                                            <button class="btn btn-sm btn-outline-danger fw-bold w-100 rounded-pill" disabled><i class="fa-solid fa-xmark me-1"></i> Declined Invitation</button>
+                                                        }
                                                     }
                                                     else
                                                     {
                                                         <form asp-action="SendStaffRequest" method="post" class="w-100">
                                                             <input type="hidden" name="campId" value="@Model.Camp.Id" />
                                                             <input type="hidden" name="doctorId" value="@doc.Id" />
-                                                            <button type="submit" class="btn btn-sm btn-primary w-100 fw-bold rounded-pill"><i class="fa-solid fa-paper-plane me-1"></i> Send Invite</button>
+                                                            <button type="submit" class="btn btn-sm btn-primary w-100 fw-bold rounded-pill shadow-sm"><i class="fa-solid fa-paper-plane me-1"></i> Send Invite</button>
                                                         </form>
                                                     }
                                                 </div>
@@ -222,26 +269,73 @@
                                 @foreach (var vol in Model.AvailableVolunteers)
                                 {
                                     var existingRequest = Model.CurrentVolunteerRequests.FirstOrDefault(r => r.VolunteerId == vol.Id);
+                                    var isAssigned = Model.VolunteerAssignedCamps.TryGetValue(vol.Id, out var assignInfo);
+                                    var isAssignedToThisCamp = isAssigned && assignInfo!.CampId == Model.Camp.Id;
+                                    var isAssignedToOtherCamp = isAssigned && assignInfo!.CampId != Model.Camp.Id;
+
                                     <div class="col-md-6">
-                                        <div class="card h-100 staff-card rounded-3 border-0 shadow-sm">
-                                            <div class="card-body p-3">
-                                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                                    <h6 class="fw-bold mb-0 text-dark">@vol.FullName</h6>
-                                                    <span class="badge bg-opacity-10 text-success rounded-pill" style="background-color: rgba(13, 148, 136, 0.1); color: #0d9488 !important;"><i class="fa-solid fa-location-dot me-1"></i> @(vol.District ?? "Unknown")</span>
-                                                </div>
-                                                <p class="small text-muted mb-3"><i class="fa-solid fa-phone me-1"></i> @vol.PhoneNumber</p>
-                                                
-                                                <div class="d-flex justify-content-end mt-auto">
-                                                    @if (existingRequest != null)
+                                        <div class="card h-100 staff-card rounded-3 border-0 shadow-sm @(isAssignedToOtherCamp ? "bg-white border-start border-danger border-3" : "")">
+                                            <div class="card-body p-3 d-flex flex-column justify-content-between">
+                                                <div>
+                                                    <div class="d-flex justify-content-between align-items-start mb-2 gap-1">
+                                                        <div>
+                                                            <h6 class="fw-bold mb-0 text-dark">@vol.FullName</h6>
+                                                            <span class="badge bg-opacity-10 text-success rounded-pill mt-1" style="background-color: rgba(13, 148, 136, 0.1); color: #0d9488 !important;"><i class="fa-solid fa-location-dot me-1"></i> @(vol.District ?? "Unknown")</span>
+                                                        </div>
+                                                        @if (isAssignedToThisCamp || (existingRequest != null && existingRequest.Status == "Approved"))
+                                                        {
+                                                            <span class="badge bg-success bg-opacity-10 text-success border border-success-subtle rounded-pill px-2 py-1"><i class="fa-solid fa-circle-check me-1"></i> Confirmed</span>
+                                                        }
+                                                        else if (isAssignedToOtherCamp)
+                                                        {
+                                                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger-subtle rounded-pill px-2 py-1"><i class="fa-solid fa-circle-xmark me-1"></i> Unavailable</span>
+                                                        }
+                                                        else if (existingRequest != null && existingRequest.Status == "Pending")
+                                                        {
+                                                            <span class="badge bg-warning bg-opacity-10 text-warning-emphasis border border-warning-subtle rounded-pill px-2 py-1"><i class="fa-solid fa-clock me-1"></i> Invited</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="badge bg-success bg-opacity-10 text-success border border-success-subtle rounded-pill px-2 py-1"><i class="fa-solid fa-circle-check me-1"></i> Available</span>
+                                                        }
+                                                    </div>
+                                                    <p class="small text-muted mb-2"><i class="fa-solid fa-phone me-1"></i> @vol.PhoneNumber</p>
+                                                    
+                                                    @if (isAssignedToOtherCamp)
                                                     {
-                                                        <button class="btn btn-sm btn-light text-muted fw-bold w-100 rounded-pill" disabled><i class="fa-solid fa-check me-1"></i> Invited</button>
+                                                        <div class="alert alert-danger py-1 px-2 mb-2 rounded-2 small d-flex align-items-center gap-1" style="font-size: 0.78rem;">
+                                                            <i class="fa-solid fa-user-lock me-1"></i>
+                                                            <span class="text-truncate">Assigned to: <strong>@assignInfo!.CampTitle</strong></span>
+                                                        </div>
+                                                    }
+                                                </div>
+                                                
+                                                <div class="d-flex justify-content-end mt-auto pt-2">
+                                                    @if (isAssignedToThisCamp || (existingRequest != null && existingRequest.Status == "Approved"))
+                                                    {
+                                                        <button class="btn btn-sm btn-success fw-bold w-100 rounded-pill" disabled><i class="fa-solid fa-user-check me-1"></i> Confirmed Staff</button>
+                                                    }
+                                                    else if (isAssignedToOtherCamp)
+                                                    {
+                                                        <button class="btn btn-sm btn-light text-danger border border-danger-subtle fw-bold w-100 rounded-pill" disabled title="Currently unavailable: accepted invitation for '@assignInfo!.CampTitle'"><i class="fa-solid fa-ban me-1"></i> Currently Unavailable</button>
+                                                    }
+                                                    else if (existingRequest != null)
+                                                    {
+                                                        @if (existingRequest.Status == "Pending")
+                                                        {
+                                                            <button class="btn btn-sm btn-light text-muted fw-bold w-100 rounded-pill" disabled><i class="fa-solid fa-hourglass-half me-1"></i> Invitation Pending</button>
+                                                        }
+                                                        else if (existingRequest.Status == "Denied")
+                                                        {
+                                                            <button class="btn btn-sm btn-outline-danger fw-bold w-100 rounded-pill" disabled><i class="fa-solid fa-xmark me-1"></i> Declined Invitation</button>
+                                                        }
                                                     }
                                                     else
                                                     {
                                                         <form asp-action="SendVolunteerRequest" method="post" class="w-100">
                                                             <input type="hidden" name="campId" value="@Model.Camp.Id" />
                                                             <input type="hidden" name="volunteerId" value="@vol.Id" />
-                                                            <button type="submit" class="btn btn-sm w-100 fw-bold text-white rounded-pill" style="background-color: #0d9488;"><i class="fa-solid fa-paper-plane me-1"></i> Send Invite</button>
+                                                            <button type="submit" class="btn btn-sm w-100 fw-bold text-white rounded-pill shadow-sm" style="background-color: #0d9488;"><i class="fa-solid fa-paper-plane me-1"></i> Send Invite</button>
                                                         </form>
                                                     }
                                                 </div>
@@ -363,26 +457,73 @@
                                 @foreach (var pharm in Model.AvailablePharmacists)
                                 {
                                     var existingRequest = Model.CurrentPharmacistRequests.FirstOrDefault(r => r.PharmacistId == pharm.Id);
+                                    var isAssigned = Model.PharmacistAssignedCamps.TryGetValue(pharm.Id, out var assignInfo);
+                                    var isAssignedToThisCamp = isAssigned && assignInfo!.CampId == Model.Camp.Id;
+                                    var isAssignedToOtherCamp = isAssigned && assignInfo!.CampId != Model.Camp.Id;
+
                                     <div class="col-md-6">
-                                        <div class="card h-100 staff-card rounded-3 border-0 shadow-sm">
-                                            <div class="card-body p-3">
-                                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                                    <h6 class="fw-bold mb-0 text-dark">@pharm.FullName</h6>
-                                                    <span class="badge bg-opacity-10 text-indigo rounded-pill" style="background-color: rgba(102, 16, 242, 0.1); color: #6610f2 !important;"><i class="fa-solid fa-location-dot me-1"></i> @(pharm.District ?? "Unknown")</span>
-                                                </div>
-                                                <p class="small text-muted mb-3"><i class="fa-solid fa-phone me-1"></i> @pharm.PhoneNumber</p>
-                                                
-                                                <div class="d-flex justify-content-end mt-auto">
-                                                    @if (existingRequest != null)
+                                        <div class="card h-100 staff-card rounded-3 border-0 shadow-sm @(isAssignedToOtherCamp ? "bg-white border-start border-danger border-3" : "")">
+                                            <div class="card-body p-3 d-flex flex-column justify-content-between">
+                                                <div>
+                                                    <div class="d-flex justify-content-between align-items-start mb-2 gap-1">
+                                                        <div>
+                                                            <h6 class="fw-bold mb-0 text-dark">@pharm.FullName</h6>
+                                                            <span class="badge bg-opacity-10 text-indigo rounded-pill mt-1" style="background-color: rgba(102, 16, 242, 0.1); color: #6610f2 !important;"><i class="fa-solid fa-location-dot me-1"></i> @(pharm.District ?? "Unknown")</span>
+                                                        </div>
+                                                        @if (isAssignedToThisCamp || (existingRequest != null && existingRequest.Status == "Approved"))
+                                                        {
+                                                            <span class="badge bg-success bg-opacity-10 text-success border border-success-subtle rounded-pill px-2 py-1"><i class="fa-solid fa-circle-check me-1"></i> Confirmed</span>
+                                                        }
+                                                        else if (isAssignedToOtherCamp)
+                                                        {
+                                                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger-subtle rounded-pill px-2 py-1"><i class="fa-solid fa-circle-xmark me-1"></i> Unavailable</span>
+                                                        }
+                                                        else if (existingRequest != null && existingRequest.Status == "Pending")
+                                                        {
+                                                            <span class="badge bg-warning bg-opacity-10 text-warning-emphasis border border-warning-subtle rounded-pill px-2 py-1"><i class="fa-solid fa-clock me-1"></i> Invited</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="badge bg-success bg-opacity-10 text-success border border-success-subtle rounded-pill px-2 py-1"><i class="fa-solid fa-circle-check me-1"></i> Available</span>
+                                                        }
+                                                    </div>
+                                                    <p class="small text-muted mb-2"><i class="fa-solid fa-phone me-1"></i> @pharm.PhoneNumber</p>
+                                                    
+                                                    @if (isAssignedToOtherCamp)
                                                     {
-                                                        <button class="btn btn-sm btn-light text-muted fw-bold w-100 rounded-pill" disabled><i class="fa-solid fa-check me-1"></i> Invited</button>
+                                                        <div class="alert alert-danger py-1 px-2 mb-2 rounded-2 small d-flex align-items-center gap-1" style="font-size: 0.78rem;">
+                                                            <i class="fa-solid fa-user-lock me-1"></i>
+                                                            <span class="text-truncate">Assigned to: <strong>@assignInfo!.CampTitle</strong></span>
+                                                        </div>
+                                                    }
+                                                </div>
+                                                
+                                                <div class="d-flex justify-content-end mt-auto pt-2">
+                                                    @if (isAssignedToThisCamp || (existingRequest != null && existingRequest.Status == "Approved"))
+                                                    {
+                                                        <button class="btn btn-sm btn-success fw-bold w-100 rounded-pill" disabled><i class="fa-solid fa-user-check me-1"></i> Confirmed Staff</button>
+                                                    }
+                                                    else if (isAssignedToOtherCamp)
+                                                    {
+                                                        <button class="btn btn-sm btn-light text-danger border border-danger-subtle fw-bold w-100 rounded-pill" disabled title="Currently unavailable: accepted invitation for '@assignInfo!.CampTitle'"><i class="fa-solid fa-ban me-1"></i> Currently Unavailable</button>
+                                                    }
+                                                    else if (existingRequest != null)
+                                                    {
+                                                        @if (existingRequest.Status == "Pending")
+                                                        {
+                                                            <button class="btn btn-sm btn-light text-muted fw-bold w-100 rounded-pill" disabled><i class="fa-solid fa-hourglass-half me-1"></i> Invitation Pending</button>
+                                                        }
+                                                        else if (existingRequest.Status == "Denied")
+                                                        {
+                                                            <button class="btn btn-sm btn-outline-danger fw-bold w-100 rounded-pill" disabled><i class="fa-solid fa-xmark me-1"></i> Declined Invitation</button>
+                                                        }
                                                     }
                                                     else
                                                     {
                                                         <form asp-action="SendPharmacistRequest" method="post" class="w-100">
                                                             <input type="hidden" name="campId" value="@Model.Camp.Id" />
                                                             <input type="hidden" name="pharmacistId" value="@pharm.Id" />
-                                                            <button type="submit" class="btn btn-sm w-100 fw-bold text-white rounded-pill" style="background-color: #6610f2;"><i class="fa-solid fa-paper-plane me-1"></i> Send Invite</button>
+                                                            <button type="submit" class="btn btn-sm w-100 fw-bold text-white rounded-pill shadow-sm" style="background-color: #6610f2;"><i class="fa-solid fa-paper-plane me-1"></i> Send Invite</button>
                                                         </form>
                                                     }
                                                 </div>

@@ -178,7 +178,7 @@ namespace MediCamp.Controllers
                     .Select(c => c.Id)
                     .ToList();
 
-                // B. Doctor Staff Applications to this host's camps
+                // B. Doctor Staff Responses / Updates for this host's camps
                 var doctorRequests = _dbContext.CampStaffRequests
                     .Include(r => r.Doctor)
                     .Include(r => r.Camp)
@@ -190,29 +190,37 @@ namespace MediCamp.Controllers
                 foreach (var req in doctorRequests)
                 {
                     var isPending = req.Status == "Pending";
+                    var isApproved = req.Status == "Approved";
+
                     notifications.Add(new NotificationItemViewModel
                     {
                         Id = $"doc_req_{req.Id}",
-                        Type = "DoctorRequest",
-                        Title = isPending ? "Doctor Application Received" : $"Doctor Request ({req.Status})",
-                        Message = $"Dr. {req.Doctor?.FullName ?? "Doctor"} requested to join '{req.Camp?.Title}' as Medical Staff.",
+                        Type = "DoctorInvitationUpdate",
+                        Title = isPending 
+                            ? "Doctor Invitation Sent" 
+                            : (isApproved ? "Doctor Accepted Invitation" : "Doctor Declined Invitation"),
+                        Message = isPending
+                            ? $"Invitation sent to Dr. {req.Doctor?.FullName ?? "Doctor"} for '{req.Camp?.Title}' (Awaiting response)."
+                            : (isApproved
+                                ? $"Dr. {req.Doctor?.FullName ?? "Doctor"} accepted your invitation to join '{req.Camp?.Title}'."
+                                : $"Dr. {req.Doctor?.FullName ?? "Doctor"} declined the invitation for '{req.Camp?.Title}'."),
                         SenderName = req.Doctor?.FullName ?? "Doctor",
                         SenderRole = "Doctor",
                         CampTitle = req.Camp?.Title,
                         CampId = req.CampId,
                         RequestId = req.Id,
-                        Timestamp = req.RequestedAt,
-                        TimeAgo = FormatTimeAgo(req.RequestedAt),
+                        Timestamp = req.RespondedAt ?? req.RequestedAt,
+                        TimeAgo = FormatTimeAgo(req.RespondedAt ?? req.RequestedAt),
                         Status = req.Status,
-                        CanApproveReject = isPending,
+                        CanApproveReject = false,
                         ActionUrl = Url.Action("ManageStaff", "Host", new { id = req.CampId }) ?? $"/Host/ManageStaff/{req.CampId}",
                         IconClass = "fa-solid fa-user-doctor",
-                        BadgeColor = isPending ? "bg-teal" : "bg-secondary",
-                        IsRead = !isPending
+                        BadgeColor = isPending ? "bg-teal bg-opacity-25 text-dark" : (isApproved ? "bg-success" : "bg-secondary"),
+                        IsRead = isPending
                     });
                 }
 
-                // C. Volunteer Applications to this host's camps
+                // C. Volunteer Responses / Updates for this host's camps
                 var volunteerRequests = _dbContext.CampVolunteerRequests
                     .Include(r => r.Volunteer)
                     .Include(r => r.Camp)
@@ -224,29 +232,37 @@ namespace MediCamp.Controllers
                 foreach (var req in volunteerRequests)
                 {
                     var isPending = req.Status == "Pending";
+                    var isApproved = req.Status == "Approved";
+
                     notifications.Add(new NotificationItemViewModel
                     {
                         Id = $"vol_req_{req.Id}",
-                        Type = "VolunteerRequest",
-                        Title = isPending ? "Volunteer Application Received" : $"Volunteer Request ({req.Status})",
-                        Message = $"{req.Volunteer?.FullName ?? "Volunteer"} applied to join '{req.Camp?.Title}' field team.",
+                        Type = "VolunteerInvitationUpdate",
+                        Title = isPending 
+                            ? "Volunteer Invitation Sent" 
+                            : (isApproved ? "Volunteer Accepted Invitation" : "Volunteer Declined Invitation"),
+                        Message = isPending
+                            ? $"Invitation sent to {req.Volunteer?.FullName ?? "Volunteer"} for '{req.Camp?.Title}' (Awaiting response)."
+                            : (isApproved
+                                ? $"{req.Volunteer?.FullName ?? "Volunteer"} accepted your invitation to join '{req.Camp?.Title}'."
+                                : $"{req.Volunteer?.FullName ?? "Volunteer"} declined the invitation for '{req.Camp?.Title}'."),
                         SenderName = req.Volunteer?.FullName ?? "Volunteer",
                         SenderRole = "Volunteer",
                         CampTitle = req.Camp?.Title,
                         CampId = req.CampId,
                         RequestId = req.Id,
-                        Timestamp = req.RequestedAt,
-                        TimeAgo = FormatTimeAgo(req.RequestedAt),
+                        Timestamp = req.RespondedAt ?? req.RequestedAt,
+                        TimeAgo = FormatTimeAgo(req.RespondedAt ?? req.RequestedAt),
                         Status = req.Status,
-                        CanApproveReject = isPending,
+                        CanApproveReject = false,
                         ActionUrl = Url.Action("ManageStaff", "Host", new { id = req.CampId }) ?? $"/Host/ManageStaff/{req.CampId}",
                         IconClass = "fa-solid fa-hand-holding-heart",
-                        BadgeColor = isPending ? "bg-warning text-dark" : "bg-secondary",
-                        IsRead = !isPending
+                        BadgeColor = isPending ? "bg-warning bg-opacity-25 text-dark" : (isApproved ? "bg-success" : "bg-secondary"),
+                        IsRead = isPending
                     });
                 }
 
-                // D. Pharmacist Applications to this host's camps
+                // D. Pharmacist Responses / Updates for this host's camps
                 var pharmacistRequests = _dbContext.CampPharmacistRequests
                     .Include(r => r.Pharmacist)
                     .Include(r => r.Camp)
@@ -258,25 +274,33 @@ namespace MediCamp.Controllers
                 foreach (var req in pharmacistRequests)
                 {
                     var isPending = req.Status == "Pending";
+                    var isApproved = req.Status == "Approved";
+
                     notifications.Add(new NotificationItemViewModel
                     {
                         Id = $"pharma_req_{req.Id}",
-                        Type = "PharmacistRequest",
-                        Title = isPending ? "Pharmacist Application Received" : $"Pharmacist Request ({req.Status})",
-                        Message = $"{req.Pharmacist?.FullName ?? "Pharmacist"} applied to join '{req.Camp?.Title}' dispensary.",
+                        Type = "PharmacistInvitationUpdate",
+                        Title = isPending 
+                            ? "Pharmacist Invitation Sent" 
+                            : (isApproved ? "Pharmacist Accepted Invitation" : "Pharmacist Declined Invitation"),
+                        Message = isPending
+                            ? $"Invitation sent to {req.Pharmacist?.FullName ?? "Pharmacist"} for '{req.Camp?.Title}' (Awaiting response)."
+                            : (isApproved
+                                ? $"{req.Pharmacist?.FullName ?? "Pharmacist"} accepted your invitation to join '{req.Camp?.Title}'."
+                                : $"{req.Pharmacist?.FullName ?? "Pharmacist"} declined the invitation for '{req.Camp?.Title}'."),
                         SenderName = req.Pharmacist?.FullName ?? "Pharmacist",
                         SenderRole = "Pharmacist",
                         CampTitle = req.Camp?.Title,
                         CampId = req.CampId,
                         RequestId = req.Id,
-                        Timestamp = req.RequestedAt,
-                        TimeAgo = FormatTimeAgo(req.RequestedAt),
+                        Timestamp = req.RespondedAt ?? req.RequestedAt,
+                        TimeAgo = FormatTimeAgo(req.RespondedAt ?? req.RequestedAt),
                         Status = req.Status,
-                        CanApproveReject = isPending,
+                        CanApproveReject = false,
                         ActionUrl = Url.Action("ManageStaff", "Host", new { id = req.CampId }) ?? $"/Host/ManageStaff/{req.CampId}",
                         IconClass = "fa-solid fa-prescription-bottle-medical",
-                        BadgeColor = isPending ? "bg-info" : "bg-secondary",
-                        IsRead = !isPending
+                        BadgeColor = isPending ? "bg-info bg-opacity-25 text-dark" : (isApproved ? "bg-success" : "bg-secondary"),
+                        IsRead = isPending
                     });
                 }
 

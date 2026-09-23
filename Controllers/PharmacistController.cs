@@ -85,6 +85,16 @@ namespace MediCamp.Controllers
                 return Redirect(returnUrl ?? Url.Action("Camps", "Home")!);
             }
 
+            var activeAssignment = _dbContext.CampPharmacistRequests
+                .Include(r => r.Camp)
+                .FirstOrDefault(r => r.PharmacistId == userId && r.Status == "Approved" && r.Camp != null && r.Camp.Status != "Completed" && r.Camp.Status != "Cancelled" && r.Camp.Status != "Rejected");
+
+            if (activeAssignment != null)
+            {
+                TempData["ErrorMessage"] = $"You are currently assigned to \"{activeAssignment.Camp?.Title}\". You cannot apply to other camps while assigned to an active camp.";
+                return Redirect(returnUrl ?? Url.Action("Camps", "Home")!);
+            }
+
             var existing = _dbContext.CampPharmacistRequests
                 .FirstOrDefault(r => r.CampId == campId && r.PharmacistId == userId);
 

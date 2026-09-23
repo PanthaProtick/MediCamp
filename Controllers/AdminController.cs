@@ -21,6 +21,12 @@ namespace MediCamp.Controllers
         }
 
         [HttpGet]
+        public IActionResult Index()
+        {
+            return RedirectToAction(nameof(Dashboard));
+        }
+
+        [HttpGet]
         public IActionResult HostApprovals(string tab = "Pending", string? search = null)
         {
             var allHosts = _dataService.GetHostsByStatus("All");
