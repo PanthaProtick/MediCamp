@@ -119,7 +119,7 @@ namespace MediCamp.Services
                 Email = model.Email.Trim().ToLowerInvariant(),
                 PhoneNumber = model.PhoneNumber.Trim(),
                 NID = model.NID?.Trim(),
-                DateOfBirth = model.DateOfBirth,
+                DateOfBirth = model.DateOfBirth.HasValue ? DateTime.SpecifyKind(model.DateOfBirth.Value, DateTimeKind.Utc) : null,
                 Gender = model.Gender,
                 BloodGroup = model.BloodGroup,
                 District = model.District,
@@ -197,7 +197,7 @@ namespace MediCamp.Services
                 Email = model.Email.Trim().ToLowerInvariant(),
                 PhoneNumber = model.PhoneNumber.Trim(),
                 NID = model.NID?.Trim(),
-                DateOfBirth = model.DateOfBirth,
+                DateOfBirth = model.DateOfBirth.HasValue ? DateTime.SpecifyKind(model.DateOfBirth.Value, DateTimeKind.Utc) : null,
                 Gender = model.Gender ?? "Male",
                 BloodGroup = model.BloodGroup ?? "O+",
                 District = model.District ?? "Dhaka",
@@ -248,7 +248,7 @@ namespace MediCamp.Services
             user.FullName = model.FullName;
             user.PhoneNumber = model.PhoneNumber;
             user.NID = model.NID;
-            user.DateOfBirth = model.DateOfBirth;
+            user.DateOfBirth = model.DateOfBirth.HasValue ? DateTime.SpecifyKind(model.DateOfBirth.Value, DateTimeKind.Utc) : null;
             user.Gender = model.Gender;
             user.BloodGroup = model.BloodGroup;
             user.District = model.District;
