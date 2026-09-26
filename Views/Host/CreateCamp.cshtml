@@ -122,14 +122,16 @@
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <label asp-for="StartDate" class="form-label-custom">Camp Start Date *</label>
-                                        <input asp-for="StartDate" type="date" class="form-control form-control-custom" id="startDateInput" required />
+                                        <input asp-for="StartDate" type="date" class="form-control form-control-custom" id="startDateInput" required min="@DateTime.Now.ToString("yyyy-MM-dd")" />
                                         <span asp-validation-for="StartDate" class="text-danger small d-block mt-1"></span>
+                                        <small class="text-muted" style="font-size: 0.74rem;"><i class="fa-solid fa-circle-info me-1 text-primary"></i>Must be today or a future date.</small>
                                     </div>
 
                                     <div class="col-md-6">
                                         <label asp-for="EndDate" class="form-label-custom">Camp End Date *</label>
-                                        <input asp-for="EndDate" type="date" class="form-control form-control-custom" id="endDateInput" required />
+                                        <input asp-for="EndDate" type="date" class="form-control form-control-custom" id="endDateInput" required min="@DateTime.Now.ToString("yyyy-MM-dd")" />
                                         <span asp-validation-for="EndDate" class="text-danger small d-block mt-1"></span>
+                                        <small class="text-muted" style="font-size: 0.74rem;"><i class="fa-solid fa-circle-info me-1 text-primary"></i>Must be on or after the Start Date.</small>
                                     </div>
                                 </div>
                             </div>
@@ -259,14 +261,30 @@
                     });
             });
 
-            // Date Picker Validation Enforcement: EndDate >= StartDate
+            // Date Picker Validation Enforcement: StartDate >= Today, EndDate >= StartDate
+            const todayStr = new Date().toISOString().split('T')[0];
+            if (!startDateInput.min) startDateInput.min = todayStr;
+            if (!endDateInput.min) endDateInput.min = todayStr;
+
             startDateInput.addEventListener("change", function () {
-                if (startDateInput.value && endDateInput.value) {
-                    if (endDateInput.value < startDateInput.value) {
+                if (startDateInput.value) {
+                    if (startDateInput.value < todayStr) {
+                        alert("Camp Start Date cannot be in the past. Please select today or a future date.");
+                        startDateInput.value = todayStr;
+                    }
+                    if (endDateInput.value && endDateInput.value < startDateInput.value) {
                         endDateInput.value = startDateInput.value;
                     }
+                    endDateInput.min = startDateInput.value;
                 }
-                endDateInput.min = startDateInput.value;
+            });
+
+            endDateInput.addEventListener("change", function () {
+                const effectiveMin = startDateInput.value || todayStr;
+                if (endDateInput.value && endDateInput.value < effectiveMin) {
+                    alert("Camp End Date must be on or after the Start Date.");
+                    endDateInput.value = effectiveMin;
+                }
             });
         });
     </script>

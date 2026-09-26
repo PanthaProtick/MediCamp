@@ -380,6 +380,7 @@ namespace MediCamp.Models.ViewModels
 
         [Required(ErrorMessage = "Start Date is required.")]
         [DataType(DataType.Date)]
+        [FutureOrTodayDate(ErrorMessage = "Camp Start Date must be today or a future date. Past dates are not allowed.")]
         [Display(Name = "Camp Start Date")]
         public DateTime StartDate { get; set; } = DateTime.Today.AddDays(1);
 

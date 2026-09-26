@@ -117,8 +117,18 @@ namespace MediCamp.Controllers
                 return RedirectToAction(nameof(Dashboard));
             }
 
+            // Validation: Start Date must be current date (today) or future date, not in the past
+            var todayUtc = DateTime.UtcNow.Date;
+            var localToday = DateTime.Today;
+            var minAllowedDate = todayUtc < localToday ? todayUtc : localToday;
+
+            if (model.StartDate.Date < minAllowedDate)
+            {
+                ModelState.AddModelError("StartDate", "Camp Start Date must be today or a future date. Past dates are not permitted.");
+            }
+
             // Validation: End Date >= Start Date
-            if (model.EndDate < model.StartDate)
+            if (model.EndDate.Date < model.StartDate.Date)
             {
                 ModelState.AddModelError("EndDate", "Camp End Date must be on or after the Start Date.");
             }
