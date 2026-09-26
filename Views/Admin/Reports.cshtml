@@ -43,6 +43,7 @@
         max-width: 100% !important;
         margin: 0 auto !important;
         box-sizing: border-box !important;
+        overflow: visible !important;
     }
 
     .exporting-pdf .glass-card {
@@ -51,11 +52,12 @@
         box-shadow: none !important;
         backdrop-filter: none !important;
         margin-bottom: 0.85rem !important;
-        padding: 0.85rem 1rem !important;
+        padding: 0.75rem 0.75rem !important;
         page-break-inside: auto !important;
         break-inside: auto !important;
         width: 100% !important;
         box-sizing: border-box !important;
+        overflow: visible !important;
     }
 
     .exporting-pdf .row {
@@ -81,14 +83,14 @@
         width: 100% !important;
         max-width: 100% !important;
         table-layout: fixed !important;
-        font-size: 0.72rem !important;
+        font-size: 0.69rem !important;
         word-break: break-word !important;
     }
 
     .exporting-pdf .table th,
     .exporting-pdf .table td {
-        padding: 0.35rem 0.35rem !important;
-        font-size: 0.72rem !important;
+        padding: 0.35rem 0.25rem !important;
+        font-size: 0.69rem !important;
         word-break: break-word !important;
         overflow-wrap: break-word !important;
         white-space: normal !important;
@@ -99,15 +101,34 @@
         white-space: normal !important;
         word-break: break-word !important;
         overflow-wrap: break-word !important;
-        font-size: 0.68rem !important;
-        padding: 0.2rem 0.35rem !important;
+        font-size: 0.65rem !important;
+        padding: 0.2rem 0.3rem !important;
         display: inline-block !important;
         max-width: 100% !important;
     }
 
+    .exporting-pdf .badge.bg-teal-subtle,
+    .exporting-pdf .text-teal {
+        color: #0f766e !important;
+        background-color: #ccfbf1 !important;
+        border-color: #99f6e4 !important;
+    }
+
+    .exporting-pdf .badge.bg-danger-subtle {
+        background-color: #fee2e2 !important;
+        color: #991b1b !important;
+        border-color: #fca5a5 !important;
+    }
+
+    .exporting-pdf .badge.bg-primary-subtle {
+        background-color: #e0e7ff !important;
+        color: #3730a3 !important;
+        border-color: #a5b4fc !important;
+    }
+
     .exporting-pdf .progress {
-        min-width: 50px !important;
-        max-width: 70px !important;
+        min-width: 45px !important;
+        max-width: 65px !important;
         height: 5px !important;
     }
 
@@ -671,6 +692,43 @@
             // Temporarily apply clean A4 PDF container styles
             element.classList.add('exporting-pdf');
 
+            // Explicitly force table-layout and overflow visibility to prevent clipping
+            const tableResponsives = element.querySelectorAll('.table-responsive');
+            tableResponsives.forEach(el => {
+                el.style.setProperty('overflow', 'visible', 'important');
+                el.style.setProperty('overflow-x', 'visible', 'important');
+            });
+            const tables = element.querySelectorAll('table');
+            tables.forEach(t => {
+                t.style.setProperty('table-layout', 'fixed', 'important');
+                t.style.setProperty('width', '100%', 'important');
+            });
+            const badges = element.querySelectorAll('.badge');
+            badges.forEach(b => {
+                b.style.setProperty('white-space', 'normal', 'important');
+                b.style.setProperty('word-break', 'break-word', 'important');
+            });
+
+            const cleanup = () => {
+                element.classList.remove('exporting-pdf');
+                tableResponsives.forEach(el => {
+                    el.style.removeProperty('overflow');
+                    el.style.removeProperty('overflow-x');
+                });
+                tables.forEach(t => {
+                    t.style.removeProperty('table-layout');
+                    t.style.removeProperty('width');
+                });
+                badges.forEach(b => {
+                    b.style.removeProperty('white-space');
+                    b.style.removeProperty('word-break');
+                });
+                if (btn) {
+                    btn.innerHTML = origHtml;
+                    btn.disabled = false;
+                }
+            };
+
             const opt = {
                 margin: [8, 8, 8, 8],
                 filename: 'MediCamp_Global_Analytics_Report.pdf',
@@ -680,7 +738,8 @@
                     useCORS: true,
                     letterRendering: true,
                     logging: false,
-                    scrollY: 0
+                    scrollY: 0,
+                    scrollX: 0
                 },
                 jsPDF: {
                     unit: 'mm',
@@ -694,28 +753,14 @@
             };
 
             if (typeof html2pdf !== 'undefined') {
-                html2pdf().set(opt).from(element).save().then(() => {
-                    element.classList.remove('exporting-pdf');
-                    if (btn) {
-                        btn.innerHTML = origHtml;
-                        btn.disabled = false;
-                    }
-                }).catch(err => {
+                html2pdf().set(opt).from(element).save().then(cleanup).catch(err => {
                     console.error('PDF export error:', err);
-                    element.classList.remove('exporting-pdf');
-                    if (btn) {
-                        btn.innerHTML = origHtml;
-                        btn.disabled = false;
-                    }
+                    cleanup();
                     window.print();
                 });
             } else {
-                element.classList.remove('exporting-pdf');
+                cleanup();
                 window.print();
-                if (btn) {
-                    btn.innerHTML = origHtml;
-                    btn.disabled = false;
-                }
             }
         }
 
