@@ -32,6 +32,23 @@
             if ($.validator.unobtrusive && $.validator.unobtrusive.adapters) {
                 $.validator.unobtrusive.adapters.addBool("bdnid");
             }
+
+            // 3. Future Or Today Date Validation
+            if (!$.validator.methods.futuredate) {
+                $.validator.addMethod("futuredate", function (value, element) {
+                    if (this.optional(element)) return true;
+                    if (!value) return true;
+                    var selected = new Date(value);
+                    selected.setHours(0, 0, 0, 0);
+                    var today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    return selected >= today;
+                }, "Camp Start Date must be today or a future date. Past dates are not permitted.");
+            }
+
+            if ($.validator.unobtrusive && $.validator.unobtrusive.adapters) {
+                $.validator.unobtrusive.adapters.addBool("futuredate");
+            }
         }
     }
 
