@@ -19,80 +19,14 @@
 <div class="container-fluid px-lg-4 py-4">
 
     <!-- Admin Dashboard Main Container with Rounded Card Frame -->
-    <div class="host-layout-card">
+    <div class="host-layout-card" id="adminLayoutCard">
         <div class="row g-0">
 
-            <!-- Left Emerald Sidebar (All Admin Tools Situated Here) -->
-            <div class="col-lg-3 col-xl-auto" style="min-width: 250px;">
-                <aside class="host-sidebar h-100">
-                    <div>
-                        <!-- Sidebar Brand / Org Info -->
-                        <div class="host-sidebar-brand">
-                            <div class="host-sidebar-brand-icon" style="background: linear-gradient(135deg, #10b981 0%, #047857 100%);">
-                                <i class="fa-solid fa-shield-halved text-white"></i>
-                            </div>
-                            <div class="d-flex flex-column text-truncate">
-                                <span class="fw-bold text-white fs-5 lh-1 text-truncate">MediCamp Admin</span>
-                                <span class="text-champagne opacity-75 small text-uppercase mt-1" style="font-size: 0.68rem; letter-spacing: 0.06em;">Central Executive</span>
-                            </div>
-                        </div>
-
-                        <!-- Sidebar Navigation Menu -->
-                        <nav class="d-flex flex-column">
-                            <a asp-controller="Admin" asp-action="Dashboard" class="host-nav-item active">
-                                <i class="fa-solid fa-house fs-6"></i>
-                                <span>Dashboard</span>
-                            </a>
-                            <a asp-controller="Admin" asp-action="UserManagement" class="host-nav-item">
-                                <i class="fa-solid fa-users-gear fs-6"></i>
-                                <span>User Management</span>
-                                <span class="badge bg-white text-dark rounded-pill ms-auto small" style="font-size: 0.7rem;">@Model.TotalUsersCount</span>
-                            </a>
-                            <a asp-controller="Admin" asp-action="Reports" class="host-nav-item">
-                                <i class="fa-solid fa-chart-pie fs-6"></i>
-                                <span>Global Analytics</span>
-                            </a>
-                            <a asp-controller="Admin" asp-action="HostApprovals" class="host-nav-item">
-                                <i class="fa-solid fa-building-circle-check fs-6"></i>
-                                <span>Host Approvals</span>
-                                @if (Model.PendingHostApprovalsCount > 0)
-                                {
-                                    <span class="badge bg-warning text-dark rounded-pill ms-auto small fw-bold" style="font-size: 0.7rem;">@Model.PendingHostApprovalsCount</span>
-                                }
-                            </a>
-                            <a asp-controller="Admin" asp-action="DoctorApprovals" class="host-nav-item">
-                                <i class="fa-solid fa-user-doctor fs-6"></i>
-                                <span>Doctor Approvals</span>
-                                @if (Model.PendingDoctorApprovalsCount > 0)
-                                {
-                                    <span class="badge bg-warning text-dark rounded-pill ms-auto small fw-bold" style="font-size: 0.7rem;">@Model.PendingDoctorApprovalsCount</span>
-                                }
-                            </a>
-                            <a asp-controller="Admin" asp-action="CampApprovals" class="host-nav-item">
-                                <i class="fa-solid fa-tent-arrow-turn-left fs-6"></i>
-                                <span>Camp Approvals</span>
-                                @if (Model.PendingCampApprovalsCount > 0)
-                                {
-                                    <span class="badge bg-danger rounded-pill ms-auto small fw-bold" style="font-size: 0.7rem;">@Model.PendingCampApprovalsCount</span>
-                                }
-                            </a>
-                        </nav>
-                    </div>
-
-                    <!-- Sidebar Bottom: Logout Button in White Rounded Pill -->
-                    <div class="pt-4 mt-auto">
-                        <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
-                            <button type="submit" class="host-logout-btn">
-                                <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                                <span>Logout</span>
-                            </button>
-                        </form>
-                    </div>
-                </aside>
-            </div>
+            <!-- Left Emerald Sidebar (Collapsible) -->
+            <partial name="_AdminSidebar" />
 
             <!-- Right Details & Analytics Panel -->
-            <div class="col-lg-9 col-xl">
+            <div class="col host-main-col">
                 <main class="host-main-panel h-100">
 
                     <!-- Top Bar: Search, Quick Actions, Alerts, User Avatar -->

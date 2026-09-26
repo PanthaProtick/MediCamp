@@ -625,6 +625,35 @@ h6,
   margin-bottom: 2.5rem;
 }
 
+.host-layout-card > .row,
+.admin-layout-row {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: stretch !important;
+  min-height: 85vh;
+  margin: 0 !important;
+  width: 100% !important;
+}
+
+.admin-sidebar-col {
+  width: 260px !important;
+  min-width: 260px !important;
+  max-width: 260px !important;
+  flex: 0 0 260px !important;
+  flex-shrink: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+              min-width 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+              max-width 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+              flex-basis 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  will-change: width, min-width;
+  position: relative;
+  z-index: 10;
+}
+
 .host-sidebar {
   background: #022c22;
   padding: 1.5rem 1.1rem;
@@ -632,7 +661,10 @@ h6,
   flex-direction: column;
   justify-content: space-between;
   border-right: 1px solid rgba(255, 255, 255, 0.08);
-  min-width: 235px;
+  height: 100%;
+  min-height: 100%;
+  width: 100%;
+  transition: padding 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .host-sidebar-brand {
@@ -642,6 +674,36 @@ h6,
   padding: 0 0.25rem 1.25rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   margin-bottom: 1.25rem;
+  transition: padding 0.28s cubic-bezier(0.4, 0, 0.2, 1), margin 0.28s ease;
+}
+
+.admin-sidebar-toggle-btn {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(248, 231, 201, 0.25);
+  color: var(--champagne, #f8e7c9);
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.admin-sidebar-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  transform: scale(1.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.admin-sidebar-toggle-btn .toggle-icon {
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 0.85rem;
 }
 
 .host-sidebar-brand-icon {
@@ -657,6 +719,12 @@ h6,
   color: var(--champagne);
   font-size: 1.2rem;
   backdrop-filter: blur(8px);
+  flex-shrink: 0;
+  transition: transform 0.28s ease;
+}
+
+.admin-brand-text {
+  transition: opacity 0.2s ease, width 0.2s ease;
 }
 
 .host-nav-item {
@@ -678,6 +746,7 @@ h6,
 .host-nav-item span {
   white-space: nowrap;
   text-overflow: ellipsis;
+  transition: opacity 0.2s ease;
 }
 
 .host-nav-item i {
@@ -685,12 +754,14 @@ h6,
   width: 18px;
   text-align: center;
   flex-shrink: 0;
+  transition: transform 0.2s ease;
 }
 
 .host-nav-item .badge {
   margin-left: auto;
   flex-shrink: 0;
   font-size: 0.7rem;
+  transition: all 0.2s ease;
 }
 
 .host-nav-item:hover {
@@ -742,6 +813,116 @@ h6,
   color: #022c22;
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+}
+
+/* =========================================================================
+   COLLAPSED / MINIMIZED ADMIN SIDEBAR STATE
+   ========================================================================= */
+
+html.admin-sidebar-collapsed .admin-sidebar-col,
+.host-layout-card.admin-sidebar-collapsed .admin-sidebar-col {
+  width: 76px !important;
+  min-width: 76px !important;
+  max-width: 76px !important;
+  flex: 0 0 76px !important;
+}
+
+html.admin-sidebar-collapsed .host-sidebar,
+.host-layout-card.admin-sidebar-collapsed .host-sidebar {
+  padding: 1.25rem 0.5rem;
+  align-items: center;
+}
+
+html.admin-sidebar-collapsed .admin-brand-text,
+.host-layout-card.admin-sidebar-collapsed .admin-brand-text {
+  display: none !important;
+}
+
+html.admin-sidebar-collapsed .host-sidebar-brand,
+.host-layout-card.admin-sidebar-collapsed .host-sidebar-brand {
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0 0 0.85rem;
+  margin-bottom: 0.85rem;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+html.admin-sidebar-collapsed .admin-sidebar-toggle-btn .toggle-icon,
+.host-layout-card.admin-sidebar-collapsed .admin-sidebar-toggle-btn .toggle-icon {
+  transform: rotate(180deg);
+}
+
+html.admin-sidebar-collapsed .host-nav-item,
+.host-layout-card.admin-sidebar-collapsed .host-nav-item {
+  justify-content: center;
+  padding: 0.8rem 0;
+  gap: 0;
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 0.4rem;
+  border-radius: 12px;
+}
+
+html.admin-sidebar-collapsed .host-nav-item span:not(.badge),
+.host-layout-card.admin-sidebar-collapsed .host-nav-item span:not(.badge) {
+  display: none !important;
+}
+
+html.admin-sidebar-collapsed .host-nav-item i,
+.host-layout-card.admin-sidebar-collapsed .host-nav-item i {
+  font-size: 1.15rem;
+  width: auto;
+  margin: 0;
+}
+
+html.admin-sidebar-collapsed .host-nav-item .badge,
+.host-layout-card.admin-sidebar-collapsed .host-nav-item .badge {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  font-size: 0.6rem;
+  padding: 0.18em 0.42em;
+  border-radius: 50rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+html.admin-sidebar-collapsed .host-nav-item.active::after,
+.host-layout-card.admin-sidebar-collapsed .host-nav-item.active::after {
+  display: none;
+}
+
+html.admin-sidebar-collapsed .host-logout-btn,
+.host-layout-card.admin-sidebar-collapsed .host-logout-btn {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  margin: 0 auto;
+  justify-content: center;
+}
+
+html.admin-sidebar-collapsed .host-logout-btn span,
+.host-layout-card.admin-sidebar-collapsed .host-logout-btn span {
+  display: none !important;
+}
+
+html.admin-sidebar-collapsed .host-logout-btn i,
+.host-layout-card.admin-sidebar-collapsed .host-logout-btn i {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.host-main-col {
+  flex: 1 1 0% !important;
+  min-width: 0 !important;
+  width: auto !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow-x: hidden;
+  transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .host-main-panel {

@@ -4,34 +4,37 @@
 }
 
 <div class="container-fluid px-lg-4 py-4">
+    <div class="host-layout-card" id="adminLayoutCard">
+        <div class="row g-0">
 
-    <!-- Top Navigation Breadcrumb & Header -->
-    <div class="glass-card p-4 mb-4">
-        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
-            <div>
-                <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
-                    <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-outline-dark btn-sm rounded-pill px-3 py-1">
-                        <i class="fa-solid fa-arrow-left me-1"></i> Admin Dashboard
-                    </a>
-                    <span class="badge badge-role-admin"><i class="fa-solid fa-shield-halved me-1"></i> Admin Governance</span>
-                    <span class="badge bg-champagne text-dark border px-2.5 py-1 fw-bold">NGO Verification</span>
-                </div>
-                <h2 class="fw-bold text-dark mb-1">Host Organization Verification Queue</h2>
-                <p class="text-secondary small mb-0">
-                    Review and verify NGO / Hospital organization registrations before they can publish public healthcare camps.
-                </p>
-            </div>
+            <!-- Left Emerald Sidebar (Collapsible) -->
+            <partial name="_AdminSidebar" />
 
-            <div class="d-flex align-items-center gap-2">
-                <a asp-controller="Admin" asp-action="UserManagement" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
-                    <i class="fa-solid fa-users-gear me-1"></i> User Directory
-                </a>
-                <a asp-controller="Admin" asp-action="CampApprovals" class="btn btn-sapphire btn-sm rounded-pill px-3 shadow-sm">
-                    <i class="fa-solid fa-tent-arrow-turn-left me-1"></i> Camp Approvals
-                </a>
-            </div>
-        </div>
-    </div>
+            <!-- Right Details & Content Panel -->
+            <div class="col host-main-col">
+                <main class="host-main-panel h-100">
+
+                    <!-- Top Navigation Header -->
+                    <div class="glass-card p-4 mb-4">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                            <div>
+                                <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                                    <span class="badge badge-role-admin"><i class="fa-solid fa-shield-halved me-1"></i> Admin Governance</span>
+                                    <span class="badge bg-champagne text-dark border px-2.5 py-1 fw-bold">NGO Verification</span>
+                                </div>
+                                <h2 class="fw-bold text-dark mb-1">Host Organization Verification Queue</h2>
+                                <p class="text-secondary small mb-0">
+                                    Review and verify NGO / Hospital organization registrations before they can publish public healthcare camps.
+                                </p>
+                            </div>
+
+                            <div class="d-flex align-items-center gap-2">
+                                <a asp-controller="Admin" asp-action="CampApprovals" class="btn btn-sapphire btn-sm rounded-pill px-3 shadow-sm">
+                                    <i class="fa-solid fa-tent-arrow-turn-left me-1"></i> Camp Approvals
+                                </a>
+                            </div>
+                        </div>
+                    </div>
 
 
     <!-- Metric Summary KPI Cards -->
@@ -317,6 +320,10 @@
         <div class="p-3 bg-light border-top d-flex justify-content-between align-items-center">
             <span class="small text-muted">Showing <strong>@targetList.Count</strong> host application(s) in <strong>@Model.ActiveTab</strong> tab</span>
             <span class="small text-muted"><i class="fa-solid fa-shield-halved text-success me-1"></i>Strict Role-Based Admin Governance</span>
+        </div>
+    </div>
+                </main>
+            </div>
         </div>
     </div>
 </div>

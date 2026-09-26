@@ -52,11 +52,84 @@
         }
     }
 
+    // =========================================================================
+    // ADMIN COLLAPSIBLE SIDEBAR LOGIC (With localStorage persistence)
+    // =========================================================================
+    function initAdminSidebar() {
+        var toggleBtn = document.getElementById('adminSidebarToggle');
+        var mobileToggleBtn = document.getElementById('adminMobileSidebarToggle');
+        var layoutCard = document.getElementById('adminLayoutCard');
+
+        // Apply saved preference immediately
+        try {
+            var isCollapsed = localStorage.getItem('admin_sidebar_collapsed') === 'true';
+            if (isCollapsed) {
+                document.documentElement.classList.add('admin-sidebar-collapsed');
+                if (layoutCard) layoutCard.classList.add('admin-sidebar-collapsed');
+            }
+        } catch (e) {}
+
+        function toggleSidebar() {
+            var isNowCollapsed = document.documentElement.classList.toggle('admin-sidebar-collapsed');
+            if (layoutCard) {
+                layoutCard.classList.toggle('admin-sidebar-collapsed', isNowCollapsed);
+            }
+            try {
+                localStorage.setItem('admin_sidebar_collapsed', isNowCollapsed ? 'true' : 'false');
+            } catch (e) {}
+
+            // Re-render / update tooltips
+            if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+                var tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+                tooltips.forEach(function (el) {
+                    var instance = bootstrap.Tooltip.getInstance(el);
+                    if (instance) {
+                        instance.hide();
+                    }
+                });
+            }
+        }
+
+        if (toggleBtn) {
+            toggleBtn.removeEventListener('click', toggleSidebar);
+            toggleBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                toggleSidebar();
+            });
+        }
+
+        if (mobileToggleBtn) {
+            mobileToggleBtn.removeEventListener('click', toggleSidebar);
+            mobileToggleBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                toggleSidebar();
+            });
+        }
+
+        // Initialize all Bootstrap tooltips on the page
+        if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+                if (!bootstrap.Tooltip.getInstance(tooltipTriggerEl)) {
+                    new bootstrap.Tooltip(tooltipTriggerEl, {
+                        trigger: 'hover',
+                        container: 'body'
+                    });
+                }
+            });
+        }
+    }
+
     if (typeof document !== 'undefined') {
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', setupValidators);
+            document.addEventListener('DOMContentLoaded', function () {
+                setupValidators();
+                initAdminSidebar();
+            });
         } else {
             setupValidators();
+            initAdminSidebar();
         }
     }
 })(typeof jQuery !== 'undefined' ? jQuery : window.jQuery);
+
