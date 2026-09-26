@@ -40,8 +40,9 @@
         color: #0f172a !important;
         padding: 0 !important;
         width: 100% !important;
-        max-width: 794px !important;
+        max-width: 100% !important;
         margin: 0 auto !important;
+        box-sizing: border-box !important;
     }
 
     .exporting-pdf .glass-card {
@@ -50,9 +51,11 @@
         box-shadow: none !important;
         backdrop-filter: none !important;
         margin-bottom: 0.85rem !important;
-        padding: 1rem 1.25rem !important;
+        padding: 0.85rem 1rem !important;
         page-break-inside: auto !important;
         break-inside: auto !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
 
     .exporting-pdf .row {
@@ -66,6 +69,48 @@
         break-inside: avoid !important;
     }
 
+    .exporting-pdf .table-responsive {
+        overflow: visible !important;
+        overflow-x: visible !important;
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .exporting-pdf table {
+        width: 100% !important;
+        max-width: 100% !important;
+        table-layout: fixed !important;
+        font-size: 0.72rem !important;
+        word-break: break-word !important;
+    }
+
+    .exporting-pdf .table th,
+    .exporting-pdf .table td {
+        padding: 0.35rem 0.35rem !important;
+        font-size: 0.72rem !important;
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
+        white-space: normal !important;
+        vertical-align: middle !important;
+    }
+
+    .exporting-pdf .badge {
+        white-space: normal !important;
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
+        font-size: 0.68rem !important;
+        padding: 0.2rem 0.35rem !important;
+        display: inline-block !important;
+        max-width: 100% !important;
+    }
+
+    .exporting-pdf .progress {
+        min-width: 50px !important;
+        max-width: 70px !important;
+        height: 5px !important;
+    }
+
     .exporting-pdf .no-print,
     .exporting-pdf .input-group,
     .exporting-pdf input,
@@ -77,15 +122,6 @@
         display: block !important;
         margin-bottom: 0.85rem !important;
         padding: 0.85rem 1rem !important;
-    }
-
-    .exporting-pdf .table {
-        font-size: 0.78rem !important;
-    }
-
-    .exporting-pdf .table th,
-    .exporting-pdf .table td {
-        padding: 0.4rem 0.5rem !important;
     }
 
     @@media print {
@@ -137,6 +173,16 @@
             break-inside: auto !important;
         }
 
+        .table-responsive {
+            overflow: visible !important;
+            overflow-x: visible !important;
+        }
+
+        table {
+            width: 100% !important;
+            table-layout: fixed !important;
+        }
+
         .row,
         .card,
         table,
@@ -154,6 +200,11 @@
 
         thead {
             display: table-header-group !important;
+        }
+
+        .badge {
+            white-space: normal !important;
+            word-break: break-word !important;
         }
     }
 </style>
@@ -410,20 +461,20 @@
                     <table class="table table-hover align-middle mb-0" id="medicineTable">
                         <thead class="table-light">
                             <tr class="small text-uppercase text-secondary">
-                                <th class="ps-3 py-3">Medicine Brand & Generic</th>
-                                <th class="py-3">Category & Strength</th>
-                                <th class="text-center py-3">Allocated</th>
-                                <th class="text-center py-3">Dispensed</th>
-                                <th class="text-center py-3">Remaining</th>
-                                <th class="py-3">Stock Utilization</th>
-                                <th class="text-end pe-3 py-3">Status</th>
+                                <th class="ps-2 py-2.5" style="width: 22%;">Medicine Brand & Generic</th>
+                                <th class="py-2.5" style="width: 18%;">Category & Strength</th>
+                                <th class="text-center py-2.5" style="width: 11%;">Allocated</th>
+                                <th class="text-center py-2.5" style="width: 11%;">Dispensed</th>
+                                <th class="text-center py-2.5" style="width: 11%;">Remaining</th>
+                                <th class="py-2.5" style="width: 15%;">Stock Utilization</th>
+                                <th class="text-end pe-2 py-2.5" style="width: 12%;">Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var med in Model.MedicineReport.MedicineStockList)
                             {
                                 <tr class="medicine-row-item">
-                                    <td class="ps-3 py-2.5">
+                                    <td class="ps-2 py-2">
                                         <span class="fw-bold text-dark d-block">@med.BrandName</span>
                                         <span class="text-muted small">@med.GenericName</span>
                                     </td>
@@ -434,7 +485,7 @@
                                     <td class="text-center fw-semibold text-dark">@med.TotalAllocated</td>
                                     <td class="text-center fw-bold text-success">@med.TotalDispensed</td>
                                     <td class="text-center fw-bold @(med.RemainingStock <= 0 ? "text-danger" : "text-dark")">@med.RemainingStock</td>
-                                    <td style="min-width: 140px;">
+                                    <td>
                                         <div class="d-flex align-items-center gap-2">
                                             <div class="progress flex-grow-1" style="height: 6px;">
                                                 <div class="progress-bar @(med.UtilizationRate >= 80 ? "bg-danger" : "bg-success")" style="width: @med.UtilizationRate%"></div>
@@ -442,7 +493,7 @@
                                             <span class="small fw-semibold text-secondary">@med.UtilizationRate.ToString("F0")%</span>
                                         </div>
                                     </td>
-                                    <td class="text-end pe-3">
+                                    <td class="text-end pe-2">
                                         @if (med.IsOutOfStock)
                                         {
                                             <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">Out of Stock</span>
@@ -545,34 +596,34 @@
                     <table class="table table-hover align-middle mb-0" id="areaTable">
                         <thead class="table-light">
                             <tr class="small text-uppercase text-secondary">
-                                <th class="ps-3 py-3">Division & District</th>
-                                <th class="py-3">Upazila / Sub-district</th>
-                                <th class="py-3">Union / Village Target</th>
-                                <th class="text-center py-3">Camps Conducted</th>
-                                <th class="text-center py-3">Patients Served</th>
-                                <th class="py-3">Dominant Local Health Burden</th>
-                                <th class="text-end pe-3 py-3">Doctors / Meds</th>
+                                <th class="ps-2 py-2.5" style="width: 17%;">Division & District</th>
+                                <th class="py-2.5" style="width: 15%;">Upazila / Sub-district</th>
+                                <th class="py-2.5" style="width: 16%;">Union / Village Target</th>
+                                <th class="text-center py-2.5" style="width: 11%;">Camps</th>
+                                <th class="text-center py-2.5" style="width: 10%;">Patients</th>
+                                <th class="py-2.5" style="width: 18%;">Dominant Health Burden</th>
+                                <th class="text-end pe-2 py-2.5" style="width: 13%;">Staff / Meds</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var item in Model.AreaReport.AreaHierarchyData)
                             {
                                 <tr class="area-row-item">
-                                    <td class="ps-3 py-2.5">
+                                    <td class="ps-2 py-2">
                                         <span class="fw-bold text-dark d-block">@item.District</span>
                                         <span class="text-muted small">@item.Division Division</span>
                                     </td>
                                     <td>
                                         <span class="fw-semibold text-primary">
-                                            <i class="fa-solid fa-location-pin me-1 small"></i> @item.Upazila
+                                            <i class="fa-solid fa-location-pin me-1 small"></i>@item.Upazila
                                         </span>
                                     </td>
                                     <td class="small">
-                                        <span class="d-block text-dark">@item.Union</span>
+                                        <span class="d-block text-dark fw-medium">@item.Union</span>
                                         <span class="text-muted">@item.Village</span>
                                     </td>
                                     <td class="text-center">
-                                        <span class="badge @(item.CampsCount > 0 ? "bg-success" : "bg-light text-secondary border") px-2.5 py-1">
+                                        <span class="badge @(item.CampsCount > 0 ? "bg-success" : "bg-light text-secondary border") px-2 py-1">
                                             @item.CampsCount Camp(s)
                                         </span>
                                     </td>
@@ -580,11 +631,11 @@
                                         @item.PatientsServed.ToString("N0")
                                     </td>
                                     <td>
-                                        <span class="badge bg-light text-danger border small">
-                                            <i class="fa-solid fa-triangle-exclamation me-1"></i> @item.TopDisease
+                                        <span class="badge bg-light text-danger border small text-wrap text-start">
+                                            <i class="fa-solid fa-triangle-exclamation me-1"></i>@item.TopDisease
                                         </span>
                                     </td>
-                                    <td class="text-end pe-3 small">
+                                    <td class="text-end pe-2 small">
                                         <span class="d-block fw-semibold text-dark"><i class="fa-solid fa-user-doctor me-1 text-teal"></i>@item.DoctorsDeployed Docs</span>
                                         <span class="text-muted"><i class="fa-solid fa-pills me-1 text-danger"></i>@item.MedicinesDispensed units</span>
                                     </td>
