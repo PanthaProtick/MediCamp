@@ -1,0 +1,80 @@
+@model ApplicationUser
+@{
+    ViewData["Title"] = "Doctor Registration Pending Verification - MediCamp";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="glass-card text-center p-4 p-md-5">
+                <div class="stat-icon stat-icon-teal mx-auto mb-4" style="width: 76px; height: 76px; font-size: 2.2rem; background: rgba(13, 148, 136, 0.12); color: #0d9488; border: 2px solid rgba(13, 148, 136, 0.3); border-radius: 20px;">
+                    <i class="fa-solid fa-user-doctor"></i>
+                </div>
+
+                <span class="badge badge-status-pending px-3 py-2 fs-6 mb-3">
+                    <i class="fa-solid fa-hourglass-half me-1"></i> Registration Pending System Admin Review
+                </span>
+
+                <h2 class="fw-bold text-dark mb-2">Doctor Registration Submitted!</h2>
+                <p class="text-secondary mb-4">
+                    Thank you for applying to serve in rural and underserved medical camps across Bangladesh. Your credentials have been forwarded to the MediCamp Clinical Administration team for screening.
+                </p>
+
+                @if (Model != null)
+                {
+                    <div class="p-3.5 p-md-4 rounded-4 bg-white border text-start mb-4 shadow-sm">
+                        <h6 class="fw-bold text-dark border-bottom pb-2 mb-3 d-flex align-items-center justify-content-between">
+                            <span><i class="fa-solid fa-stethoscope text-teal me-2"></i>Submitted Clinical Profile</span>
+                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle fw-semibold">Pending Verification</span>
+                        </h6>
+                        <div class="row g-3 small">
+                            <div class="col-sm-6">
+                                <span class="text-muted d-block">Doctor Name:</span>
+                                <strong class="text-dark fs-6">@Model.FullName</strong>
+                            </div>
+                            <div class="col-sm-6">
+                                <span class="text-muted d-block">BMDC Registration No:</span>
+                                <span class="badge bg-teal-subtle text-teal border border-teal-subtle font-monospace px-2.5 py-1">
+                                    <i class="fa-solid fa-certificate me-1"></i>@(Model.BMDCRegNo ?? "Not Provided")
+                                </span>
+                            </div>
+                            <div class="col-sm-6">
+                                <span class="text-muted d-block">Medical Specialization:</span>
+                                <span class="fw-semibold text-secondary">@(Model.MedicalSpecialization ?? "General Practitioner / MBBS")</span>
+                            </div>
+                            <div class="col-sm-6">
+                                <span class="text-muted d-block">Official Email:</span>
+                                <span class="text-dark">@Model.Email</span>
+                            </div>
+                            <div class="col-sm-6">
+                                <span class="text-muted d-block">Contact Phone:</span>
+                                <span class="text-dark">@Model.PhoneNumber</span>
+                            </div>
+                            <div class="col-sm-6">
+                                <span class="text-muted d-block">Assigned District / Area:</span>
+                                <span>@(Model.Upazila != null ? $"{Model.Upazila}, " : "")@Model.District</span>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <div class="alert alert-warning text-start small mb-4 rounded-3 d-flex gap-3 align-items-center" style="background: rgba(217, 119, 6, 0.08); border-left: 4px solid #d97706; color: #92400e;">
+                    <i class="fa-solid fa-shield-halved fs-3 text-warning"></i>
+                    <div>
+                        <strong>Patient Safety & BMDC Credential Verification:</strong>
+                        To safeguard clinical governance and verify active medical licensing, all doctor accounts undergo screening against Bangladesh Medical & Dental Council (BMDC) records by System Administrators. You will be able to sign in as soon as an administrator verifies and approves your account.
+                    </div>
+                </div>
+
+                <div class="d-flex flex-wrap justify-content-center gap-3">
+                    <a asp-controller="Account" asp-action="Login" class="btn btn-sapphire btn-lg px-4 shadow">
+                        <i class="fa-solid fa-arrow-right-to-bracket me-2"></i> Go to Sign In Screen
+                    </a>
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-light border btn-lg px-4">
+                        <i class="fa-solid fa-house me-2"></i> Return to Homepage
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

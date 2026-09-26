@@ -1,0 +1,391 @@
+@model DoctorApprovalsViewModel
+@{
+    ViewData["Title"] = "Doctor Approvals & BMDC Verification - Admin Governance";
+}
+
+<div class="container-fluid px-lg-4 py-4">
+
+    <!-- Top Navigation Breadcrumb & Header -->
+    <div class="glass-card p-4 mb-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                    <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-outline-dark btn-sm rounded-pill px-3 py-1">
+                        <i class="fa-solid fa-arrow-left me-1"></i> Admin Dashboard
+                    </a>
+                    <span class="badge badge-role-admin"><i class="fa-solid fa-shield-halved me-1"></i> Admin Governance</span>
+                    <span class="badge bg-teal-subtle text-teal border border-teal-subtle px-2.5 py-1 fw-bold">BMDC Clinical Screening</span>
+                </div>
+                <h2 class="fw-bold text-dark mb-1">Doctor Verification & Credentialing Queue</h2>
+                <p class="text-secondary small mb-0">
+                    Review and verify physician registrations and BMDC licenses before authorizing clinical consultations and prescription generation.
+                </p>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <a asp-controller="Admin" asp-action="UserManagement" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                    <i class="fa-solid fa-users-gear me-1"></i> User Directory
+                </a>
+                <a asp-controller="Admin" asp-action="HostApprovals" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                    <i class="fa-solid fa-building-circle-check me-1"></i> Host Approvals
+                </a>
+                <a asp-controller="Admin" asp-action="CampApprovals" class="btn btn-sapphire btn-sm rounded-pill px-3 shadow-sm">
+                    <i class="fa-solid fa-tent-arrow-turn-left me-1"></i> Camp Approvals
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Metric Summary KPI Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-xl-3">
+            <div class="p-3 bg-white rounded-4 border shadow-sm border-start border-4 border-warning h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="text-secondary small fw-bold text-uppercase d-block mb-1">Pending Review</span>
+                        <h3 class="fw-bold text-warning mb-0">@Model.PendingCount</h3>
+                    </div>
+                    <div class="stat-icon bg-warning-subtle text-warning" style="width: 44px; height: 44px; border-radius: 12px; font-size: 1.2rem;">
+                        <i class="fa-solid fa-hourglass-half"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="p-3 bg-white rounded-4 border shadow-sm border-start border-4 border-success h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="text-secondary small fw-bold text-uppercase d-block mb-1">Verified Doctors</span>
+                        <h3 class="fw-bold text-success mb-0">@Model.ApprovedCount</h3>
+                    </div>
+                    <div class="stat-icon bg-success-subtle text-success" style="width: 44px; height: 44px; border-radius: 12px; font-size: 1.2rem;">
+                        <i class="fa-solid fa-user-doctor"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="p-3 bg-white rounded-4 border shadow-sm border-start border-4 border-danger h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="text-secondary small fw-bold text-uppercase d-block mb-1">Rejected Applications</span>
+                        <h3 class="fw-bold text-danger mb-0">@Model.RejectedCount</h3>
+                    </div>
+                    <div class="stat-icon bg-danger-subtle text-danger" style="width: 44px; height: 44px; border-radius: 12px; font-size: 1.2rem;">
+                        <i class="fa-solid fa-circle-xmark"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="p-3 bg-white rounded-4 border shadow-sm border-start border-4 border-teal h-100" style="border-left-color: #0d9488 !important;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="text-secondary small fw-bold text-uppercase d-block mb-1">Total Doctor Accounts</span>
+                        <h3 class="fw-bold text-teal mb-0" style="color: #0d9488;">@Model.TotalCount</h3>
+                    </div>
+                    <div class="stat-icon text-teal" style="width: 44px; height: 44px; border-radius: 12px; font-size: 1.2rem; background: rgba(13, 148, 136, 0.15); color: #0d9488;">
+                        <i class="fa-solid fa-stethoscope"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Structured Data Panel -->
+    <div class="glass-card mb-4 overflow-hidden">
+        
+        <!-- Filter Toolbar -->
+        <div class="p-3 bg-white border-bottom d-flex flex-wrap align-items-center justify-content-between gap-3">
+            
+            <!-- Filter Tabs -->
+            <div class="d-flex gap-2 flex-wrap">
+                <a class="btn btn-sm rounded-pill px-3 fw-bold @(Model.ActiveTab == "Pending" ? "btn-warning text-dark shadow-xs" : "btn-light text-secondary border")" 
+                   asp-controller="Admin" asp-action="DoctorApprovals" asp-route-tab="Pending" asp-route-search="@Model.SearchTerm">
+                    <i class="fa-solid fa-hourglass-half me-1"></i> Pending Queue 
+                    <span class="badge bg-dark text-white rounded-pill ms-1">@Model.PendingCount</span>
+                </a>
+                <a class="btn btn-sm rounded-pill px-3 fw-bold @(Model.ActiveTab == "Approved" ? "btn-success text-white shadow-xs" : "btn-light text-secondary border")" 
+                   asp-controller="Admin" asp-action="DoctorApprovals" asp-route-tab="Approved" asp-route-search="@Model.SearchTerm">
+                    <i class="fa-solid fa-circle-check me-1"></i> Approved History 
+                    <span class="badge bg-white text-success rounded-pill ms-1">@Model.ApprovedCount</span>
+                </a>
+                <a class="btn btn-sm rounded-pill px-3 fw-bold @(Model.ActiveTab == "Rejected" ? "btn-danger text-white shadow-xs" : "btn-light text-secondary border")" 
+                   asp-controller="Admin" asp-action="DoctorApprovals" asp-route-tab="Rejected" asp-route-search="@Model.SearchTerm">
+                    <i class="fa-solid fa-circle-xmark me-1"></i> Rejected History 
+                    <span class="badge bg-white text-danger rounded-pill ms-1">@Model.RejectedCount</span>
+                </a>
+                <a class="btn btn-sm rounded-pill px-3 fw-bold @(Model.ActiveTab == "All" ? "btn-primary text-white shadow-xs" : "btn-light text-secondary border")" 
+                   asp-controller="Admin" asp-action="DoctorApprovals" asp-route-tab="All" asp-route-search="@Model.SearchTerm">
+                    <i class="fa-solid fa-list me-1"></i> All Records 
+                    <span class="badge bg-light text-dark rounded-pill ms-1">@Model.TotalCount</span>
+                </a>
+            </div>
+
+            <!-- Search Form -->
+            <form method="get" asp-controller="Admin" asp-action="DoctorApprovals" class="d-flex align-items-center gap-2">
+                <input type="hidden" name="tab" value="@Model.ActiveTab" />
+                <div class="input-group input-group-sm" style="width: 280px;">
+                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="fa-solid fa-magnifying-glass"></i></span>
+                    <input type="text" name="search" value="@Model.SearchTerm" class="form-control border-start-0" placeholder="Search doctor, BMDC, specialization..." />
+                    @if (!string.IsNullOrWhiteSpace(Model.SearchTerm))
+                    {
+                        <a asp-controller="Admin" asp-action="DoctorApprovals" asp-route-tab="@Model.ActiveTab" class="btn btn-outline-secondary">
+                            <i class="fa-solid fa-times"></i>
+                        </a>
+                    }
+                </div>
+                <button type="submit" class="btn btn-sm btn-dark rounded-pill px-3">Filter</button>
+            </form>
+        </div>
+
+        <!-- Table View of Doctors -->
+        @{
+            var currentList = Model.ActiveTab switch
+            {
+                "Approved" => Model.ApprovedDoctors,
+                "Rejected" => Model.RejectedDoctors,
+                "All" => Model.AllDoctors,
+                _ => Model.PendingDoctors
+            };
+        }
+
+        @if (!currentList.Any())
+        {
+            <div class="p-5 text-center bg-white">
+                <div class="stat-icon bg-light text-secondary mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.5rem; border-radius: 50%;">
+                    <i class="fa-solid fa-user-doctor"></i>
+                </div>
+                <h5 class="fw-bold text-dark">No Doctor Records Found</h5>
+                <p class="text-secondary small mb-3">
+                    @if (!string.IsNullOrWhiteSpace(Model.SearchTerm))
+                    {
+                        <span>No doctors matched your search term "<strong>@Model.SearchTerm</strong>" under @Model.ActiveTab.</span>
+                    }
+                    else
+                    {
+                        <span>There are no doctor accounts in the <strong>@Model.ActiveTab</strong> status queue.</span>
+                    }
+                </p>
+                @if (!string.IsNullOrWhiteSpace(Model.SearchTerm))
+                {
+                    <a asp-controller="Admin" asp-action="DoctorApprovals" asp-route-tab="@Model.ActiveTab" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                        Clear Search Filter
+                    </a>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive bg-white">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light small text-secondary text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.5px;">
+                        <tr>
+                            <th class="ps-4">Physician & Contact</th>
+                            <th>BMDC Registration</th>
+                            <th>Specialization / Degree</th>
+                            <th>Area / Location</th>
+                            <th>Status</th>
+                            <th>Applied Date</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="small">
+                        @foreach (var doc in currentList)
+                        {
+                            var statusBadgeClass = doc.DoctorApprovalStatus switch
+                            {
+                                "Approved" => "badge-status-completed",
+                                "Rejected" => "badge-status-danger",
+                                _ => "badge-status-pending"
+                            };
+
+                            var statusIcon = doc.DoctorApprovalStatus switch
+                            {
+                                "Approved" => "fa-circle-check text-success",
+                                "Rejected" => "fa-circle-xmark text-danger",
+                                _ => "fa-hourglass-half text-warning"
+                            };
+
+                            <tr>
+                                <!-- Doctor Name & Contact -->
+                                <td class="ps-4 py-3">
+                                    <div class="d-flex align-items-center gap-2.5">
+                                        <div class="avatar-placeholder rounded-circle bg-teal-subtle text-teal fw-bold d-flex align-items-center justify-content-center" 
+                                             style="width: 38px; height: 38px; font-size: 0.85rem; color: #0d9488; background: rgba(13, 148, 136, 0.12);">
+                                            <i class="fa-solid fa-user-md"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-dark fs-6">@doc.FullName</div>
+                                            <div class="text-muted small">
+                                                <i class="fa-regular fa-envelope me-1"></i>@doc.Email
+                                            </div>
+                                            <div class="text-muted small">
+                                                <i class="fa-solid fa-phone me-1 text-teal" style="color: #0d9488;"></i>@doc.PhoneNumber
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- BMDC Reg Number -->
+                                <td>
+                                    <span class="badge bg-light text-dark border font-monospace px-2.5 py-1.5 fs-7 shadow-xs">
+                                        <i class="fa-solid fa-id-card-clip text-primary me-1"></i>@(doc.BMDCRegNo ?? "Pending BMDC")
+                                    </span>
+                                </td>
+
+                                <!-- Medical Specialization -->
+                                <td>
+                                    <span class="fw-semibold text-dark d-block">@(doc.MedicalSpecialization ?? "General Physician")</span>
+                                    @if (!string.IsNullOrWhiteSpace(doc.NID))
+                                    {
+                                        <span class="text-muted small">NID: @doc.NID</span>
+                                    }
+                                </td>
+
+                                <!-- Location -->
+                                <td>
+                                    <span class="text-dark">@(doc.Upazila != null ? $"{doc.Upazila}, " : "")@doc.District</span>
+                                </td>
+
+                                <!-- Status Badge -->
+                                <td>
+                                    <span class="badge @statusBadgeClass px-2.5 py-1.5">
+                                        <i class="fa-solid @statusIcon me-1"></i> @doc.DoctorApprovalStatus
+                                    </span>
+                                    @if (doc.DoctorApprovalStatus == "Rejected" && !string.IsNullOrEmpty(doc.DoctorRejectionReason))
+                                    {
+                                        <div class="text-danger small mt-1" style="max-width: 220px;" title="@doc.DoctorRejectionReason">
+                                            <i class="fa-solid fa-circle-exclamation me-1"></i>@doc.DoctorRejectionReason
+                                        </div>
+                                    }
+                                </td>
+
+                                <!-- Applied Date -->
+                                <td class="text-muted">
+                                    @doc.CreatedAt.ToString("dd MMM yyyy")
+                                    <div class="small text-secondary">@doc.CreatedAt.ToString("hh:mm tt")</div>
+                                </td>
+
+                                <!-- Actions -->
+                                <td class="text-end pe-4">
+                                    @if (doc.DoctorApprovalStatus == "Pending")
+                                    {
+                                        <div class="d-inline-flex gap-1">
+                                            <!-- Approve Form -->
+                                            <form method="post" asp-controller="Admin" asp-action="ApproveDoctor" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="userId" value="@doc.Id" />
+                                                <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 shadow-xs" 
+                                                        onclick="return confirm('Confirm verification and approval for Dr. @doc.FullName (BMDC: @doc.BMDCRegNo)?');">
+                                                    <i class="fa-solid fa-check me-1"></i> Approve
+                                                </button>
+                                            </form>
+
+                                            <!-- Reject Trigger Button -->
+                                            <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-2.5" 
+                                                    data-bs-toggle="modal" data-bs-target="#rejectModal-@doc.Id">
+                                                <i class="fa-solid fa-xmark me-1"></i> Reject
+                                            </button>
+                                        </div>
+
+                                        <!-- Reject Modal for Doctor -->
+                                        <div class="modal fade" id="rejectModal-@doc.Id" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered text-start">
+                                                <div class="modal-content rounded-4 border-0 shadow">
+                                                    <div class="modal-header border-bottom pb-3">
+                                                        <h5 class="modal-title fw-bold text-dark">
+                                                            <i class="fa-solid fa-user-xmark text-danger me-2"></i>Reject Doctor Registration
+                                                        </h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <form method="post" asp-controller="Admin" asp-action="RejectDoctor">
+                                                        @Html.AntiForgeryToken()
+                                                        <input type="hidden" name="userId" value="@doc.Id" />
+                                                        <div class="modal-body py-4">
+                                                            <div class="p-3 bg-light rounded-3 mb-3 border small">
+                                                                <div><strong>Physician:</strong> Dr. @doc.FullName</div>
+                                                                <div><strong>BMDC Reg:</strong> @(doc.BMDCRegNo ?? "N/A")</div>
+                                                                <div><strong>Email:</strong> @doc.Email</div>
+                                                            </div>
+
+                                                            <div class="mb-3">
+                                                                <label class="form-label small fw-bold text-dark">Rejection Justification / Reason *</label>
+                                                                <textarea name="rejectionReason" class="form-control small" rows="3" required 
+                                                                          placeholder="e.g. BMDC Registration number could not be validated with the Bangladesh Medical & Dental Council registry."></textarea>
+                                                                <div class="form-text small text-muted">
+                                                                    This reason will be displayed to the doctor upon attempting to log in.
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer border-top pt-2">
+                                                            <button type="button" class="btn btn-sm btn-light border rounded-pill px-3" data-bs-dismiss="modal">Cancel</button>
+                                                            <button type="submit" class="btn btn-sm btn-danger rounded-pill px-3 shadow-xs">
+                                                                <i class="fa-solid fa-ban me-1"></i> Confirm Rejection
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    else if (doc.DoctorApprovalStatus == "Approved")
+                                    {
+                                        <div class="d-inline-flex gap-1">
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1 small">
+                                                <i class="fa-solid fa-shield-check me-1"></i> Certified
+                                            </span>
+                                            <!-- Allow Revocation / Rejection if needed -->
+                                            <button type="button" class="btn btn-sm btn-outline-danger btn-xs rounded-pill px-2" 
+                                                    data-bs-toggle="modal" data-bs-target="#rejectModal-@doc.Id" title="Revoke Approval">
+                                                <i class="fa-solid fa-ban"></i>
+                                            </button>
+                                        </div>
+
+                                        <!-- Revocation Modal -->
+                                        <div class="modal fade" id="rejectModal-@doc.Id" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered text-start">
+                                                <div class="modal-content rounded-4 border-0 shadow">
+                                                    <div class="modal-header border-bottom pb-3">
+                                                        <h5 class="modal-title fw-bold text-danger">Revoke Doctor Certification</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <form method="post" asp-controller="Admin" asp-action="RejectDoctor">
+                                                        @Html.AntiForgeryToken()
+                                                        <input type="hidden" name="userId" value="@doc.Id" />
+                                                        <div class="modal-body py-3 small">
+                                                            <p class="text-danger fw-semibold mb-2">Are you sure you want to revoke approved status for Dr. @doc.FullName?</p>
+                                                            <label class="form-label fw-bold">Reason for Revocation *</label>
+                                                            <textarea name="rejectionReason" class="form-control" rows="3" required 
+                                                                      placeholder="Reason for suspension or revocation..."></textarea>
+                                                        </div>
+                                                        <div class="modal-footer border-top pt-2">
+                                                            <button type="button" class="btn btn-sm btn-light border rounded-pill px-3" data-bs-dismiss="modal">Cancel</button>
+                                                            <button type="submit" class="btn btn-sm btn-danger rounded-pill px-3">Confirm Revocation</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <!-- Re-Approve Option for Previously Rejected Doctor -->
+                                        <form method="post" asp-controller="Admin" asp-action="ApproveDoctor" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="userId" value="@doc.Id" />
+                                            <button type="submit" class="btn btn-sm btn-outline-success rounded-pill px-3" 
+                                                    onclick="return confirm('Re-approve Dr. @doc.FullName?');">
+                                                <i class="fa-solid fa-rotate-left me-1"></i> Re-Approve
+                                            </button>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

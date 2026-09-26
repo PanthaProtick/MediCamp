@@ -306,11 +306,16 @@ namespace MediCamp.Controllers
                 return View("HostRegistrationPending", user);
             }
 
+            if (model.Role == SystemRoles.Doctor)
+            {
+                TempData["SuccessMessage"] = "Doctor registration submitted successfully! Pending Administrator verification.";
+                return View("DoctorRegistrationPending", user);
+            }
+
             await SignInUserAsync(user, false);
 
             string welcomeMsg = model.Role switch
             {
-                SystemRoles.Doctor => "Doctor registration completed! Welcome to the MediCamp Clinical Portal.",
                 SystemRoles.Volunteer => "Field Volunteer registration completed! Welcome to MediCamp Triage.",
                 SystemRoles.Pharmacist => "Pharmacist registration completed! Welcome to MediCamp Dispensary.",
                 _ => "Patient registration completed successfully! Welcome to MediCamp."
@@ -359,7 +364,7 @@ namespace MediCamp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RegisterDoctor(RegisterViewModel model)
+        public IActionResult RegisterDoctor(RegisterViewModel model)
         {
             model.Role = SystemRoles.Doctor;
             if (string.IsNullOrWhiteSpace(model.BMDCRegNo))
@@ -375,9 +380,14 @@ namespace MediCamp.Controllers
                 return View("RegisterDoctor", model);
             }
 
-            await SignInUserAsync(user, false);
-            TempData["SuccessMessage"] = "Doctor registration completed! Welcome to the MediCamp Clinical Portal.";
-            return RedirectToAction("Index", "Home");
+            TempData["SuccessMessage"] = "Doctor registration submitted successfully! Pending Administrator verification.";
+            return View("DoctorRegistrationPending", user);
+        }
+
+        [HttpGet]
+        public IActionResult DoctorRegistrationPending()
+        {
+            return View();
         }
 
         // 3. Host NGO Registration

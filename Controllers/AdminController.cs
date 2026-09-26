@@ -95,6 +95,75 @@ namespace MediCamp.Controllers
         }
 
         [HttpGet]
+        public IActionResult DoctorApprovals(string tab = "Pending", string? search = null)
+        {
+            var allDoctors = _dataService.GetDoctorsByStatus("All");
+            
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                string query = search.Trim().ToLower();
+                allDoctors = allDoctors.Where(d => 
+                    d.FullName.ToLower().Contains(query) ||
+                    d.Email.ToLower().Contains(query) ||
+                    (d.BMDCRegNo != null && d.BMDCRegNo.ToLower().Contains(query)) ||
+                    (d.MedicalSpecialization != null && d.MedicalSpecialization.ToLower().Contains(query)) ||
+                    (d.District != null && d.District.ToLower().Contains(query)) ||
+                    (d.PhoneNumber != null && d.PhoneNumber.Contains(query))
+                ).ToList();
+            }
+
+            var pending = allDoctors.Where(d => d.DoctorApprovalStatus == "Pending").ToList();
+            var approved = allDoctors.Where(d => d.DoctorApprovalStatus == "Approved").ToList();
+            var rejected = allDoctors.Where(d => d.DoctorApprovalStatus == "Rejected").ToList();
+
+            var model = new DoctorApprovalsViewModel
+            {
+                PendingDoctors = pending,
+                ApprovedDoctors = approved,
+                RejectedDoctors = rejected,
+                AllDoctors = allDoctors,
+                ActiveTab = string.IsNullOrWhiteSpace(tab) ? "Pending" : tab,
+                SearchTerm = search
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ApproveDoctor(string userId)
+        {
+            var (success, message) = _dataService.ApproveDoctor(userId);
+            if (success)
+            {
+                TempData["SuccessMessage"] = message;
+            }
+            else
+            {
+                TempData["ErrorMessage"] = message;
+            }
+
+            return RedirectToAction(nameof(DoctorApprovals), new { tab = "Pending" });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult RejectDoctor(string userId, string rejectionReason)
+        {
+            var (success, message) = _dataService.RejectDoctor(userId, rejectionReason);
+            if (success)
+            {
+                TempData["SuccessMessage"] = message;
+            }
+            else
+            {
+                TempData["ErrorMessage"] = message;
+            }
+
+            return RedirectToAction(nameof(DoctorApprovals), new { tab = "Pending" });
+        }
+
+        [HttpGet]
         public IActionResult UserManagement(string? search, string? role, string? status)
         {
             var filteredUsers = _dataService.GetFilteredUsers(search, role, status);
@@ -113,7 +182,8 @@ namespace MediCamp.Controllers
                 ActiveVolunteersCount = allUsers.Count(u => u.Role == SystemRoles.Volunteer && u.IsActive),
                 ActivePharmacistsCount = allUsers.Count(u => u.Role == SystemRoles.Pharmacist && u.IsActive),
                 ActivePatientsCount = allUsers.Count(u => u.Role == SystemRoles.Patient && u.IsActive),
-                PendingApprovalsCount = allUsers.Count(u => u.HostApprovalStatus == "Pending")
+                PendingApprovalsCount = allUsers.Count(u => (u.Role == SystemRoles.Host && u.HostApprovalStatus == "Pending") || (u.Role == SystemRoles.Doctor && u.DoctorApprovalStatus == "Pending")),
+                PendingDoctorApprovalsCount = allUsers.Count(u => u.Role == SystemRoles.Doctor && u.DoctorApprovalStatus == "Pending")
             };
 
             return View(model);
@@ -244,6 +314,8 @@ namespace MediCamp.Controllers
                 bmdcRegNo = user.BMDCRegNo ?? "N/A",
                 isActive = user.IsActive,
                 hostApprovalStatus = user.HostApprovalStatus,
+                doctorApprovalStatus = user.DoctorApprovalStatus,
+                doctorRejectionReason = user.DoctorRejectionReason,
                 createdAt = user.CreatedAt.ToString("dd MMM yyyy, hh:mm tt"),
                 lastLoginAt = user.LastLoginAt.HasValue ? user.LastLoginAt.Value.ToString("dd MMM yyyy, hh:mm tt") : "Never logged in"
             });
@@ -436,6 +508,7 @@ namespace MediCamp.Controllers
                 TotalPatientsCount = allUsers.Count(u => u.Role == SystemRoles.Patient),
 
                 PendingHostApprovalsCount = allUsers.Count(u => u.Role == SystemRoles.Host && u.HostApprovalStatus == "Pending"),
+                PendingDoctorApprovalsCount = allUsers.Count(u => u.Role == SystemRoles.Doctor && u.DoctorApprovalStatus == "Pending"),
                 UrgentBloodRequestsCount = urgentBloodCount,
 
                 TotalConsultationsCount = allConsultations.Count,

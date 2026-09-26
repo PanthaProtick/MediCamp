@@ -200,6 +200,21 @@ namespace MediCamp.Models.ViewModels
         public int TotalCount => AllHosts.Count;
     }
 
+    public class DoctorApprovalsViewModel
+    {
+        public List<ApplicationUser> PendingDoctors { get; set; } = new();
+        public List<ApplicationUser> ApprovedDoctors { get; set; } = new();
+        public List<ApplicationUser> RejectedDoctors { get; set; } = new();
+        public List<ApplicationUser> AllDoctors { get; set; } = new();
+        public string ActiveTab { get; set; } = "Pending";
+        public string? SearchTerm { get; set; }
+
+        public int PendingCount => PendingDoctors.Count;
+        public int ApprovedCount => ApprovedDoctors.Count;
+        public int RejectedCount => RejectedDoctors.Count;
+        public int TotalCount => AllDoctors.Count;
+    }
+
     public class UserManagementViewModel
     {
         public List<ApplicationUser> Users { get; set; } = new();
@@ -216,6 +231,7 @@ namespace MediCamp.Models.ViewModels
         public int ActivePharmacistsCount { get; set; }
         public int ActivePatientsCount { get; set; }
         public int PendingApprovalsCount { get; set; }
+        public int PendingDoctorApprovalsCount { get; set; }
     }
 
     public class CreateUserViewModel

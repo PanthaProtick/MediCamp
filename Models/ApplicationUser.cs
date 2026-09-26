@@ -84,6 +84,11 @@ namespace MediCamp.Models
         [Display(Name = "BMDC Registration Number")]
         public string? BMDCRegNo { get; set; }
 
+        [MaxLength(20)]
+        public string DoctorApprovalStatus { get; set; } = "Approved"; // Approved, Pending, Rejected
+
+        public string? DoctorRejectionReason { get; set; }
+
         public bool IsActive { get; set; } = true;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
