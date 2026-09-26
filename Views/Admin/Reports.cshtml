@@ -15,24 +15,35 @@
         display: none;
     }
 
-    .pdf-avoid-break {
+    .report-print-header,
+    thead,
+    tr {
         page-break-inside: avoid !important;
         break-inside: avoid !important;
     }
 
-    .pdf-page-break {
-        page-break-before: always !important;
-        break-before: page !important;
+    /* Allow natural flow and splitting across pages for tables and cards */
+    .glass-card,
+    .row,
+    .card,
+    .table-responsive,
+    table,
+    tbody,
+    #reportExportArea {
+        page-break-inside: auto !important;
+        break-inside: auto !important;
     }
 
     /* Temporary styling applied during html2pdf rasterization */
     .exporting-pdf {
         background: #ffffff !important;
         color: #0f172a !important;
-        padding: 12px !important;
+        padding: 0 !important;
         width: 100% !important;
-        max-width: 820px !important;
+        max-width: 100% !important;
         margin: 0 auto !important;
+        box-sizing: border-box !important;
+        overflow: visible !important;
     }
 
     .exporting-pdf .glass-card {
@@ -40,6 +51,85 @@
         border: 1px solid #e2e8f0 !important;
         box-shadow: none !important;
         backdrop-filter: none !important;
+        margin-bottom: 0.85rem !important;
+        padding: 0.75rem 0.75rem !important;
+        page-break-inside: auto !important;
+        break-inside: auto !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        overflow: visible !important;
+    }
+
+    .exporting-pdf .row {
+        page-break-inside: auto !important;
+        break-inside: auto !important;
+        margin-bottom: 0.85rem !important;
+    }
+
+    .exporting-pdf tr {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    .exporting-pdf .table-responsive {
+        overflow: visible !important;
+        overflow-x: visible !important;
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .exporting-pdf table {
+        width: 100% !important;
+        max-width: 100% !important;
+        table-layout: fixed !important;
+        font-size: 0.69rem !important;
+        word-break: break-word !important;
+    }
+
+    .exporting-pdf .table th,
+    .exporting-pdf .table td {
+        padding: 0.35rem 0.25rem !important;
+        font-size: 0.69rem !important;
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
+        white-space: normal !important;
+        vertical-align: middle !important;
+    }
+
+    .exporting-pdf .badge {
+        white-space: normal !important;
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
+        font-size: 0.65rem !important;
+        padding: 0.2rem 0.3rem !important;
+        display: inline-block !important;
+        max-width: 100% !important;
+    }
+
+    .exporting-pdf .badge.bg-teal-subtle,
+    .exporting-pdf .text-teal {
+        color: #0f766e !important;
+        background-color: #ccfbf1 !important;
+        border-color: #99f6e4 !important;
+    }
+
+    .exporting-pdf .badge.bg-danger-subtle {
+        background-color: #fee2e2 !important;
+        color: #991b1b !important;
+        border-color: #fca5a5 !important;
+    }
+
+    .exporting-pdf .badge.bg-primary-subtle {
+        background-color: #e0e7ff !important;
+        color: #3730a3 !important;
+        border-color: #a5b4fc !important;
+    }
+
+    .exporting-pdf .progress {
+        min-width: 45px !important;
+        max-width: 65px !important;
+        height: 5px !important;
     }
 
     .exporting-pdf .no-print,
@@ -51,10 +141,8 @@
 
     .exporting-pdf .report-print-header {
         display: block !important;
-    }
-
-    .exporting-pdf .table {
-        font-size: 0.82rem !important;
+        margin-bottom: 0.85rem !important;
+        padding: 0.85rem 1rem !important;
     }
 
     @@media print {
@@ -101,33 +189,43 @@
             border: 1px solid #e2e8f0 !important;
             box-shadow: none !important;
             backdrop-filter: none !important;
-            margin-bottom: 1.25rem !important;
-            page-break-inside: avoid !important;
-            break-inside: avoid !important;
+            margin-bottom: 1rem !important;
+            page-break-inside: auto !important;
+            break-inside: auto !important;
         }
 
-        .pdf-avoid-break,
-        .row,
-        .card,
-        tr,
-        .col-md-4,
-        .col-md-3,
-        .col-sm-6 {
-            page-break-inside: avoid !important;
-            break-inside: avoid !important;
+        .table-responsive {
+            overflow: visible !important;
+            overflow-x: visible !important;
         }
 
         table {
-            page-break-inside: auto !important;
+            width: 100% !important;
+            table-layout: fixed !important;
         }
 
-        tr {
+        .row,
+        .card,
+        table,
+        tbody {
+            page-break-inside: auto !important;
+            break-inside: auto !important;
+        }
+
+        tr,
+        thead,
+        .report-print-header {
             page-break-inside: avoid !important;
-            page-break-after: auto !important;
+            break-inside: avoid !important;
         }
 
         thead {
             display: table-header-group !important;
+        }
+
+        .badge {
+            white-space: normal !important;
+            word-break: break-word !important;
         }
     }
 </style>
@@ -186,7 +284,7 @@
     <div id="reportExportArea">
 
         <!-- Official Report Header (Printed on PDF and Paper) -->
-        <div class="report-print-header p-3 mb-4 bg-white border rounded-3 pdf-avoid-break">
+        <div class="report-print-header p-3 mb-3 bg-white border rounded-3">
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                 <div class="d-flex align-items-center gap-3">
                     <img src="~/images/logo.png" alt="MediCamp Logo" style="width: 44px; height: 44px; object-fit: contain; border-radius: 8px;" />
@@ -208,7 +306,7 @@
         @if (Model.ActiveTab == "disease")
         {
             <!-- Disease Summary KPI Cards -->
-            <div class="row g-3 mb-4 pdf-avoid-break">
+            <div class="row g-3 mb-3">
                 <div class="col-md-4">
                     <div class="p-3.5 bg-white rounded-3 border shadow-xs border-start border-4 border-success h-100 d-flex flex-column justify-content-between">
                         <div>
@@ -241,7 +339,7 @@
             </div>
 
             <!-- Disease Prevalence Ranking Table (Full-Width A4 Layout) -->
-            <div class="row g-4 mb-4 pdf-avoid-break">
+            <div class="row g-4 mb-3">
                 <div class="col-12">
                     <div class="glass-card p-4">
                         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
@@ -293,7 +391,7 @@
             </div>
 
             <!-- Seasonal Epidemiology Insights -->
-            <div class="glass-card p-4 p-md-4 pdf-avoid-break">
+            <div class="glass-card p-4 p-md-4 mb-3">
                 <div class="mb-3">
                     <h5 class="fw-bold text-dark mb-1"><i class="fa-solid fa-cloud-sun-rain me-2 text-teal"></i> Seasonal Epidemiology & Disease Surge Patterns</h5>
                     <p class="text-secondary small mb-0">Macro clinical insights across Bangladesh's three major meteorological cycles.</p>
@@ -302,7 +400,7 @@
                     @foreach (var s in Model.DiseaseReport.SeasonalTrends)
                     {
                         <div class="col-md-4">
-                            <div class="p-3.5 bg-white rounded-3 border h-100 shadow-xs d-flex flex-column justify-content-between pdf-avoid-break">
+                            <div class="p-3.5 bg-white rounded-3 border h-100 shadow-xs d-flex flex-column justify-content-between">
                                 <div>
                                     <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
                                         <span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-semibold px-2.5 py-1">@s.Season</span>
@@ -326,7 +424,7 @@
         @if (Model.ActiveTab == "medicine")
         {
             <!-- Medicine Summary KPI Cards -->
-            <div class="row g-3 mb-4 pdf-avoid-break">
+            <div class="row g-3 mb-3">
                 <div class="col-md-3 col-sm-6">
                     <div class="p-3.5 bg-white rounded-3 border shadow-xs border-start border-4 border-primary h-100 d-flex flex-column justify-content-between">
                         <div>
@@ -369,7 +467,7 @@
             </div>
 
             <!-- Medicine Usage Table -->
-            <div class="glass-card p-4 mb-4 pdf-avoid-break">
+            <div class="glass-card p-4 mb-3">
                 <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                     <div>
                         <h5 class="fw-bold text-dark mb-0"><i class="fa-solid fa-boxes-stacked me-2 text-teal"></i> Central Medicine Usage & Stock Status</h5>
@@ -384,20 +482,20 @@
                     <table class="table table-hover align-middle mb-0" id="medicineTable">
                         <thead class="table-light">
                             <tr class="small text-uppercase text-secondary">
-                                <th class="ps-3 py-3">Medicine Brand & Generic</th>
-                                <th class="py-3">Category & Strength</th>
-                                <th class="text-center py-3">Allocated</th>
-                                <th class="text-center py-3">Dispensed</th>
-                                <th class="text-center py-3">Remaining</th>
-                                <th class="py-3">Stock Utilization</th>
-                                <th class="text-end pe-3 py-3">Status</th>
+                                <th class="ps-2 py-2.5" style="width: 22%;">Medicine Brand & Generic</th>
+                                <th class="py-2.5" style="width: 18%;">Category & Strength</th>
+                                <th class="text-center py-2.5" style="width: 11%;">Allocated</th>
+                                <th class="text-center py-2.5" style="width: 11%;">Dispensed</th>
+                                <th class="text-center py-2.5" style="width: 11%;">Remaining</th>
+                                <th class="py-2.5" style="width: 15%;">Stock Utilization</th>
+                                <th class="text-end pe-2 py-2.5" style="width: 12%;">Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var med in Model.MedicineReport.MedicineStockList)
                             {
                                 <tr class="medicine-row-item">
-                                    <td class="ps-3 py-2.5">
+                                    <td class="ps-2 py-2">
                                         <span class="fw-bold text-dark d-block">@med.BrandName</span>
                                         <span class="text-muted small">@med.GenericName</span>
                                     </td>
@@ -408,7 +506,7 @@
                                     <td class="text-center fw-semibold text-dark">@med.TotalAllocated</td>
                                     <td class="text-center fw-bold text-success">@med.TotalDispensed</td>
                                     <td class="text-center fw-bold @(med.RemainingStock <= 0 ? "text-danger" : "text-dark")">@med.RemainingStock</td>
-                                    <td style="min-width: 140px;">
+                                    <td>
                                         <div class="d-flex align-items-center gap-2">
                                             <div class="progress flex-grow-1" style="height: 6px;">
                                                 <div class="progress-bar @(med.UtilizationRate >= 80 ? "bg-danger" : "bg-success")" style="width: @med.UtilizationRate%"></div>
@@ -416,7 +514,7 @@
                                             <span class="small fw-semibold text-secondary">@med.UtilizationRate.ToString("F0")%</span>
                                         </div>
                                     </td>
-                                    <td class="text-end pe-3">
+                                    <td class="text-end pe-2">
                                         @if (med.IsOutOfStock)
                                         {
                                             <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">Out of Stock</span>
@@ -438,13 +536,13 @@
             </div>
 
             <!-- Category Usage Breakdown -->
-            <div class="glass-card p-4 pdf-avoid-break">
+            <div class="glass-card p-4 mb-3">
                 <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-tablets me-2 text-teal"></i> Therapeutic Category Consumption</h5>
                 <div class="row g-3">
                     @foreach (var cat in Model.MedicineReport.CategoryUsageList)
                     {
                         <div class="col-md-4">
-                            <div class="p-3 bg-white rounded-3 border shadow-xs pdf-avoid-break">
+                            <div class="p-3 bg-white rounded-3 border shadow-xs">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <span class="fw-bold text-dark">@cat.Category</span>
                                     <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1">@cat.UtilizationRate.ToString("F0")% Utilized</span>
@@ -466,7 +564,7 @@
         @if (Model.ActiveTab == "area")
         {
             <!-- Geographical Filter Bar (No Print) -->
-            <div class="glass-card p-4 mb-4 no-print">
+            <div class="glass-card p-4 mb-3 no-print">
                 <form method="get" asp-controller="Admin" asp-action="Reports" class="row g-3 align-items-center">
                     <input type="hidden" name="tab" value="area" />
                     <div class="col-md-4">
@@ -498,7 +596,7 @@
             </div>
 
             <!-- Multi-tier Area Aggregation Table -->
-            <div class="glass-card p-4 pdf-avoid-break">
+            <div class="glass-card p-4 mb-3">
                 <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                     <div>
                         <h5 class="fw-bold text-dark mb-1"><i class="fa-solid fa-sitemap me-2 text-teal"></i> Multi-tier Regional Coverage & Clinical Reach</h5>
@@ -519,34 +617,34 @@
                     <table class="table table-hover align-middle mb-0" id="areaTable">
                         <thead class="table-light">
                             <tr class="small text-uppercase text-secondary">
-                                <th class="ps-3 py-3">Division & District</th>
-                                <th class="py-3">Upazila / Sub-district</th>
-                                <th class="py-3">Union / Village Target</th>
-                                <th class="text-center py-3">Camps Conducted</th>
-                                <th class="text-center py-3">Patients Served</th>
-                                <th class="py-3">Dominant Local Health Burden</th>
-                                <th class="text-end pe-3 py-3">Doctors / Meds</th>
+                                <th class="ps-2 py-2.5" style="width: 17%;">Division & District</th>
+                                <th class="py-2.5" style="width: 15%;">Upazila / Sub-district</th>
+                                <th class="py-2.5" style="width: 16%;">Union / Village Target</th>
+                                <th class="text-center py-2.5" style="width: 11%;">Camps</th>
+                                <th class="text-center py-2.5" style="width: 10%;">Patients</th>
+                                <th class="py-2.5" style="width: 18%;">Dominant Health Burden</th>
+                                <th class="text-end pe-2 py-2.5" style="width: 13%;">Staff / Meds</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var item in Model.AreaReport.AreaHierarchyData)
                             {
                                 <tr class="area-row-item">
-                                    <td class="ps-3 py-2.5">
+                                    <td class="ps-2 py-2">
                                         <span class="fw-bold text-dark d-block">@item.District</span>
                                         <span class="text-muted small">@item.Division Division</span>
                                     </td>
                                     <td>
                                         <span class="fw-semibold text-primary">
-                                            <i class="fa-solid fa-location-pin me-1 small"></i> @item.Upazila
+                                            <i class="fa-solid fa-location-pin me-1 small"></i>@item.Upazila
                                         </span>
                                     </td>
                                     <td class="small">
-                                        <span class="d-block text-dark">@item.Union</span>
+                                        <span class="d-block text-dark fw-medium">@item.Union</span>
                                         <span class="text-muted">@item.Village</span>
                                     </td>
                                     <td class="text-center">
-                                        <span class="badge @(item.CampsCount > 0 ? "bg-success" : "bg-light text-secondary border") px-2.5 py-1">
+                                        <span class="badge @(item.CampsCount > 0 ? "bg-success" : "bg-light text-secondary border") px-2 py-1">
                                             @item.CampsCount Camp(s)
                                         </span>
                                     </td>
@@ -554,11 +652,11 @@
                                         @item.PatientsServed.ToString("N0")
                                     </td>
                                     <td>
-                                        <span class="badge bg-light text-danger border small">
-                                            <i class="fa-solid fa-triangle-exclamation me-1"></i> @item.TopDisease
+                                        <span class="badge bg-light text-danger border small text-wrap text-start">
+                                            <i class="fa-solid fa-triangle-exclamation me-1"></i>@item.TopDisease
                                         </span>
                                     </td>
-                                    <td class="text-end pe-3 small">
+                                    <td class="text-end pe-2 small">
                                         <span class="d-block fw-semibold text-dark"><i class="fa-solid fa-user-doctor me-1 text-teal"></i>@item.DoctorsDeployed Docs</span>
                                         <span class="text-muted"><i class="fa-solid fa-pills me-1 text-danger"></i>@item.MedicinesDispensed units</span>
                                     </td>
@@ -594,8 +692,45 @@
             // Temporarily apply clean A4 PDF container styles
             element.classList.add('exporting-pdf');
 
+            // Explicitly force table-layout and overflow visibility to prevent clipping
+            const tableResponsives = element.querySelectorAll('.table-responsive');
+            tableResponsives.forEach(el => {
+                el.style.setProperty('overflow', 'visible', 'important');
+                el.style.setProperty('overflow-x', 'visible', 'important');
+            });
+            const tables = element.querySelectorAll('table');
+            tables.forEach(t => {
+                t.style.setProperty('table-layout', 'fixed', 'important');
+                t.style.setProperty('width', '100%', 'important');
+            });
+            const badges = element.querySelectorAll('.badge');
+            badges.forEach(b => {
+                b.style.setProperty('white-space', 'normal', 'important');
+                b.style.setProperty('word-break', 'break-word', 'important');
+            });
+
+            const cleanup = () => {
+                element.classList.remove('exporting-pdf');
+                tableResponsives.forEach(el => {
+                    el.style.removeProperty('overflow');
+                    el.style.removeProperty('overflow-x');
+                });
+                tables.forEach(t => {
+                    t.style.removeProperty('table-layout');
+                    t.style.removeProperty('width');
+                });
+                badges.forEach(b => {
+                    b.style.removeProperty('white-space');
+                    b.style.removeProperty('word-break');
+                });
+                if (btn) {
+                    btn.innerHTML = origHtml;
+                    btn.disabled = false;
+                }
+            };
+
             const opt = {
-                margin: [10, 10, 10, 10],
+                margin: [8, 8, 8, 8],
                 filename: 'MediCamp_Global_Analytics_Report.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: {
@@ -603,7 +738,8 @@
                     useCORS: true,
                     letterRendering: true,
                     logging: false,
-                    scrollY: 0
+                    scrollY: 0,
+                    scrollX: 0
                 },
                 jsPDF: {
                     unit: 'mm',
@@ -611,34 +747,20 @@
                     orientation: 'portrait'
                 },
                 pagebreak: {
-                    mode: ['avoid-all', 'css', 'legacy'],
-                    avoid: ['.pdf-avoid-break', '.glass-card', '.card', '.row', 'tr']
+                    mode: ['css', 'legacy'],
+                    avoid: ['tr', '.report-print-header']
                 }
             };
 
             if (typeof html2pdf !== 'undefined') {
-                html2pdf().set(opt).from(element).save().then(() => {
-                    element.classList.remove('exporting-pdf');
-                    if (btn) {
-                        btn.innerHTML = origHtml;
-                        btn.disabled = false;
-                    }
-                }).catch(err => {
+                html2pdf().set(opt).from(element).save().then(cleanup).catch(err => {
                     console.error('PDF export error:', err);
-                    element.classList.remove('exporting-pdf');
-                    if (btn) {
-                        btn.innerHTML = origHtml;
-                        btn.disabled = false;
-                    }
+                    cleanup();
                     window.print();
                 });
             } else {
-                element.classList.remove('exporting-pdf');
+                cleanup();
                 window.print();
-                if (btn) {
-                    btn.innerHTML = origHtml;
-                    btn.disabled = false;
-                }
             }
         }
 
