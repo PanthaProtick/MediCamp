@@ -1,0 +1,88 @@
+@using MediCamp.Models
+@inject MediCamp.Services.IMockDataService MockDataService
+@inject MediCamp.Data.ApplicationDbContext DbContext
+
+@{
+    var currentAction = ViewData["ActiveAdminNav"]?.ToString() ?? ViewContext.RouteData.Values["Action"]?.ToString() ?? "Dashboard";
+
+    // Accurate Badge Counts from DbContext
+    var totalUsersCount = DbContext.Users.Count();
+    var pendingHostsCount = DbContext.Users.Count(u => u.Role == SystemRoles.Host && u.HostApprovalStatus == "Pending");
+    var pendingDoctorsCount = DbContext.Users.Count(u => u.Role == SystemRoles.Doctor && u.DoctorApprovalStatus == "Pending");
+    var pendingCampsCount = DbContext.Camps.Count(c => c.Status == "Pending Admin Approval");
+}
+
+<div class="admin-sidebar-col" id="adminSidebarCol">
+    <aside class="host-sidebar h-100" id="adminSidebar">
+        <div>
+            <!-- Sidebar Brand Header + Minimize/Expand Button -->
+            <div class="host-sidebar-brand d-flex align-items-center justify-content-between position-relative">
+                <a asp-controller="Admin" asp-action="Dashboard" class="d-flex align-items-center gap-2 text-decoration-none min-w-0" data-bs-toggle="tooltip" data-bs-placement="right" title="MediCamp Admin Portal">
+                    <div class="host-sidebar-brand-icon" style="background: linear-gradient(135deg, #10b981 0%, #047857 100%);">
+                        <i class="fa-solid fa-shield-halved text-white"></i>
+                    </div>
+                    <div class="d-flex flex-column text-truncate admin-brand-text">
+                        <span class="fw-bold text-white fs-5 lh-1 text-truncate">MediCamp Admin</span>
+                        <span class="text-champagne opacity-75 small text-uppercase mt-1" style="font-size: 0.68rem; letter-spacing: 0.06em;">Central Executive</span>
+                    </div>
+                </a>
+
+                <!-- Collapse / Minimize Sidebar Button -->
+                <button type="button" class="admin-sidebar-toggle-btn" id="adminSidebarToggle" title="Minimize / Expand Sidebar" aria-label="Toggle Sidebar" data-bs-toggle="tooltip" data-bs-placement="bottom">
+                    <i class="fa-solid fa-angles-left toggle-icon"></i>
+                </button>
+            </div>
+
+            <!-- Sidebar Navigation Menu -->
+            <nav class="d-flex flex-column" id="adminNavMenu">
+                <a asp-controller="Admin" asp-action="Dashboard" class="host-nav-item @(currentAction == "Dashboard" ? "active" : "")" data-bs-toggle="tooltip" data-bs-placement="right" title="Dashboard">
+                    <i class="fa-solid fa-house fs-6"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a asp-controller="Admin" asp-action="UserManagement" class="host-nav-item @(currentAction == "UserManagement" ? "active" : "")" data-bs-toggle="tooltip" data-bs-placement="right" title="User Management (@totalUsersCount Accounts)">
+                    <i class="fa-solid fa-users-gear fs-6"></i>
+                    <span>User Management</span>
+                    <span class="badge bg-white text-dark rounded-pill ms-auto small" style="font-size: 0.7rem;">@totalUsersCount</span>
+                </a>
+                <a asp-controller="Admin" asp-action="Reports" class="host-nav-item @(currentAction == "Reports" ? "active" : "")" data-bs-toggle="tooltip" data-bs-placement="right" title="Global Analytics & Reports">
+                    <i class="fa-solid fa-chart-pie fs-6"></i>
+                    <span>Global Analytics</span>
+                </a>
+                <a asp-controller="Admin" asp-action="HostApprovals" class="host-nav-item @(currentAction == "HostApprovals" ? "active" : "")" data-bs-toggle="tooltip" data-bs-placement="right" title="Host Approvals @(pendingHostsCount > 0 ? $"({pendingHostsCount} Pending)" : "")">
+                    <i class="fa-solid fa-building-circle-check fs-6"></i>
+                    <span>Host Approvals</span>
+                    @if (pendingHostsCount > 0)
+                    {
+                        <span class="badge bg-warning text-dark rounded-pill ms-auto small fw-bold" style="font-size: 0.7rem;">@pendingHostsCount</span>
+                    }
+                </a>
+                <a asp-controller="Admin" asp-action="DoctorApprovals" class="host-nav-item @(currentAction == "DoctorApprovals" ? "active" : "")" data-bs-toggle="tooltip" data-bs-placement="right" title="Doctor Approvals @(pendingDoctorsCount > 0 ? $"({pendingDoctorsCount} Pending)" : "")">
+                    <i class="fa-solid fa-user-doctor fs-6"></i>
+                    <span>Doctor Approvals</span>
+                    @if (pendingDoctorsCount > 0)
+                    {
+                        <span class="badge bg-warning text-dark rounded-pill ms-auto small fw-bold" style="font-size: 0.7rem;">@pendingDoctorsCount</span>
+                    }
+                </a>
+                <a asp-controller="Admin" asp-action="CampApprovals" class="host-nav-item @(currentAction == "CampApprovals" ? "active" : "")" data-bs-toggle="tooltip" data-bs-placement="right" title="Camp Approvals @(pendingCampsCount > 0 ? $"({pendingCampsCount} Pending)" : "")">
+                    <i class="fa-solid fa-tent-arrow-turn-left fs-6"></i>
+                    <span>Camp Approvals</span>
+                    @if (pendingCampsCount > 0)
+                    {
+                        <span class="badge bg-danger rounded-pill ms-auto small fw-bold" style="font-size: 0.7rem;">@pendingCampsCount</span>
+                    }
+                </a>
+            </nav>
+        </div>
+
+        <!-- Sidebar Bottom: Logout Button -->
+        <div class="pt-4 mt-auto admin-sidebar-footer">
+            <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+                <button type="submit" class="host-logout-btn" data-bs-toggle="tooltip" data-bs-placement="right" title="Logout from Admin Portal">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    <span>Logout</span>
+                </button>
+            </form>
+        </div>
+    </aside>
+</div>
