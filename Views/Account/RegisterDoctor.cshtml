@@ -67,7 +67,8 @@
 
                             <div class="col-md-6">
                                 <label asp-for="NID" class="form-label-custom">National ID (NID)</label>
-                                <input asp-for="NID" class="form-control form-control-custom" placeholder="e.g. 19882690044556677" />
+                                <input asp-for="NID" class="form-control form-control-custom" placeholder="10, 13, or 17 digits" />
+                                <span asp-validation-for="NID" class="text-danger small"></span>
                             </div>
 
                             <div class="col-md-6">

@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using MediCamp.Models.Domain;
+using MediCamp.Models.Validation;
 
 namespace MediCamp.Models.ViewModels
 {
@@ -37,10 +38,11 @@ namespace MediCamp.Models.ViewModels
         public string Email { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Phone Number is required.")]
-        [Phone(ErrorMessage = "Please enter a valid phone number (e.g., 017xxxxxxxx).")]
+        [BangladeshiPhoneNumber]
         [Display(Name = "Phone Number")]
         public string PhoneNumber { get; set; } = string.Empty;
 
+        [BangladeshiNid]
         [Display(Name = "National ID (NID)")]
         public string? NID { get; set; }
 
@@ -108,11 +110,12 @@ namespace MediCamp.Models.ViewModels
         [Display(Name = "Full Name")]
         public string FullName { get; set; } = string.Empty;
 
-        [Required]
-        [Phone]
+        [Required(ErrorMessage = "Phone Number is required.")]
+        [BangladeshiPhoneNumber]
         [Display(Name = "Phone Number")]
         public string PhoneNumber { get; set; } = string.Empty;
 
+        [BangladeshiNid]
         [Display(Name = "National ID (NID)")]
         public string? NID { get; set; }
 
@@ -161,6 +164,11 @@ namespace MediCamp.Models.ViewModels
         {
             Role = SystemRoles.Patient;
         }
+
+        [Required(ErrorMessage = "National ID (NID) is required for patient profile registration.")]
+        [BangladeshiNid]
+        [Display(Name = "National ID (NID)")]
+        public new string? NID { get; set; }
     }
 
     public class RegisterHostViewModel : RegisterViewModel
@@ -246,10 +254,11 @@ namespace MediCamp.Models.ViewModels
         public string Email { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Phone Number is required.")]
-        [Phone]
+        [BangladeshiPhoneNumber]
         [Display(Name = "Phone Number")]
         public string PhoneNumber { get; set; } = string.Empty;
 
+        [BangladeshiNid]
         [Display(Name = "National ID (NID)")]
         public string? NID { get; set; }
 
@@ -951,8 +960,9 @@ namespace MediCamp.Models.ViewModels
         [System.ComponentModel.DataAnnotations.MaxLength(50)]
         public string? Upazila { get; set; }
 
-        [System.ComponentModel.DataAnnotations.Required]
-        [System.ComponentModel.DataAnnotations.MaxLength(20)]
+        [Required(ErrorMessage = "Emergency contact phone number is required.")]
+        [BangladeshiPhoneNumber]
+        [MaxLength(20)]
         public string ContactNumber { get; set; } = string.Empty;
 
         [System.ComponentModel.DataAnnotations.MaxLength(500)]

@@ -205,13 +205,14 @@
 
                                 <div class="col-12 col-sm-6">
                                     <label asp-for="PhoneNumber" class="form-label-custom" style="font-size: 0.74rem;">Mobile Number *</label>
-                                    <input asp-for="PhoneNumber" class="form-control form-control-sm form-control-custom rounded-pill" placeholder="e.g. 017xxxxxxxx" required />
+                                    <input asp-for="PhoneNumber" class="form-control form-control-sm form-control-custom rounded-pill" placeholder="e.g. 01712345678" required />
                                     <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
                                 </div>
 
                                 <div class="col-12 col-sm-6">
                                     <label asp-for="NID" class="form-label-custom" style="font-size: 0.74rem;">National ID (NID) (Optional)</label>
-                                    <input asp-for="NID" class="form-control form-control-sm form-control-custom rounded-pill" placeholder="e.g. 1985269123456789" />
+                                    <input asp-for="NID" class="form-control form-control-sm form-control-custom rounded-pill" placeholder="10, 13, or 17 digits" />
+                                    <span asp-validation-for="NID" class="text-danger small"></span>
                                 </div>
 
                                 <div class="col-4">

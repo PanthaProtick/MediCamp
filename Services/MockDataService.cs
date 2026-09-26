@@ -114,6 +114,12 @@ namespace MediCamp.Services
 
         public (bool Success, string Message, ApplicationUser? User) RegisterPatient(RegisterPatientViewModel model)
         {
+            if (!BdIdentityValidator.IsValidPhoneNumber(model.PhoneNumber))
+                return (false, "Please enter a valid Bangladeshi mobile number (013-019XXXXXXXX).", null);
+
+            if (!string.IsNullOrWhiteSpace(model.NID) && !BdIdentityValidator.IsValidNid(model.NID))
+                return (false, "Please enter a valid Bangladeshi National ID (10, 13, or 17 digits).", null);
+
             if (_dbContext.Users.Any(u => u.Email.ToLower() == model.Email.ToLower()))
                 return (false, "Email already registered.", null);
 
@@ -125,8 +131,8 @@ namespace MediCamp.Services
                 Id = $"usr-pat-{Guid.NewGuid().ToString()[..8]}",
                 FullName = model.FullName.Trim(),
                 Email = model.Email.Trim().ToLowerInvariant(),
-                PhoneNumber = model.PhoneNumber.Trim(),
-                NID = model.NID?.Trim(),
+                PhoneNumber = BdIdentityValidator.NormalizePhoneNumber(model.PhoneNumber),
+                NID = BdIdentityValidator.NormalizeNid(model.NID),
                 DateOfBirth = model.DateOfBirth.HasValue ? DateTime.SpecifyKind(model.DateOfBirth.Value, DateTimeKind.Utc) : null,
                 Gender = model.Gender,
                 BloodGroup = model.BloodGroup,
@@ -162,6 +168,9 @@ namespace MediCamp.Services
 
         public (bool Success, string Message, ApplicationUser? User) RegisterHost(RegisterHostViewModel model)
         {
+            if (!BdIdentityValidator.IsValidPhoneNumber(model.PhoneNumber))
+                return (false, "Please enter a valid Bangladeshi mobile number (013-019XXXXXXXX).", null);
+
             if (_dbContext.Users.Any(u => u.Email.ToLower() == model.Email.ToLower()))
                 return (false, "Email already registered.", null);
 
@@ -172,7 +181,7 @@ namespace MediCamp.Services
                 Id = $"usr-host-{Guid.NewGuid().ToString()[..8]}",
                 FullName = model.ContactPersonName.Trim(),
                 Email = model.Email.Trim().ToLowerInvariant(),
-                PhoneNumber = model.PhoneNumber.Trim(),
+                PhoneNumber = BdIdentityValidator.NormalizePhoneNumber(model.PhoneNumber),
                 OrganizationName = orgName,
                 OrganizationType = string.IsNullOrWhiteSpace(model.OrganizationType) ? "NGO" : model.OrganizationType,
                 OrganizationRegNo = model.OrganizationRegNo?.Trim(),
@@ -194,6 +203,12 @@ namespace MediCamp.Services
 
         public (bool Success, string Message, ApplicationUser? User) RegisterUser(RegisterViewModel model)
         {
+            if (!BdIdentityValidator.IsValidPhoneNumber(model.PhoneNumber))
+                return (false, "Please enter a valid Bangladeshi mobile number (013-019XXXXXXXX).", null);
+
+            if (!string.IsNullOrWhiteSpace(model.NID) && !BdIdentityValidator.IsValidNid(model.NID))
+                return (false, "Please enter a valid Bangladeshi National ID (10, 13, or 17 digits).", null);
+
             if (_dbContext.Users.Any(u => u.Email.ToLower() == model.Email.ToLower()))
                 return (false, "Email address is already registered.", null);
 
@@ -203,8 +218,8 @@ namespace MediCamp.Services
                 Id = $"usr-{role.ToLower()}-{Guid.NewGuid().ToString()[..8]}",
                 FullName = model.FullName.Trim(),
                 Email = model.Email.Trim().ToLowerInvariant(),
-                PhoneNumber = model.PhoneNumber.Trim(),
-                NID = model.NID?.Trim(),
+                PhoneNumber = BdIdentityValidator.NormalizePhoneNumber(model.PhoneNumber),
+                NID = BdIdentityValidator.NormalizeNid(model.NID),
                 DateOfBirth = model.DateOfBirth.HasValue ? DateTime.SpecifyKind(model.DateOfBirth.Value, DateTimeKind.Utc) : null,
                 Gender = model.Gender ?? "Male",
                 BloodGroup = model.BloodGroup ?? "O+",
@@ -254,9 +269,15 @@ namespace MediCamp.Services
                 return (false, "User not found.");
             }
 
+            if (!BdIdentityValidator.IsValidPhoneNumber(model.PhoneNumber))
+                return (false, "Please enter a valid Bangladeshi mobile number (013-019XXXXXXXX).");
+
+            if (!string.IsNullOrWhiteSpace(model.NID) && !BdIdentityValidator.IsValidNid(model.NID))
+                return (false, "Please enter a valid Bangladeshi National ID (10, 13, or 17 digits).");
+
             user.FullName = model.FullName;
-            user.PhoneNumber = model.PhoneNumber;
-            user.NID = model.NID;
+            user.PhoneNumber = BdIdentityValidator.NormalizePhoneNumber(model.PhoneNumber);
+            user.NID = BdIdentityValidator.NormalizeNid(model.NID);
             user.DateOfBirth = model.DateOfBirth.HasValue ? DateTime.SpecifyKind(model.DateOfBirth.Value, DateTimeKind.Utc) : null;
             user.Gender = model.Gender;
             user.BloodGroup = model.BloodGroup;
@@ -287,12 +308,21 @@ namespace MediCamp.Services
             if (_dbContext.Users.Any(u => u.Email.ToLower() == model.Email.ToLower()))
                 return (false, "Email already registered.");
 
+            if (!BdIdentityValidator.IsValidPhoneNumber(model.PhoneNumber))
+                return (false, "Please enter a valid Bangladeshi mobile number (013-019XXXXXXXX).");
+
+            if (!string.IsNullOrWhiteSpace(model.NID) && !BdIdentityValidator.IsValidNid(model.NID))
+                return (false, "Please enter a valid Bangladeshi National ID (10, 13, or 17 digits).");
+
             var newUser = new ApplicationUser
             {
                 Id = $"usr-{Guid.NewGuid().ToString()[..8]}",
                 FullName = model.FullName.Trim(),
                 Email = model.Email.Trim().ToLowerInvariant(),
+                PhoneNumber = BdIdentityValidator.NormalizePhoneNumber(model.PhoneNumber),
+                NID = BdIdentityValidator.NormalizeNid(model.NID),
                 Role = model.Role,
+                District = model.District ?? "Dhaka",
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
                 PasswordHash = model.TemporaryPassword
