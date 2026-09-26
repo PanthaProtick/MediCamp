@@ -24,6 +24,9 @@ namespace MediCamp.Services
         (bool Success, string Message) ApproveHost(string userId);
         (bool Success, string Message) RejectHost(string userId, string rejectionReason);
         List<ApplicationUser> GetHostsByStatus(string? status);
+        (bool Success, string Message) ApproveDoctor(string userId);
+        (bool Success, string Message) RejectDoctor(string userId, string rejectionReason);
+        List<ApplicationUser> GetDoctorsByStatus(string? status);
 
         // System Metrics & Camps
         HomeLandingViewModel GetHomeLandingData();

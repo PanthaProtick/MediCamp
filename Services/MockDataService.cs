@@ -84,6 +84,14 @@ namespace MediCamp.Services
                     return (false, "Your host registration is currently pending review by System Administrators.", null);
             }
 
+            if (user.Role == SystemRoles.Doctor)
+            {
+                if (user.DoctorApprovalStatus == "Rejected")
+                    return (false, $"Doctor registration rejected. Reason: {user.DoctorRejectionReason ?? "Credentials could not be verified."}", null);
+                if (user.DoctorApprovalStatus == "Pending")
+                    return (false, "Your doctor registration is currently pending verification by System Administrators. BMDC credentials are being verified.", null);
+            }
+
             user.LastLoginAt = DateTime.UtcNow;
             _dbContext.SaveChanges();
 
@@ -212,6 +220,7 @@ namespace MediCamp.Services
                 OrganizationRegNo = role == SystemRoles.Host ? model.OrganizationRegNo?.Trim() : null,
                 FocalPersonContact = role == SystemRoles.Host ? (model.FocalPersonContact?.Trim() ?? model.PhoneNumber.Trim()) : null,
                 HostApprovalStatus = role == SystemRoles.Host ? "Pending" : "Approved",
+                DoctorApprovalStatus = role == SystemRoles.Doctor ? "Pending" : "Approved",
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
                 PasswordHash = model.Password
@@ -376,6 +385,42 @@ namespace MediCamp.Services
             if (!string.IsNullOrWhiteSpace(status) && status != "All")
             {
                 query = query.Where(u => u.HostApprovalStatus == status);
+            }
+
+            return query.OrderByDescending(u => u.CreatedAt).ToList();
+        }
+
+        public (bool Success, string Message) ApproveDoctor(string userId)
+        {
+            var user = _dbContext.Users.FirstOrDefault(u => u.Id == userId && u.Role == SystemRoles.Doctor);
+            if (user == null) return (false, "Doctor profile not found.");
+
+            user.DoctorApprovalStatus = "Approved";
+            user.DoctorRejectionReason = null;
+            _dbContext.SaveChanges();
+
+            return (true, $"Doctor '{user.FullName}' ({user.BMDCRegNo ?? "BMDC Verified"}) has been approved.");
+        }
+
+        public (bool Success, string Message) RejectDoctor(string userId, string rejectionReason)
+        {
+            var user = _dbContext.Users.FirstOrDefault(u => u.Id == userId && u.Role == SystemRoles.Doctor);
+            if (user == null) return (false, "Doctor profile not found.");
+
+            user.DoctorApprovalStatus = "Rejected";
+            user.DoctorRejectionReason = rejectionReason;
+            _dbContext.SaveChanges();
+
+            return (true, $"Doctor application for '{user.FullName}' has been rejected.");
+        }
+
+        public List<ApplicationUser> GetDoctorsByStatus(string? status)
+        {
+            var query = _dbContext.Users.Where(u => u.Role == SystemRoles.Doctor);
+
+            if (!string.IsNullOrWhiteSpace(status) && status != "All")
+            {
+                query = query.Where(u => u.DoctorApprovalStatus == status);
             }
 
             return query.OrderByDescending(u => u.CreatedAt).ToList();

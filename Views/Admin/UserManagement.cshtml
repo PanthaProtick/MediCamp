@@ -230,6 +230,18 @@
                                             <i class="fa-solid fa-hourglass-half"></i> Pending Review
                                         </span>
                                     }
+                                    else if (user.Role == "Doctor" && user.DoctorApprovalStatus == "Pending")
+                                    {
+                                        <span class="badge badge-status-pending">
+                                            <i class="fa-solid fa-hourglass-half"></i> Pending Review
+                                        </span>
+                                    }
+                                    else if (user.Role == "Doctor" && user.DoctorApprovalStatus == "Rejected")
+                                    {
+                                        <span class="badge badge-status-disabled text-danger">
+                                            <i class="fa-solid fa-circle-xmark"></i> Rejected
+                                        </span>
+                                    }
                                     else
                                     {
                                         <span class="badge badge-status-active">

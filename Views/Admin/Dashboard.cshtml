@@ -60,6 +60,14 @@
                                     <span class="badge bg-warning text-dark rounded-pill ms-auto small fw-bold" style="font-size: 0.7rem;">@Model.PendingHostApprovalsCount</span>
                                 }
                             </a>
+                            <a asp-controller="Admin" asp-action="DoctorApprovals" class="host-nav-item">
+                                <i class="fa-solid fa-user-doctor fs-6"></i>
+                                <span>Doctor Approvals</span>
+                                @if (Model.PendingDoctorApprovalsCount > 0)
+                                {
+                                    <span class="badge bg-warning text-dark rounded-pill ms-auto small fw-bold" style="font-size: 0.7rem;">@Model.PendingDoctorApprovalsCount</span>
+                                }
+                            </a>
                             <a asp-controller="Admin" asp-action="CampApprovals" class="host-nav-item">
                                 <i class="fa-solid fa-tent-arrow-turn-left fs-6"></i>
                                 <span>Camp Approvals</span>
@@ -373,11 +381,24 @@
                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                         <h6 class="fw-bold text-dark mb-0">Pending Admin Action Items</h6>
                                         <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2.5 py-1 small fw-bold">
-                                            @(Model.PendingHostApprovalsCount + Model.PendingCampApprovalsCount) Action(s)
+                                            @(Model.PendingHostApprovalsCount + Model.PendingDoctorApprovalsCount + Model.PendingCampApprovalsCount) Action(s)
                                         </span>
                                     </div>
 
                                     <div class="d-flex flex-column gap-2">
+                                        @if (Model.PendingDoctorApprovalsCount > 0)
+                                        {
+                                            <div class="p-2.5 rounded-3 bg-teal-subtle border border-teal-subtle d-flex align-items-center justify-content-between" style="background: rgba(13, 148, 136, 0.08); border-color: rgba(13, 148, 136, 0.25) !important;">
+                                                <div>
+                                                    <strong class="text-dark small d-block"><i class="fa-solid fa-user-doctor text-teal me-1" style="color: #0d9488;"></i> @Model.PendingDoctorApprovalsCount Doctor Verification(s)</strong>
+                                                    <span class="text-secondary" style="font-size: 0.72rem;">Awaiting BMDC medical license screening.</span>
+                                                </div>
+                                                <a asp-controller="Admin" asp-action="DoctorApprovals" class="btn btn-sm rounded-pill px-3 fw-bold shadow-xs text-white" style="background: #0d9488;">
+                                                    Screen
+                                                </a>
+                                            </div>
+                                        }
+
                                         @if (Model.PendingHostApprovalsCount > 0)
                                         {
                                             <div class="p-2.5 rounded-3 bg-warning-subtle border border-warning-subtle d-flex align-items-center justify-content-between">
@@ -404,7 +425,7 @@
                                             </div>
                                         }
 
-                                        @if (Model.PendingHostApprovalsCount == 0 && Model.PendingCampApprovalsCount == 0)
+                                        @if (Model.PendingHostApprovalsCount == 0 && Model.PendingDoctorApprovalsCount == 0 && Model.PendingCampApprovalsCount == 0)
                                         {
                                             <div class="text-center py-3 text-muted">
                                                 <i class="fa-solid fa-circle-check text-success fs-3 d-block mb-1 opacity-75"></i>
